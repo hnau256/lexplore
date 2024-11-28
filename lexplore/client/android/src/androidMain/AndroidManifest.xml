@@ -5,12 +5,12 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/lexplorer"
+        android:label="@string/lexplore"
         android:theme="@style/Theme.KtIoT"
         android:enableOnBackInvokedCallback="true">
 
         <activity
-            android:name="hnau.lexplorer.client.android.AppActivity"
+            android:name="hnau.lexplore.client.android.AppActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">

@@ -1,4 +1,4 @@
-package hnau.lexplorer.client.android
+package hnau.lexplore.client.android
 
 import androidx.activity.ComponentActivity
 

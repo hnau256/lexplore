@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "hnau.lexplorer"
+    namespace = "hnau.lexplore"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     buildTypes {
