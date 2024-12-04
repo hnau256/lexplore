@@ -10,11 +10,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import hnau.common.compose.uikit.chip.Chip
@@ -22,17 +20,18 @@ import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
+import hnau.lexplore.light.engine.Engine
 import hnau.lexplore.light.ui.LexplorerTheme
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun AppContent(
-    words: List<Word>,
+    engine: Engine,
     translator: Translator,
     tts: TTS,
 ) {
     LexplorerTheme {
-        var currentWord: Int by remember { mutableIntStateOf(0) }
+        val currentWord by engine.currentWord.collectAsState()
         AnimatedContent(
             modifier = Modifier.fillMaxSize(),
             targetState = currentWord,
@@ -44,10 +43,11 @@ fun AppContent(
             }
         ) { localCurrentWord ->
             WordContent(
-                word = words[localCurrentWord].word,
-                onReady = { currentWord++ },
+                word = localCurrentWord,
                 translator = translator,
                 tts = tts,
+                onAnswer = engine::onAnswer,
+                markAsKnown = engine::markAsKnown,
             )
         }
     }
@@ -58,7 +58,8 @@ fun WordContent(
     word: String,
     translator: Translator,
     tts: TTS,
-    onReady: () -> Unit,
+    onAnswer: (isCorrect: Boolean) -> Unit,
+    markAsKnown: () -> Unit,
 ) {
     LaunchedEffect(tts, word) {
         tts.speek(word)
@@ -80,7 +81,7 @@ fun WordContent(
         ) {
             value = translator.translateGreekToRussian(word)
         }
-        translationOrNull?.let {translation ->
+        translationOrNull?.let { translation ->
             Text(
                 text = translation,
                 style = MaterialTheme.typography.h4,
@@ -90,13 +91,34 @@ fun WordContent(
             modifier = Modifier.weight(1f),
         )
         Chip(
-            onClick = onReady,
+            onClick = markAsKnown,
             size = ChipSize.large,
             content = {
                 Text(
-                    text = "Next",
+                    text = "Mark as known",
                 )
             },
+            style = ChipStyle.chip,
+        )
+        Chip(
+            onClick = { onAnswer(true) },
+            size = ChipSize.large,
+            content = {
+                Text(
+                    text = "Known",
+                )
+            },
+            style = ChipStyle.button,
+        )
+        Chip(
+            onClick = { onAnswer(false) },
+            size = ChipSize.large,
+            content = {
+                Text(
+                    text = "Unknown",
+                )
+            },
+            activeColor = MaterialTheme.colors.error,
             style = ChipStyle.button,
         )
     }

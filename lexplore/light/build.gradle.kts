@@ -20,6 +20,7 @@ android {
 }
 
 dependencies {
+    add("kspAndroid", libs.room.compiler)
     add("kspJvm", libs.room.compiler)
 }
 
