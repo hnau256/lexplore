@@ -16,6 +16,7 @@ shuffler = "1.0.8"
 ksp = "1.9.23-1.0.20"
 compose-activity = "1.8.2"
 kotlin-date-time = "0.6.0-RC.2"
+room = "2.6.1"
 
 [plugins]
 android-app = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -35,6 +36,7 @@ gradle-plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinSerialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+kotlin-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinCoroutines" }
 kotest-framework-multiplatform-plugin = { module = "io.kotest:kotest-framework-multiplatform-plugin-gradle", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-junit-runner = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
@@ -56,4 +58,10 @@ paho = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version = "
 #shuffler
 shuffler-annotations = { module = "hnau.shuffler:annotations", version.ref = "shuffler" }
 shuffler-processor = { module = "hnau.shuffler:processor", version.ref = "shuffler" }
+#room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+#other
+mlkit-translate = { module = "com.google.mlkit:translate", version = "17.0.3" }
 
