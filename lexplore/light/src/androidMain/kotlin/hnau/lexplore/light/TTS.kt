@@ -4,6 +4,7 @@ import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -41,6 +42,7 @@ class TTS(
             return false
         }
         activeIds.first { activeIds -> id !in activeIds }
+        delay(1000)
         return true
     }
 
@@ -60,7 +62,7 @@ class TTS(
                 logger.warn { "Error while initializing TextToSpeech" }
                 return@withLock null
             }
-            logger.warn { "QWERTY" + Locale.getAvailableLocales().filter { it.toString().lowercase().contains("gr") } .joinToString() }
+            result.setSpeechRate(0.75f)
             result.language = Locale("el", "GR")
             result.setOnUtteranceProgressListener(
                 object : UtteranceProgressListener() {

@@ -3,22 +3,37 @@ package hnau.lexplore.light
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import hnau.common.compose.uikit.chip.Chip
 import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
+import hnau.common.compose.uikit.progressindicator.ProgressIndicator
+import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
+import hnau.common.compose.uikit.shape.HnauShape
+import hnau.common.compose.uikit.shape.end
+import hnau.common.compose.uikit.shape.inRow
+import hnau.common.compose.uikit.shape.start
 import hnau.common.compose.uikit.utils.Dimens
+import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.light.engine.Engine
 import hnau.lexplore.light.ui.LexplorerTheme
@@ -61,9 +76,6 @@ fun WordContent(
     onAnswer: (isCorrect: Boolean) -> Unit,
     markAsKnown: () -> Unit,
 ) {
-    LaunchedEffect(tts, word) {
-        tts.speek(word)
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,25 +83,6 @@ fun WordContent(
         verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = word,
-            style = MaterialTheme.typography.h4,
-        )
-        val translationOrNull: String? by produceState<String?>(
-            initialValue = null,
-            key1 = word,
-        ) {
-            value = translator.translateGreekToRussian(word)
-        }
-        translationOrNull?.let { translation ->
-            Text(
-                text = translation,
-                style = MaterialTheme.typography.h4,
-            )
-        }
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
         Chip(
             onClick = markAsKnown,
             size = ChipSize.large,
@@ -100,26 +93,201 @@ fun WordContent(
             },
             style = ChipStyle.chip,
         )
-        Chip(
-            onClick = { onAnswer(true) },
-            size = ChipSize.large,
-            content = {
-                Text(
-                    text = "Known",
-                )
-            },
-            style = ChipStyle.button,
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = word,
+                style = MaterialTheme.typography.h4,
+            )
+            SpeakButton(
+                word = word,
+                tts = tts,
+            )
+        }
+        Spacer(
+            modifier = Modifier.weight(1f),
         )
-        Chip(
-            onClick = { onAnswer(false) },
-            size = ChipSize.large,
-            content = {
-                Text(
-                    text = "Unknown",
+        var state by remember { mutableStateOf(State.Default) }
+        AnimatedContent(
+            targetState = state,
+            label = "state"
+        ) { localState ->
+            when (localState) {
+
+                State.Default -> DefaultState(
+                    onKnown = { state = State.Known },
+                    onUnknown = { state = State.Unknown },
                 )
-            },
-            activeColor = MaterialTheme.colors.error,
-            style = ChipStyle.button,
+
+                State.Known -> KnownState(
+                    word = word,
+                    onAnswer = onAnswer,
+                    translator = translator,
+                )
+
+                State.Unknown -> UnknownState(
+                    word = word,
+                    onReady = { onAnswer(false) },
+                    translator = translator,
+                )
+            }
+        }
+    }
+}
+
+private enum class State { Default, Known, Unknown }
+
+@Composable
+private fun KnownState(
+    word: String,
+    translator: Translator,
+    onAnswer: (isCorrect: Boolean) -> Unit,
+) = Column(
+    modifier = Modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+    horizontalAlignment = Alignment.CenterHorizontally,
+) {
+    Translation(
+        word = word,
+        translator = translator,
+    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(
+            Dimens.chipsSeparation,
+            Alignment.CenterHorizontally,
+        )
+    ) {
+        Button(
+            onClick = { onAnswer(true) },
+            text = "Correct",
+            shape = HnauShape.inRow.start,
+        )
+        Button(
+            onClick = { onAnswer(false) },
+            text = "Incorrect",
+            error = true,
+            shape = HnauShape.inRow.end,
         )
     }
+}
+
+@Composable
+private fun DefaultState(
+    onKnown: () -> Unit,
+    onUnknown: () -> Unit,
+) = Row(
+    horizontalArrangement = Arrangement.spacedBy(
+        Dimens.chipsSeparation,
+        Alignment.CenterHorizontally,
+    )
+) {
+    Button(
+        onClick = onKnown,
+        text = "Known",
+        shape = HnauShape.inRow.start,
+    )
+    Button(
+        onClick = onUnknown,
+        text = "Unknown",
+        error = true,
+        shape = HnauShape.inRow.end,
+    )
+}
+
+@Composable
+private fun UnknownState(
+    word: String,
+    translator: Translator,
+    onReady: () -> Unit,
+) = Column(
+    modifier = Modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+    horizontalAlignment = Alignment.CenterHorizontally,
+) {
+    Translation(
+        word = word,
+        translator = translator,
+    )
+    Button(
+        onClick = onReady,
+        text = "Ok",
+    )
+}
+
+@Composable
+private fun Button(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    style: ChipStyle = ChipStyle.button,
+    error: Boolean = false,
+    shape: Shape = HnauShape(),
+) = Chip(
+    modifier = modifier,
+    onClick = onClick,
+    size = ChipSize.large,
+    content = { Text(text = text) },
+    activeColor = when (error) {
+        true -> MaterialTheme.colors.error
+        false -> MaterialTheme.colors.primary
+    },
+    style = style,
+    shape = shape,
+)
+
+@Composable
+private fun Translation(
+    word: String,
+    translator: Translator,
+) {
+    val translationOrNull: String? by produceState<String?>(
+        initialValue = null,
+        key1 = word,
+    ) {
+        value = translator.translateGreekToRussian(word)
+    }
+    AnimatedContent(
+        targetState = translationOrNull,
+        contentKey = { it != null },
+        label = "TranslationOrProgressIndicator",
+        contentAlignment = Alignment.Center,
+    ) { localTranslationOrNull ->
+        when (localTranslationOrNull) {
+            null -> ProgressIndicator()
+            else -> Text(
+                text = localTranslationOrNull,
+                style = MaterialTheme.typography.h4,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpeakButton(
+    word: String,
+    tts: TTS,
+) {
+    var speakNumber by remember { mutableIntStateOf(0) }
+    var isSpeaking by remember { mutableStateOf(false) }
+    LaunchedEffect(speakNumber, tts, word) {
+        isSpeaking = true
+        tts.speek(word)
+        isSpeaking = false
+    }
+    Chip(
+        style = ChipStyle.chipSelected,
+        size = ChipSize.large,
+        leading = chipInProgressLeadingContent(
+            inProgress = isSpeaking,
+        ),
+        onClick = when (isSpeaking) {
+            true -> null
+            false -> {
+                { speakNumber++ }
+            }
+        },
+        content = { Icon { RecordVoiceOver } }
+    )
 }

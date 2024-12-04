@@ -77,28 +77,6 @@ class Engine(
     private fun resolveNextWord(
         currentWord: String?,
     ): String {
-        val (count, word) = _resolveNextWord(currentWord)
-        val wordIndex = words.indexOf(word)
-        Log.d(
-            "QWERTY",
-            (0 until count).joinToString(
-                separator = "",
-            ) { i ->
-                val level = (levels.getOrDefault(words[i], 0f) * 10).toInt()
-                val suffix = when (i) {
-                    wordIndex -> ']'
-                    wordIndex - 1 -> '['
-                    else -> ' '
-                }
-                level.toString() + suffix
-            }
-        )
-        return word
-    }
-
-    private fun _resolveNextWord(
-        currentWord: String?,
-    ): Pair<Int, String> {
         val wellKnownWordsCount = levels.count { (_, level) ->
             level >= wellKnownLevel
         }
@@ -119,10 +97,10 @@ class Engine(
         wordsToChooseWithWeights.forEach { (word, weight) ->
             currentWeight += weight
             if (currentWeight > targetWeight) {
-                return wordsToChooseCount to word
+                return word
             }
         }
-        return wordsToChooseCount to words
+        return words
             .dropLastWhile { it == currentWord }
             .last()
     }

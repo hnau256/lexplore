@@ -9,6 +9,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import hnau.common.color.material.MaterialHue
 
 @Composable
@@ -28,6 +31,7 @@ fun LexplorerTheme(
     ) {
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.onBackground,
+            LocalDensity provides Density(LocalDensity.current.density * 1.25f),
         ) {
             content()
         }

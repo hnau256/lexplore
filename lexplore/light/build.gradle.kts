@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.arrow.core)
             implementation(libs.slf4j.simple)
             implementation(libs.slf4j.kotlin)
+            implementation(compose.materialIconsExtended)
             implementation(project(":common:app"))
             implementation(project(":common:kotlin"))
             implementation(project(":common:color"))
