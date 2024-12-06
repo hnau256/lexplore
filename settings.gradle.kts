@@ -1,4 +1,4 @@
-rootProject.name = "Lexplore"
+rootProject.name = "LEXplore"
 
 pluginManagement {
     includeBuild("plugins")

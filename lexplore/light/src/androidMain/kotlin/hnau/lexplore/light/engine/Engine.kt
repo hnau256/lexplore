@@ -1,9 +1,7 @@
 package hnau.lexplore.light.engine
 
 import android.content.Context
-import android.util.Log
 import hnau.common.kotlin.sumOf
-import hnau.lexplore.light.Word
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,10 +13,16 @@ class Engine(
     context: Context,
 ) {
 
-    private val words: List<String> = Word
-        .loadList(context)
-        .sortedByDescending(Word::count)
-        .map(Word::word)
+    private val words: List<String> = context
+        .assets
+        .open("dictionary.txt")
+        .reader()
+        .readLines()
+        .mapNotNull { line ->
+            line
+                .trim()
+                .takeIf(String::isNotEmpty)
+        }
 
     private val knowledgeLevelDao: KnowledgeLevel.Dao = KnowledgeLevel.Dao.create(
         context = context,
@@ -108,9 +112,9 @@ class Engine(
 
     companion object {
 
-        private const val wordsWindow: Int = 5
+        private const val wordsWindow: Int = 10
         private const val wellKnownLevel: Float = 0.75f
-        private const val correctFactor: Float = 0.3f
+        private const val correctFactor: Float = 0.2f
         private const val incorrectFactor: Float = 0.5f
     }
 }

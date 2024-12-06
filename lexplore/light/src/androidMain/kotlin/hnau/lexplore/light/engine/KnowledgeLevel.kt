@@ -44,7 +44,7 @@ data class KnowledgeLevel(
                 .databaseBuilder(
                     context,
                     Database::class.java,
-                    "lexplorer_4"
+                    "lexplorer_5"
                 )
                 .allowMainThreadQueries()
                 .build()
