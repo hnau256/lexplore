@@ -7,7 +7,7 @@ class HnauKotlinMultiplatformLibPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         target.config(
-            androidMode = null,
+            androidMode = AndroidMode.Lib,
         )
     }
 }

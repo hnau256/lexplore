@@ -2,6 +2,8 @@ package hnau.lexplore.app
 
 import hnau.common.app.storage.Storage
 
-expect fun LexploreApp.Dependencies.Companion.commonImpl(
+fun LexploreApp.Dependencies.Companion.commonImpl(
     storageFactory: Storage.Factory,
-): LexploreApp.Dependencies
+): LexploreApp.Dependencies = LexploreApp.Dependencies.impl(
+    storageFactory = storageFactory,
+)
