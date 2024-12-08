@@ -64,5 +64,4 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 #other
 mlkit-translate = { module = "com.google.mlkit:translate", version = "17.0.3" }
-opencsv = { module = "com.opencsv:opencsv", version = "5.7.1" }
 

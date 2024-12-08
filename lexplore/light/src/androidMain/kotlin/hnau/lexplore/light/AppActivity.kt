@@ -9,12 +9,10 @@ class AppActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val translator = Translator()
         val tts = TTS(this)
         val engine = Engine(this)
         setContent {
             AppContent(
-                translator = translator,
                 tts = tts,
                 engine = engine,
             )

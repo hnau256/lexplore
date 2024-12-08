@@ -1,4 +1,4 @@
-package hnau.lexplore.api.dictionary.dto
+package hnau.lexplore.data.api.dictionary.dto
 
 import arrow.core.NonEmptyList
 

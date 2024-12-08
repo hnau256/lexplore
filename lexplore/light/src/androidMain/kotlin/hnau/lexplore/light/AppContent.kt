@@ -17,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,7 +25,6 @@ import androidx.compose.ui.graphics.Shape
 import hnau.common.compose.uikit.chip.Chip
 import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
-import hnau.common.compose.uikit.progressindicator.ProgressIndicator
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.shape.HnauShape
 import hnau.common.compose.uikit.shape.end
@@ -36,17 +34,17 @@ import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.light.engine.Engine
+import hnau.lexplore.light.engine.WordWithTranslation
 import hnau.lexplore.light.ui.LexplorerTheme
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun AppContent(
     engine: Engine,
-    translator: Translator,
     tts: TTS,
 ) {
     LexplorerTheme {
-        val currentWord by engine.currentWord.collectAsState()
+        val currentWord: WordWithTranslation by engine.currentWord.collectAsState()
         AnimatedContent(
             modifier = Modifier.fillMaxSize(),
             targetState = currentWord,
@@ -59,7 +57,6 @@ fun AppContent(
         ) { localCurrentWord ->
             WordContent(
                 word = localCurrentWord,
-                translator = translator,
                 tts = tts,
                 onAnswer = engine::onAnswer,
                 markAsKnown = engine::markAsKnown,
@@ -70,8 +67,7 @@ fun AppContent(
 
 @Composable
 fun WordContent(
-    word: String,
-    translator: Translator,
+    word: WordWithTranslation,
     tts: TTS,
     onAnswer: (isCorrect: Boolean) -> Unit,
     markAsKnown: () -> Unit,
@@ -98,11 +94,11 @@ fun WordContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = word,
+                text = word.word,
                 style = MaterialTheme.typography.h4,
             )
             SpeakButton(
-                word = word,
+                word = word.word,
                 tts = tts,
             )
         }
@@ -124,13 +120,11 @@ fun WordContent(
                 State.Known -> KnownState(
                     word = word,
                     onAnswer = onAnswer,
-                    translator = translator,
                 )
 
                 State.Unknown -> UnknownState(
                     word = word,
                     onReady = { onAnswer(false) },
-                    translator = translator,
                 )
             }
         }
@@ -141,8 +135,7 @@ private enum class State { Default, Known, Unknown }
 
 @Composable
 private fun KnownState(
-    word: String,
-    translator: Translator,
+    word: WordWithTranslation,
     onAnswer: (isCorrect: Boolean) -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxWidth(),
@@ -151,7 +144,6 @@ private fun KnownState(
 ) {
     Translation(
         word = word,
-        translator = translator,
     )
     Row(
         horizontalArrangement = Arrangement.spacedBy(
@@ -198,8 +190,7 @@ private fun DefaultState(
 
 @Composable
 private fun UnknownState(
-    word: String,
-    translator: Translator,
+    word: WordWithTranslation,
     onReady: () -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxWidth(),
@@ -208,7 +199,6 @@ private fun UnknownState(
 ) {
     Translation(
         word = word,
-        translator = translator,
     )
     Button(
         onClick = onReady,
@@ -239,29 +229,12 @@ private fun Button(
 
 @Composable
 private fun Translation(
-    word: String,
-    translator: Translator,
+    word: WordWithTranslation,
 ) {
-    val translationOrNull: String? by produceState<String?>(
-        initialValue = null,
-        key1 = word,
-    ) {
-        value = translator.translateGreekToRussian(word)
-    }
-    AnimatedContent(
-        targetState = translationOrNull,
-        contentKey = { it != null },
-        label = "TranslationOrProgressIndicator",
-        contentAlignment = Alignment.Center,
-    ) { localTranslationOrNull ->
-        when (localTranslationOrNull) {
-            null -> ProgressIndicator()
-            else -> Text(
-                text = localTranslationOrNull,
-                style = MaterialTheme.typography.h4,
-            )
-        }
-    }
+    Text(
+        text = word.translation,
+        style = MaterialTheme.typography.h4,
+    )
 }
 
 @Composable

@@ -1,6 +1,6 @@
-package hnau.lexplore.api.dictionary
+package hnau.lexplore.data.api.dictionary
 
-import hnau.lexplore.api.dictionary.dto.Dictionary
+import hnau.lexplore.data.api.dictionary.dto.Dictionary
 import kotlinx.coroutines.flow.StateFlow
 
 interface DictionaryRepository {

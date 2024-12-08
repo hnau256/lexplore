@@ -1,6 +1,7 @@
 package hnau.lexplore.light.engine
 
 import android.content.Context
+import hnau.common.kotlin.coroutines.mapStateLite
 import hnau.common.kotlin.sumOf
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,16 +14,25 @@ class Engine(
     context: Context,
 ) {
 
-    private val words: List<String> = context
+    private val wordsWithTranslations: Map<String, String> = context
         .assets
         .open("dictionary.txt")
         .reader()
         .readLines()
-        .mapNotNull { line ->
-            line
-                .trim()
-                .takeIf(String::isNotEmpty)
+        .associate { line ->
+            val wordWithTranslation = line
+                .split('\t')
+                .map { it.trim() }
+            if (wordWithTranslation.size != 2) {
+                error("Expected word with translation got '$line'")
+            }
+            val (word, translation) = wordWithTranslation
+            word to translation
         }
+
+    private val words: List<String> = wordsWithTranslations
+        .keys
+        .toList()
 
     private val knowledgeLevelDao: KnowledgeLevel.Dao = KnowledgeLevel.Dao.create(
         context = context,
@@ -39,13 +49,17 @@ class Engine(
         )
     )
 
-    val currentWord: StateFlow<String>
-        get() = _currentWord
+    val currentWord: StateFlow<WordWithTranslation> = _currentWord.mapStateLite {
+        WordWithTranslation(
+            word = it,
+            translation = wordsWithTranslations.getValue(it),
+        )
+    }
 
     private fun updateLevel(
         newLevel: Float,
     ) {
-        val word = currentWord.value
+        val word = _currentWord.value
         levels[word] = newLevel
         knowledgeLevelDao.insert(
             KnowledgeLevel(
@@ -61,7 +75,7 @@ class Engine(
     fun onAnswer(
         isCorrect: Boolean,
     ) {
-        val word = currentWord.value
+        val word = _currentWord.value
         val currentLevel = levels.getOrDefault(word, 0f)
         val newLevel = when (isCorrect) {
             true -> currentLevel + (1 - currentLevel) * correctFactor
