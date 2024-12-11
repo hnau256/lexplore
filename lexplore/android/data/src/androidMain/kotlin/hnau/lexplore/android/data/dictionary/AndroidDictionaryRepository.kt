@@ -1,4 +1,4 @@
-package hnau.lexplore.data.impl.dictionary
+package hnau.lexplore.android.data.dictionary
 
 import android.content.Context
 import hnau.common.kotlin.AsyncLazy
@@ -7,10 +7,10 @@ import hnau.lexplore.data.api.dictionary.DictionaryRepository
 import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
 import hnau.lexplore.data.api.dictionary.dto.Dictionary
 import hnau.lexplore.data.api.dictionary.dto.DictionaryInfo
-import hnau.lexplore.data.impl.dictionary.utils.DictionaryDao
-import hnau.lexplore.data.impl.dictionary.utils.DictionaryWithValues
-import hnau.lexplore.data.impl.dictionary.utils.LexploreDatabase
-import hnau.lexplore.data.impl.dictionary.utils.Values
+import hnau.lexplore.android.data.dictionary.utils.DictionaryDao
+import hnau.lexplore.android.data.dictionary.utils.DictionaryWithValues
+import hnau.lexplore.android.data.dictionary.utils.LexploreDatabase
+import hnau.lexplore.android.data.dictionary.utils.Values
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext

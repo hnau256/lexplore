@@ -1,4 +1,4 @@
-package hnau.lexplore.data.impl.dictionary.utils
+package hnau.lexplore.android.data.dictionary.utils
 
 import androidx.room.DatabaseView
 import arrow.core.NonEmptyList

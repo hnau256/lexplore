@@ -1,4 +1,4 @@
-package hnau.lexplore.data.impl.dictionary.utils
+package hnau.lexplore.android.data.dictionary.utils
 
 import hnau.common.kotlin.mapper.Mapper
 import hnau.common.kotlin.serialization.MappingKSerializer

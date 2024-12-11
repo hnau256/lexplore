@@ -8,10 +8,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import hnau.lexplore.android.data.dictionary.AndroidDictionaryRepository
 import hnau.lexplore.app.LexploreApp
 import hnau.lexplore.app.SavedState
 import hnau.lexplore.app.impl
-import hnau.lexplore.data.impl.dictionary.AndroidDictionaryRepository
 import hnau.lexplore.prefiller.impl.AndroidPrefillDataProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
