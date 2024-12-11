@@ -11,7 +11,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import hnau.common.app.storage.Storage
 import hnau.lexplore.app.LexploreApp
 import hnau.lexplore.app.SavedState
-import hnau.lexplore.app.commonImpl
+import hnau.lexplore.app.impl
+import hnau.lexplore.data.impl.dictionary.AndroidDictionaryRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -25,11 +26,14 @@ class AppViewModel(
 
     val app = LexploreApp(
         scope = scope,
-        dependencies = LexploreApp.Dependencies.commonImpl(
+        dependencies = LexploreApp.Dependencies.impl(
             storageFactory = Storage.Factory.dataStore(
                 scope = scope,
                 context = context,
             ),
+            dictionaryRepository = AndroidDictionaryRepository(
+                context = context,
+            )
         ),
         savedState = SavedState(
             state

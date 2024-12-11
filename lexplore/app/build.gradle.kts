@@ -6,15 +6,15 @@ plugins {
 
 kotlin {
     sourceSets {
-        jvmMain.dependencies {
-            implementation(project(":common:app"))
-            implementation(project(":lexplore:model:init:api"))
-        }
         commonMain.dependencies {
             implementation(project(":common:app"))
             implementation(project(":lexplore:model:common"))
             implementation(project(":lexplore:model:init:api"))
             implementation(project(":lexplore:model:init:impl"))
+            implementation(project(":lexplore:data:api"))
         }
     }
+}
+dependencies {
+    implementation(project(":lexplore:data:api"))
 }

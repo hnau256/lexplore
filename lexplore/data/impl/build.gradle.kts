@@ -4,6 +4,10 @@ plugins {
     id("hnau.kotlin.multiplatform")
 }
 
+dependencies {
+    kspAndroid(libs.room.compiler)
+}
+
 kotlin {
     sourceSets {
         commonMain.dependencies {

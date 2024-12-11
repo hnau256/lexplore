@@ -2,11 +2,10 @@ package hnau.lexplore.data.api.dictionary.dto
 
 import arrow.core.NonEmptyList
 
-data class Dictionary(
+data class DictionaryInfo(
     val name: String,
     val mainLanguage: Language,
     val columns: NonEmptyList<Column>,
-    val rows: NonEmptyList<(Column.Id) -> String>
 ) {
 
     @JvmInline

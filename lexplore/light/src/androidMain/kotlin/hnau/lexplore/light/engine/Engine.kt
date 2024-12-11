@@ -17,18 +17,25 @@ class Engine(
     private val wordsWithTranslations: Map<String, String> = context
         .assets
         .open("dictionary.txt")
-        .reader()
-        .readLines()
-        .associate { line ->
-            val wordWithTranslation = line
-                .split('\t')
-                .map { it.trim() }
-            if (wordWithTranslation.size != 2) {
-                error("Expected word with translation got '$line'")
-            }
-            val (word, translation) = wordWithTranslation
-            word to translation
+        .use { inputStream ->
+            inputStream
+                .reader()
+                .use { reader ->
+                    reader
+                        .readLines()
+                        .associate { line ->
+                            val wordWithTranslation = line
+                                .split('\t')
+                                .map { it.trim() }
+                            if (wordWithTranslation.size != 2) {
+                                error("Expected word with translation got '$line'")
+                            }
+                            val (word, translation) = wordWithTranslation
+                            word to translation
+                        }
+                }
         }
+
 
     private val words: List<String> = wordsWithTranslations
         .keys
