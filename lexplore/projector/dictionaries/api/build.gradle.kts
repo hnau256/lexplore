@@ -7,8 +7,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":lexplore:model:init:api"))
-            implementation(project(":lexplore:projector:mainstack:api"))
+            implementation(project(":lexplore:model:dictionaries:api"))
             implementation(project(":lexplore:projector:common"))
         }
     }

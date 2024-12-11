@@ -7,6 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":common:app"))
             implementation(project(":lexplore:model:mainstack:api"))
+            implementation(project(":lexplore:model:dictionaries:api"))
         }
     }
 }

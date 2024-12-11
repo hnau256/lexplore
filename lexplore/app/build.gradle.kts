@@ -13,6 +13,8 @@ kotlin {
             implementation(project(":lexplore:model:init:impl"))
             implementation(project(":lexplore:model:mainstack:api"))
             implementation(project(":lexplore:model:mainstack:impl"))
+            implementation(project(":lexplore:model:dictionaries:api"))
+            implementation(project(":lexplore:model:dictionaries:impl"))
             implementation(project(":lexplore:data:api"))
         }
     }

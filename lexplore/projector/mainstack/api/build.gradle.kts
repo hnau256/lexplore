@@ -6,12 +6,11 @@ plugins {
 
 kotlin {
     sourceSets {
-        jvmMain.dependencies {
-            implementation(project(":lexplore:projector:common"))
-        }
         commonMain.dependencies {
             implementation(project(":lexplore:model:mainstack:api"))
+            implementation(project(":lexplore:model:dictionaries:api"))
             implementation(project(":lexplore:projector:common"))
+            implementation(project(":lexplore:projector:dictionaries:api"))
         }
     }
 }

@@ -9,7 +9,6 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":common:app"))
             implementation(project(":lexplore:data:api"))
-            implementation(project(":lexplore:model:dictionaries:api"))
         }
     }
 }
