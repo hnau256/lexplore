@@ -22,9 +22,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.android.activity.compose)
             implementation(libs.android.appcompat)
-            implementation(libs.android.datastore)
             implementation(libs.slf4j.simple)
             implementation(project(":common:app"))
+            implementation(project(":common:android:app"))
             implementation(project(":lexplore:app"))
             implementation(project(":lexplore:compose"))
             implementation(project(":lexplore:model:init:api"))

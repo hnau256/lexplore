@@ -1,4 +1,4 @@
-package hnau.lexplore.android.app
+package hnau.common.android.app
 
 import android.content.Context
 import androidx.datastore.core.DataStoreFactory
