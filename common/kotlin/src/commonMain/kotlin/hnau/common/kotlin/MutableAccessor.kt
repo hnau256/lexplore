@@ -42,9 +42,16 @@ inline fun <T, reified R : T> MutableAccessor<Option<T>>.shrinkType(): MutableAc
         set = set,
     )
 
-inline fun <T> MutableAccessor<Option<T>>.getOrInit(
+inline fun <T> MutableAccessor<Option<T>>.getOrInitOption(
     init: () -> T,
 ): T = when (val valueOrNone = get()) {
     None -> init().also { set(Some(it)) }
     is Some -> valueOrNone.value
+}
+
+inline fun <T> MutableAccessor<T?>.getOrInit(
+    init: () -> T,
+): T = when (val valueOrNull = get()) {
+    null -> init().also { set(it) }
+    else -> valueOrNull
 }

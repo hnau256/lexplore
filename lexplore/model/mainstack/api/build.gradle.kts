@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":common:app"))
+            implementation(project(":lexplore:data:api"))
         }
     }
 }

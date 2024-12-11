@@ -35,6 +35,7 @@ class LexploreApp(
                 dependencies
                     .dictionaryRepository
                     .getDictionaries()
+                    .dictionaries
                     .collect {
                         println("QWERTY. Dictionaries $it")
                     }

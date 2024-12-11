@@ -5,6 +5,7 @@ import hnau.common.compose.uikit.bubble.BubblesShower
 import hnau.lexplore.model.init.api.InitModel
 import hnau.lexplore.projector.common.Localizer
 import hnau.lexplore.projector.common.backbutton.BackButtonWidthProvider
+import hnau.lexplore.projector.mainstack.api.MainStackProjector
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 
@@ -13,7 +14,7 @@ interface InitProjector {
     @Shuffle
     interface Dependencies {
 
-        val localizer: Localizer
+        fun mainStack(): MainStackProjector.Dependencies
 
         companion object
     }

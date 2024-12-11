@@ -1,17 +1,32 @@
 package hnau.lexplore.model.init.api
 
 import hnau.common.app.goback.GoBackHandlerProvider
+import hnau.lexplore.data.api.dictionary.DictionaryRepository
+import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
+import hnau.lexplore.model.mainstack.api.MainStackModel
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 interface InitModel : GoBackHandlerProvider {
 
     @Serializable
-    class Skeleton
+    data class Skeleton(
+        var mainStack: MainStackModel.Skeleton? = null,
+    )
 
     @Shuffle
-    interface Dependencies
+    interface Dependencies {
+
+        val dictionariesRepository: DictionaryRepository
+
+        fun mainStack(
+            dictionariesFlow: DictionariesFlow,
+        ): MainStackModel.Dependencies
+    }
+
+    val mainStack: StateFlow<MainStackModel?>
 
     fun interface Factory {
 

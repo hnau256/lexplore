@@ -11,6 +11,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(project(":lexplore:model:init:api"))
+            implementation(project(":lexplore:projector:mainstack:api"))
             implementation(project(":lexplore:projector:common"))
         }
     }

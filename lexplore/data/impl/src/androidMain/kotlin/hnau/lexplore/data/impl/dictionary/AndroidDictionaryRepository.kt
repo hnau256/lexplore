@@ -4,11 +4,11 @@ import android.content.Context
 import hnau.common.kotlin.AsyncLazy
 import hnau.common.kotlin.coroutines.toStateLite
 import hnau.lexplore.data.api.dictionary.DictionaryRepository
+import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
 import hnau.lexplore.data.api.dictionary.dto.DictionaryInfo
 import hnau.lexplore.data.impl.dictionary.utils.DictionaryDao
 import hnau.lexplore.data.impl.dictionary.utils.LexploreDatabase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -46,7 +46,7 @@ class AndroidDictionaryRepository(
         }
     }
 
-    override suspend fun getDictionaries(): StateFlow<Map<DictionaryInfo.Id, DictionaryInfo>> =
-        dictionaries.get()
-
+    override suspend fun getDictionaries(): DictionariesFlow = DictionariesFlow(
+        dictionaries = dictionaries.get(),
+    )
 }

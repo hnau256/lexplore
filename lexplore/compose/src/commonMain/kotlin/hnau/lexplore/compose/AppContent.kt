@@ -26,7 +26,7 @@ fun LexploreApp.Content(
             .createInitProjector(
                 scope = projectorScope,
                 dependencies = InitProjector.Dependencies.impl(
-                    localizer = localizer,
+                    //localizer = localizer,
                 ),
                 model = model
                     .remindType<InitModel>()

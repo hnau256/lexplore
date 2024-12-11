@@ -1,6 +1,7 @@
 package hnau.lexplore.model.mainstack.api
 
 import hnau.common.app.goback.GoBackHandlerProvider
+import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
@@ -11,7 +12,10 @@ interface MainStackModel : GoBackHandlerProvider {
     class Skeleton
 
     @Shuffle
-    interface Dependencies
+    interface Dependencies {
+
+        val dictionariesFlow: DictionariesFlow
+    }
 
     fun interface Factory {
 
