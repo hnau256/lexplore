@@ -1,4 +1,4 @@
-package hnau.lexplore.android
+package hnau.lexplore.android.app
 
 import android.content.Context
 import android.os.Bundle
