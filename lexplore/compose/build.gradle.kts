@@ -19,6 +19,8 @@ kotlin {
             implementation(project(":lexplore:projector:common"))
             implementation(project(":lexplore:projector:init:api"))
             implementation(project(":lexplore:projector:init:impl"))
+            implementation(project(":lexplore:projector:mainstack:api"))
+            implementation(project(":lexplore:projector:mainstack:impl"))
         }
     }
 }

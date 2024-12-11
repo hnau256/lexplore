@@ -11,6 +11,8 @@ kotlin {
             implementation(project(":lexplore:model:common"))
             implementation(project(":lexplore:model:init:api"))
             implementation(project(":lexplore:model:init:impl"))
+            implementation(project(":lexplore:model:mainstack:api"))
+            implementation(project(":lexplore:model:mainstack:impl"))
             implementation(project(":lexplore:data:api"))
         }
     }

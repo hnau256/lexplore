@@ -12,7 +12,7 @@ import hnau.lexplore.compose.utils.LocalizerImpl
 import hnau.lexplore.model.init.api.InitModel
 import hnau.lexplore.projector.common.Localizer
 import hnau.lexplore.projector.init.api.InitProjector
-import hnau.lexplore.projector.init.api.commonImpl
+import hnau.lexplore.projector.init.api.impl
 
 @Composable
 fun LexploreApp.Content(
@@ -25,7 +25,7 @@ fun LexploreApp.Content(
             .assemble()
             .createInitProjector(
                 scope = projectorScope,
-                dependencies = InitProjector.Dependencies.commonImpl(
+                dependencies = InitProjector.Dependencies.impl(
                     localizer = localizer,
                 ),
                 model = model

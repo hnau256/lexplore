@@ -12,12 +12,14 @@ import hnau.common.kotlin.remindType
 import hnau.lexplore.model.init.api.InitModel
 import hnau.lexplore.projector.common.backbutton.BackButtonDelegate
 import hnau.lexplore.projector.init.api.InitProjector
+import hnau.lexplore.projector.mainstack.api.MainStackProjector
 import kotlinx.coroutines.CoroutineScope
 
 internal class InitProjectorImpl(
     scope: CoroutineScope,
     private val dependencies: InitProjector.Dependencies,
     model: InitModel,
+    private val mainStackProjectorFactory: MainStackProjector.Factory,
 ) : InitProjector {
 
     private val backButtonDelegate = BackButtonDelegate(

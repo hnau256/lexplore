@@ -1,14 +1,17 @@
 plugins {
+    alias(libs.plugins.compose.desktop)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlin.serialization)
     id("hnau.kotlin.multiplatform")
 }
 
 kotlin {
     sourceSets {
+        jvmMain.dependencies {
+            implementation(project(":lexplore:projector:common"))
+        }
         commonMain.dependencies {
-            implementation(project(":common:app"))
             implementation(project(":lexplore:model:mainstack:api"))
+            implementation(project(":lexplore:projector:common"))
         }
     }
 }

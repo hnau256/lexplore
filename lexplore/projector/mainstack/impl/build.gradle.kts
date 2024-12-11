@@ -7,9 +7,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":common:app"))
-            implementation(project(":lexplore:model:init:api"))
+            implementation(project(":lexplore:model:mainstack:api"))
             implementation(project(":lexplore:projector:common"))
-            implementation(project(":lexplore:projector:init:api"))
             implementation(project(":lexplore:projector:mainstack:api"))
         }
     }
