@@ -9,6 +9,7 @@ kotlin {
             implementation(project(":lexplore:model:init:api"))
             implementation(project(":lexplore:model:mainstack:api"))
             implementation(project(":lexplore:data:api"))
+            implementation(project(":lexplore:prefiller:api"))
         }
     }
 }

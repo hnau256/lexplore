@@ -19,6 +19,10 @@ internal data class Values(
             base = ListSerializer(MapSerializer(String.serializer(), String.serializer())),
             mapper = Mapper(::Values, Values::values),
         )
+
+        val empty: Values = Values(
+            values = emptyList(),
+        )
     }
 
 }

@@ -31,6 +31,8 @@ kotlin {
             implementation(project(":lexplore:projector:common"))
             implementation(project(":lexplore:data:api"))
             implementation(project(":lexplore:data:impl"))
+            implementation(project(":lexplore:prefiller:api"))
+            implementation(project(":lexplore:prefiller:impl"))
         }
     }
 }

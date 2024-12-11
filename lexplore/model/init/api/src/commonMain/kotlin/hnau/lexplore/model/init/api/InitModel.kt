@@ -4,6 +4,8 @@ import hnau.common.app.goback.GoBackHandlerProvider
 import hnau.lexplore.data.api.dictionary.DictionaryRepository
 import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
 import hnau.lexplore.model.mainstack.api.MainStackModel
+import hnau.lexplore.prefiller.api.PrefillDataProvider
+import hnau.lexplore.prefiller.api.Prefiller
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +22,10 @@ interface InitModel : GoBackHandlerProvider {
     interface Dependencies {
 
         val dictionariesRepository: DictionaryRepository
+
+        val prefillDataProvider: PrefillDataProvider
+
+        val prefiller: Prefiller
 
         fun mainStack(
             dictionariesFlow: DictionariesFlow,

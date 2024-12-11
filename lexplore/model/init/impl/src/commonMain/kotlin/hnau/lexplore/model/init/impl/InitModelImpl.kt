@@ -22,8 +22,12 @@ internal class InitModelImpl(
 ) : InitModel {
 
     override val mainStack: StateFlow<MainStackModel?> = flow {
-        val storage = dependencies.dictionariesRepository.getDictionaries()
-        emit(storage)
+        val dictionariesRepository = dependencies.dictionariesRepository
+        dependencies.prefiller.prefillIfNeed(
+            repository = dictionariesRepository,
+        )
+        val dictionaries = dictionariesRepository.getDictionaries()
+        emit(dictionaries)
     }
         .stateIn(
             scope = scope,

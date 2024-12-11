@@ -16,9 +16,8 @@ kotlin {
             implementation(project(":lexplore:model:dictionaries:api"))
             implementation(project(":lexplore:model:dictionaries:impl"))
             implementation(project(":lexplore:data:api"))
+            implementation(project(":lexplore:prefiller:api"))
+            implementation(project(":lexplore:prefiller:impl"))
         }
     }
-}
-dependencies {
-    implementation(project(":lexplore:data:api"))
 }

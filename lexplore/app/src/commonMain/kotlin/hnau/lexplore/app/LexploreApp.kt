@@ -1,14 +1,13 @@
 package hnau.lexplore.app
 
-import hnau.common.app.storage.Storage
 import hnau.common.kotlin.mapper.toMapper
-import hnau.lexplore.data.api.dictionary.DictionaryRepository
 import hnau.lexplore.model.init.api.InitModel
+import hnau.lexplore.prefiller.api.PrefillDataProvider
+import hnau.lexplore.prefiller.api.Prefiller
+import hnau.lexplore.prefiller.impl.PrefillerImpl
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import java.util.logging.Logger
 
 class LexploreApp(
     scope: CoroutineScope,
@@ -19,30 +18,13 @@ class LexploreApp(
     @Shuffle
     interface Dependencies {
 
-        val storageFactory: Storage.Factory
+        fun init(
+            prefiller: Prefiller,
+        ): InitModel.Dependencies
 
-        val dictionaryRepository: DictionaryRepository
-
-        fun initStorage(): InitModel.Dependencies
+        val prefillDataProvider: PrefillDataProvider
 
         companion object
-    }
-
-    init {
-        scope.launch {
-            println("QWERTY. Collecting dictionaries")
-            try {
-                dependencies
-                    .dictionaryRepository
-                    .getDictionaries()
-                    .dictionaries
-                    .collect {
-                        println("QWERTY. Dictionaries $it")
-                    }
-            } finally {
-                println("QWERTY. End collecting dictionaries")
-            }
-        }
     }
 
     private val json = Json {
@@ -65,7 +47,11 @@ class LexploreApp(
         .createInitModel(
             scope = scope,
             skeleton = modelSkeleton,
-            dependencies = dependencies.initStorage(),
+            dependencies = dependencies.init(
+                prefiller = PrefillerImpl(
+                    prefillDataProvider = dependencies.prefillDataProvider,
+                )
+            ),
         )
 
     val savableState: SavedState

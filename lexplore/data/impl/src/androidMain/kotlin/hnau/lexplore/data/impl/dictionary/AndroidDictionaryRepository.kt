@@ -5,9 +5,12 @@ import hnau.common.kotlin.AsyncLazy
 import hnau.common.kotlin.coroutines.toStateLite
 import hnau.lexplore.data.api.dictionary.DictionaryRepository
 import hnau.lexplore.data.api.dictionary.dto.DictionariesFlow
+import hnau.lexplore.data.api.dictionary.dto.Dictionary
 import hnau.lexplore.data.api.dictionary.dto.DictionaryInfo
 import hnau.lexplore.data.impl.dictionary.utils.DictionaryDao
+import hnau.lexplore.data.impl.dictionary.utils.DictionaryWithValues
 import hnau.lexplore.data.impl.dictionary.utils.LexploreDatabase
+import hnau.lexplore.data.impl.dictionary.utils.Values
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -49,4 +52,27 @@ class AndroidDictionaryRepository(
     override suspend fun getDictionaries(): DictionariesFlow = DictionariesFlow(
         dictionaries = dictionaries.get(),
     )
+
+    override suspend fun insertDictionary(
+        id: DictionaryInfo.Id,
+        dictionary: Dictionary,
+    ) {
+        withContext(Dispatchers.IO) {
+            dictionariesDao
+                .get()
+                .insertOrUpdate(
+                    DictionaryWithValues(
+                        id = id.id,
+                        name = dictionary.info.name,
+                        columns = dictionary.info.columns,
+                        mainLanguage = dictionary.info.mainLanguage,
+                        values = Values(
+                            dictionary.values.map { row ->
+                                row.mapKeys { (columnId) -> columnId.id }
+                            }
+                        ),
+                    )
+                )
+        }
+    }
 }
