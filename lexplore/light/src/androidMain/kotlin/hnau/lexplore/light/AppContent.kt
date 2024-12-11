@@ -44,6 +44,7 @@ fun AppContent(
     tts: TTS,
 ) {
     LexplorerTheme {
+        var autoTTS: Boolean by remember { mutableStateOf(true) }
         val currentWord: WordWithTranslation by engine.currentWord.collectAsState()
         AnimatedContent(
             modifier = Modifier.fillMaxSize(),
@@ -60,6 +61,8 @@ fun AppContent(
                 tts = tts,
                 onAnswer = engine::onAnswer,
                 markAsKnown = engine::markAsKnown,
+                autoTTS = autoTTS,
+                switchAutoTTS = { autoTTS = !autoTTS },
             )
         }
     }
@@ -71,6 +74,8 @@ fun WordContent(
     tts: TTS,
     onAnswer: (isCorrect: Boolean) -> Unit,
     markAsKnown: () -> Unit,
+    autoTTS: Boolean,
+    switchAutoTTS: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -79,36 +84,56 @@ fun WordContent(
         verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Chip(
-            onClick = markAsKnown,
-            size = ChipSize.large,
-            content = {
-                Text(
-                    text = "Mark as known",
-                )
-            },
-            style = ChipStyle.chip,
-        )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(
+                space = Dimens.separation,
+                alignment = Alignment.CenterHorizontally,
+            ),
         ) {
-            Text(
-                text = word.word,
-                style = MaterialTheme.typography.h4,
+            Chip(
+                onClick = markAsKnown,
+                size = ChipSize.large,
+                content = {
+                    Text(
+                        text = "Known",
+                    )
+                },
+                style = ChipStyle.chip,
             )
-            SpeakButton(
-                word = word.word,
-                tts = tts,
+            Chip(
+                onClick = switchAutoTTS,
+                size = ChipSize.large,
+                content = {
+                    Text(
+                        text = "Auto TTS",
+                    )
+                },
+                style = when (autoTTS) {
+                    true -> ChipStyle.chipSelected
+                    false -> ChipStyle.chip
+                },
             )
         }
+
+
+        Text(
+            text = word.word,
+            style = MaterialTheme.typography.h4,
+        )
+        SpeakButton(
+            word = word.word,
+            tts = tts,
+            auto = autoTTS,
+        )
         Spacer(
             modifier = Modifier.weight(1f),
         )
         var state by remember { mutableStateOf(State.Default) }
         AnimatedContent(
             targetState = state,
-            label = "state"
+            label = "state",
+            contentAlignment = Alignment.Center,
         ) { localState ->
             when (localState) {
 
@@ -241,13 +266,16 @@ private fun Translation(
 private fun SpeakButton(
     word: String,
     tts: TTS,
+    auto: Boolean,
 ) {
     var speakNumber by remember { mutableIntStateOf(0) }
     var isSpeaking by remember { mutableStateOf(false) }
-    LaunchedEffect(speakNumber, tts, word) {
-        isSpeaking = true
-        tts.speek(word)
-        isSpeaking = false
+    LaunchedEffect(auto, speakNumber, tts, word) {
+        if (auto || speakNumber > 0) {
+            isSpeaking = true
+            tts.speek(word)
+            isSpeaking = false
+        }
     }
     Chip(
         style = ChipStyle.chipSelected,
