@@ -10,10 +10,8 @@ dependencies {
 
 kotlin {
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":lexplore:data:api"))
-        }
         androidMain.dependencies {
+            implementation(project(":lexplore:data:api"))
             implementation(libs.room.runtime)
             implementation(libs.room.ktx)
         }

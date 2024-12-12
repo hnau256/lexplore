@@ -28,7 +28,7 @@ internal abstract class LexploreDatabase : RoomDatabase() {
             .databaseBuilder(
                 context = context,
                 klass = LexploreDatabase::class.java,
-                name = "lexplore",
+                name = "lexplore_3",
             )
             .build()
     }

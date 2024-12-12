@@ -1,6 +1,12 @@
 package hnau.lexplore.data.api.dictionary.dto
 
 enum class Language {
-    Ru,
-    El,
+    RU,
+    EL,
+    ;
+
+    companion object {
+
+        val default: Language = Language.entries.first()
+    }
 }

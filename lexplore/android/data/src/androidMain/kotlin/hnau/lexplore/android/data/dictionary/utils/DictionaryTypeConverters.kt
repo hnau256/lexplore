@@ -7,12 +7,8 @@ import hnau.common.kotlin.mapper.Mapper
 import hnau.common.kotlin.serialization.MappingKSerializer
 import hnau.lexplore.data.api.dictionary.dto.DictionaryInfo
 import hnau.lexplore.data.api.dictionary.dto.Language
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
 internal data object DictionaryTypeConverters {
