@@ -12,6 +12,7 @@ kotlin {
             implementation(project(":common:app"))
             implementation(project(":common:color"))
             implementation(project(":lexplore:model:common"))
+            implementation(project(":lexplore:data:api"))
         }
     }
 }

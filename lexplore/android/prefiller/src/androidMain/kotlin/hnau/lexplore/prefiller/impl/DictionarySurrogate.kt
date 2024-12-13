@@ -47,14 +47,7 @@ data class DictionarySurrogate(
 
     data object LanguageSerializer : MappingKSerializer<String, Language>(
         base = String.serializer(),
-        mapper = Mapper.toEnum<String, Language>(
-            default = Language.default,
-        ) {
-            when (this) {
-                Language.RU -> "ru"
-                Language.EL -> "el"
-            }
-        }
+        mapper = Language.codeMapper,
     )
 
     @Serializable
