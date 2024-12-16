@@ -33,6 +33,7 @@ kotlin {
             implementation(libs.kotlin.coroutines.play.services)
             implementation(libs.android.activity.compose)
             implementation(libs.android.appcompat)
+            implementation(libs.apache.commons.text)
             implementation(libs.kotlin.serialization.json)
             implementation(libs.arrow.core)
             implementation(libs.slf4j.simple)

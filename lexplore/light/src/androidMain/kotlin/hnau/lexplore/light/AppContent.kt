@@ -1,8 +1,10 @@
 package hnau.lexplore.light
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,14 +30,11 @@ import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.shape.HnauShape
-import hnau.common.compose.uikit.shape.end
-import hnau.common.compose.uikit.shape.inRow
-import hnau.common.compose.uikit.shape.start
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.light.engine.Engine
-import hnau.lexplore.light.engine.WordWithTranslation
+import hnau.lexplore.light.engine.LearningWord
 import hnau.lexplore.light.ui.LexplorerTheme
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -45,19 +45,22 @@ fun AppContent(
 ) {
     LexplorerTheme {
         var autoTTS: Boolean by remember { mutableStateOf(true) }
-        val currentWord: WordWithTranslation by engine.currentWord.collectAsState()
+        val learningWord: LearningWord by engine.currentWord.collectAsState()
         AnimatedContent(
             modifier = Modifier.fillMaxSize(),
-            targetState = currentWord,
+            targetState = learningWord,
+            contentKey = { localLearningWord ->
+                localLearningWord.words[localLearningWord.correctWordIndex]
+            },
             label = "CurrentWord",
             transitionSpec = getTransitionSpecForHorizontalSlide(
                 duration = 200.milliseconds,
             ) {
                 0.1f
             }
-        ) { localCurrentWord ->
+        ) { localLearningWord ->
             WordContent(
-                word = localCurrentWord,
+                word = localLearningWord,
                 tts = tts,
                 onAnswer = engine::onAnswer,
                 markAsKnown = engine::markAsKnown,
@@ -70,7 +73,7 @@ fun AppContent(
 
 @Composable
 fun WordContent(
-    word: WordWithTranslation,
+    word: LearningWord,
     tts: TTS,
     onAnswer: (isCorrect: Boolean) -> Unit,
     markAsKnown: () -> Unit,
@@ -116,125 +119,124 @@ fun WordContent(
             )
         }
 
+        when (word.isNew) {
+            true -> ContentUnknown(
+                word = word,
+                onReady = remember(onAnswer) { { onAnswer(false) } },
+                tts = tts,
+                autoTTS = autoTTS,
+            )
 
-        Text(
-            text = word.word,
-            style = MaterialTheme.typography.h4,
-        )
-        SpeakButton(
-            word = word.word,
-            tts = tts,
-            auto = autoTTS,
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-        var state by remember { mutableStateOf(State.Default) }
-        AnimatedContent(
-            targetState = state,
-            label = "state",
-            contentAlignment = Alignment.Center,
-        ) { localState ->
-            when (localState) {
-
-                State.Default -> DefaultState(
-                    onKnown = { state = State.Known },
-                    onUnknown = { state = State.Unknown },
-                )
-
-                State.Known -> KnownState(
-                    word = word,
-                    onAnswer = onAnswer,
-                )
-
-                State.Unknown -> UnknownState(
-                    word = word,
-                    onReady = { onAnswer(false) },
-                )
-            }
+            false -> ContentKnown(
+                word = word,
+                onAnswer = onAnswer,
+                tts = tts,
+                autoTTS = autoTTS,
+            )
         }
     }
 }
 
-private enum class State { Default, Known, Unknown }
-
 @Composable
-private fun KnownState(
-    word: WordWithTranslation,
+private fun ColumnScope.ContentKnown(
+    word: LearningWord,
     onAnswer: (isCorrect: Boolean) -> Unit,
-) = Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
-    horizontalAlignment = Alignment.CenterHorizontally,
+    tts: TTS,
+    autoTTS: Boolean,
 ) {
-    Translation(
-        word = word,
+    Text(
+        text = word.translation,
+        style = MaterialTheme.typography.h4,
     )
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(
-            Dimens.chipsSeparation,
-            Alignment.CenterHorizontally,
-        )
+    Spacer(
+        modifier = Modifier.weight(1f),
+    )
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+    word.words.forEachIndexed { i, greekWord ->
+        key(greekWord) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = when (selectedIndex) {
+                    null -> {
+                        when (i) {
+                            word.correctWordIndex -> {
+                                { onAnswer(true) }
+                            }
+
+                            else -> {
+                                { selectedIndex = i }
+                            }
+                        }
+                    }
+
+                    else -> null
+                },
+                text = word.words[i],
+                style = when {
+                    selectedIndex != null && (i == selectedIndex || i == word.correctWordIndex) -> ChipStyle.button
+                    else -> ChipStyle.chip
+                },
+                error = selectedIndex == i
+            )
+        }
+    }
+    AnimatedVisibility(
+        visible = selectedIndex != null,
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Button(
-            onClick = { onAnswer(true) },
-            text = "Correct",
-            shape = HnauShape.inRow.start,
-        )
-        Button(
-            onClick = { onAnswer(false) },
-            text = "Incorrect",
-            error = true,
-            shape = HnauShape.inRow.end,
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+        ) {
+            SpeakButton(
+                tts = tts,
+                word = word.words[word.correctWordIndex],
+                auto = autoTTS,
+            )
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onAnswer(false) },
+                text = "Next",
+            )
+        }
     }
 }
 
 @Composable
-private fun DefaultState(
-    onKnown: () -> Unit,
-    onUnknown: () -> Unit,
-) = Row(
-    horizontalArrangement = Arrangement.spacedBy(
-        Dimens.chipsSeparation,
-        Alignment.CenterHorizontally,
-    )
-) {
-    Button(
-        onClick = onKnown,
-        text = "Known",
-        shape = HnauShape.inRow.start,
-    )
-    Button(
-        onClick = onUnknown,
-        text = "Unknown",
-        error = true,
-        shape = HnauShape.inRow.end,
-    )
-}
-
-@Composable
-private fun UnknownState(
-    word: WordWithTranslation,
+private fun ColumnScope.ContentUnknown(
+    word: LearningWord,
     onReady: () -> Unit,
-) = Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
-    horizontalAlignment = Alignment.CenterHorizontally,
+    tts: TTS,
+    autoTTS: Boolean,
 ) {
-    Translation(
-        word = word,
+    val greekWord = word.words[word.correctWordIndex]
+    Text(
+        text = greekWord,
+        style = MaterialTheme.typography.h4,
+    )
+    SpeakButton(
+        tts = tts,
+        word = greekWord,
+        auto = autoTTS,
+    )
+    Text(
+        text = word.translation,
+        style = MaterialTheme.typography.h4,
+    )
+    Spacer(
+        modifier = Modifier.weight(1f),
     )
     Button(
-        onClick = onReady,
+        modifier = Modifier.fillMaxWidth(),
         text = "Ok",
+        onClick = onReady,
     )
 }
 
 @Composable
 private fun Button(
     text: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     style: ChipStyle = ChipStyle.button,
     error: Boolean = false,
@@ -251,16 +253,6 @@ private fun Button(
     style = style,
     shape = shape,
 )
-
-@Composable
-private fun Translation(
-    word: WordWithTranslation,
-) {
-    Text(
-        text = word.translation,
-        style = MaterialTheme.typography.h4,
-    )
-}
 
 @Composable
 private fun SpeakButton(
