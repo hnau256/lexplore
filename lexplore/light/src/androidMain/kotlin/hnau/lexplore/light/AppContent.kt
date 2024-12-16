@@ -30,6 +30,7 @@ import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.shape.HnauShape
+import hnau.common.compose.uikit.shape.create
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
@@ -145,39 +146,72 @@ private fun ColumnScope.ContentKnown(
     autoTTS: Boolean,
 ) {
     Text(
-        text = word.translation,
+        text = word.correct.russian,
         style = MaterialTheme.typography.h4,
     )
     Spacer(
         modifier = Modifier.weight(1f),
     )
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
-    word.words.forEachIndexed { i, greekWord ->
-        key(greekWord) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = when (selectedIndex) {
-                    null -> {
-                        when (i) {
-                            word.correctWordIndex -> {
-                                { onAnswer(true) }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Dimens.chipsSeparation),
+    ) {
+        word.words.forEachIndexed { i, greekWord ->
+            key(greekWord) {
+                val roundTop = i == 0
+                val roundBottom = i == word.words.lastIndex
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.chipsSeparation)
+                ) {
+                    Button(
+                        shape = HnauShape.create(
+                            startTopRoundCorners = roundTop,
+                            endTopRoundCorners = false,
+                            startBottomRoundCorners = roundBottom,
+                            endBottomRoundCorners = false,
+                        ),
+                        modifier = Modifier.weight(1f),
+                        onClick = when (selectedIndex) {
+                            null -> {
+                                when (i) {
+                                    word.correctWordIndex -> {
+                                        { onAnswer(true) }
+                                    }
+
+                                    else -> {
+                                        { selectedIndex = i }
+                                    }
+                                }
                             }
 
-                            else -> {
-                                { selectedIndex = i }
-                            }
-                        }
-                    }
-
-                    else -> null
-                },
-                text = word.words[i],
-                style = when {
-                    selectedIndex != null && (i == selectedIndex || i == word.correctWordIndex) -> ChipStyle.button
-                    else -> ChipStyle.chip
-                },
-                error = selectedIndex == i
-            )
+                            else -> null
+                        },
+                        text = word.words[i].greek + when (selectedIndex) {
+                            null -> ""
+                            else -> " (${word.words[i].russian})"
+                        },
+                        style = when {
+                            selectedIndex != null && (i == selectedIndex || i == word.correctWordIndex) -> ChipStyle.button
+                            else -> ChipStyle.chip
+                        },
+                        error = selectedIndex == i
+                    )
+                    SpeakButton(
+                        shape = HnauShape.create(
+                            startTopRoundCorners = false,
+                            endTopRoundCorners = roundTop,
+                            startBottomRoundCorners = false,
+                            endBottomRoundCorners = roundBottom,
+                        ),
+                        style = ChipStyle.chip,
+                        tts = tts,
+                        word = word.words[i].greek,
+                        auto = autoTTS && i == word.correctWordIndex && selectedIndex != null,
+                    )
+                }
+            }
         }
     }
     AnimatedVisibility(
@@ -188,11 +222,6 @@ private fun ColumnScope.ContentKnown(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         ) {
-            SpeakButton(
-                tts = tts,
-                word = word.words[word.correctWordIndex],
-                auto = autoTTS,
-            )
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onAnswer(false) },
@@ -209,18 +238,17 @@ private fun ColumnScope.ContentUnknown(
     tts: TTS,
     autoTTS: Boolean,
 ) {
-    val greekWord = word.words[word.correctWordIndex]
     Text(
-        text = greekWord,
+        text = word.correct.greek,
         style = MaterialTheme.typography.h4,
     )
     SpeakButton(
         tts = tts,
-        word = greekWord,
+        word = word.correct.greek,
         auto = autoTTS,
     )
     Text(
-        text = word.translation,
+        text = word.correct.russian,
         style = MaterialTheme.typography.h4,
     )
     Spacer(
@@ -258,7 +286,9 @@ private fun Button(
 private fun SpeakButton(
     word: String,
     tts: TTS,
-    auto: Boolean,
+    auto: Boolean = false,
+    shape: Shape = HnauShape(),
+    style: ChipStyle = ChipStyle.chipSelected,
 ) {
     var speakNumber by remember { mutableIntStateOf(0) }
     var isSpeaking by remember { mutableStateOf(false) }
@@ -270,7 +300,8 @@ private fun SpeakButton(
         }
     }
     Chip(
-        style = ChipStyle.chipSelected,
+        shape = shape,
+        style = style,
         size = ChipSize.large,
         leading = chipInProgressLeadingContent(
             inProgress = isSpeaking,

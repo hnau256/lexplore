@@ -65,12 +65,18 @@ class Engine(
         val words = buildList {
             add(word)
             addAll(getAdditionalWords(word))
-        }.shuffled()
+        }
+            .map { greek ->
+                LearningWord.Variant(
+                    greek = greek,
+                    russian = wordsWithTranslations.getValue(greek)
+                )
+            }
+            .shuffled()
         LearningWord(
-            translation = wordsWithTranslations.getValue(word),
             isNew = !levels.containsKey(word),
             words = words,
-            correctWordIndex = words.indexOf(word),
+            correctWordIndex = words.indexOfFirst { it.greek == word },
         )
     }
 
