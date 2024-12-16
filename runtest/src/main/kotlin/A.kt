@@ -5,31 +5,26 @@ import java.io.InputStreamReader
 
 
 fun main() {
-    val count = File("frequency.txt")
+    val lines = File("dictionary.txt")
         .reader()
         .use(InputStreamReader::readLines)
         .mapNotNull { line ->
-            val (word, countString) = line
-                .split(' ')
+            val (greek, russian) = line
+                .split('\t')
                 .filter(String::isNotEmpty)
                 .takeIf { it.size == 2 }
                 ?: return@mapNotNull null
-            word to countString.toInt()
+            greek.lowercase() to russian.lowercase()
         }
-        .associate { it }
-    val dictionary = File("translations.txt")
-        .reader()
-        .use { reader ->
-            reader
-                .use(InputStreamReader::readLines)
-                .map { line ->
-                    val (greek, russian) = line
-                        .split('\t')
-                        .filter(String::isNotEmpty)
-                        .takeIf { it.size == 2 }!!
-                    greek to russian
+        .distinctBy { (greek) -> greek }
+
+    File("out.txt")
+        .writer()
+        .use { writer ->
+            lines
+                .forEach { (greek, russian) ->
+                    writer.write("$greek\t$russian")
+                    writer.write("\n")
                 }
         }
-    println(count)
-    println(dictionary)
 }
