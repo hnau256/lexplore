@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,15 +22,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.input.TextFieldValue
 import hnau.common.compose.uikit.chip.Chip
 import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.shape.HnauShape
-import hnau.common.compose.uikit.shape.end
-import hnau.common.compose.uikit.shape.inRow
-import hnau.common.compose.uikit.shape.start
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
@@ -51,10 +52,9 @@ fun AppContent(
             targetState = currentWord,
             label = "CurrentWord",
             transitionSpec = getTransitionSpecForHorizontalSlide(
-                duration = 200.milliseconds,
-            ) {
-                0.1f
-            }
+                duration = 400.milliseconds,
+                slideCoefficientProvider = { 0.2f },
+            )
         ) { localCurrentWord ->
             WordContent(
                 word = localCurrentWord,
@@ -118,118 +118,91 @@ fun WordContent(
 
 
         Text(
-            text = word.greek,
+            text = word.russian,
             style = MaterialTheme.typography.h4,
-        )
-        SpeakButton(
-            word = word.greek,
-            tts = tts,
-            auto = autoTTS,
         )
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        var state by remember { mutableStateOf(State.Default) }
+        var isUnknown: Boolean by remember { mutableStateOf(false) }
         AnimatedContent(
-            targetState = state,
-            label = "state",
-            contentAlignment = Alignment.Center,
-        ) { localState ->
-            when (localState) {
+            targetState = isUnknown,
+            label = "KnownOrNot",
+            modifier = Modifier.fillMaxWidth(),
+        ) { localIsUnknown ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+            ) {
+                when (localIsUnknown) {
+                    true -> {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = word.greek,
+                                style = MaterialTheme.typography.h4,
+                                modifier = Modifier.weight(1f),
+                            )
+                            SpeakButton(
+                                word = word.greek,
+                                tts = tts,
+                                auto = autoTTS,
+                            )
+                        }
+                        TextToInput(
+                            text = word.greek,
+                            title = "Try to input",
+                            onEntered = { onAnswer(true) }
+                        )
+                    }
 
-                State.Default -> DefaultState(
-                    onKnown = { state = State.Known },
-                    onUnknown = { state = State.Unknown },
-                )
-
-                State.Known -> KnownState(
-                    word = word,
-                    onAnswer = onAnswer,
-                )
-
-                State.Unknown -> UnknownState(
-                    word = word,
-                    onReady = { onAnswer(false) },
-                )
+                    false -> {
+                        TextToInput(
+                            text = word.greek,
+                            title = "Greek word",
+                            onEntered = { onAnswer(true) }
+                        )
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Unknown",
+                            style = ChipStyle.chip,
+                            onClick = { isUnknown = true }
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-private enum class State { Default, Known, Unknown }
-
 @Composable
-private fun KnownState(
-    word: WordWithTranslation,
-    onAnswer: (isCorrect: Boolean) -> Unit,
-) = Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
-    horizontalAlignment = Alignment.CenterHorizontally,
+private fun TextToInput(
+    text: String,
+    title: String,
+    onEntered: () -> Unit,
 ) {
-    Translation(
-        word = word,
+    var enteredText: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
+    val focusRequester = remember { FocusRequester() }
+    TextField(
+        value = enteredText,
+        onValueChange = { newEnteredText ->
+            if (newEnteredText.text.normalize == text.normalize) {
+                onEntered()
+            }
+            enteredText = newEnteredText
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+        label = { Text(title) },
     )
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(
-            Dimens.chipsSeparation,
-            Alignment.CenterHorizontally,
-        )
-    ) {
-        Button(
-            onClick = { onAnswer(true) },
-            text = "Correct",
-            shape = HnauShape.inRow.start,
-        )
-        Button(
-            onClick = { onAnswer(false) },
-            text = "Incorrect",
-            error = true,
-            shape = HnauShape.inRow.end,
-        )
-    }
+    LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
 }
 
-@Composable
-private fun DefaultState(
-    onKnown: () -> Unit,
-    onUnknown: () -> Unit,
-) = Row(
-    horizontalArrangement = Arrangement.spacedBy(
-        Dimens.chipsSeparation,
-        Alignment.CenterHorizontally,
-    )
-) {
-    Button(
-        onClick = onKnown,
-        text = "Known",
-        shape = HnauShape.inRow.start,
-    )
-    Button(
-        onClick = onUnknown,
-        text = "Unknown",
-        error = true,
-        shape = HnauShape.inRow.end,
-    )
-}
-
-@Composable
-private fun UnknownState(
-    word: WordWithTranslation,
-    onReady: () -> Unit,
-) = Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(Dimens.separation),
-    horizontalAlignment = Alignment.CenterHorizontally,
-) {
-    Translation(
-        word = word,
-    )
-    Button(
-        onClick = onReady,
-        text = "Ok",
-    )
-}
+private val String.normalize: String
+    get() = lowercase().trim().withoutNonSpacingMarks
 
 @Composable
 private fun Button(

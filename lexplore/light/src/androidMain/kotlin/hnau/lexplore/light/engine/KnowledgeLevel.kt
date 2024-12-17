@@ -44,7 +44,7 @@ data class KnowledgeLevel(
                 .databaseBuilder(
                     context,
                     Database::class.java,
-                    "lexplorer_5"
+                    "lexplorer_greek_from_russian"
                 )
                 .allowMainThreadQueries()
                 .build()
