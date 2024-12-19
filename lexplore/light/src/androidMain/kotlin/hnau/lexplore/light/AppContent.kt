@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.filled.RecordVoiceOver
@@ -25,12 +29,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import hnau.common.compose.uikit.chip.Chip
 import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.shape.HnauShape
+import hnau.common.compose.uikit.shape.end
+import hnau.common.compose.uikit.shape.inRow
+import hnau.common.compose.uikit.shape.start
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
@@ -124,17 +134,17 @@ fun WordContent(
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        var isUnknown: Boolean by remember { mutableStateOf(false) }
+        var isError: Boolean by remember { mutableStateOf(false) }
         AnimatedContent(
-            targetState = isUnknown,
+            targetState = isError,
             label = "KnownOrNot",
             modifier = Modifier.fillMaxWidth(),
-        ) { localIsUnknown ->
+        ) { localIsError ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Dimens.separation),
             ) {
-                when (localIsUnknown) {
+                when (localIsError) {
                     true -> {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
@@ -153,22 +163,21 @@ fun WordContent(
                         }
                         TextToInput(
                             text = word.greek,
-                            title = "Try to input",
-                            onEntered = { onAnswer(true) }
+                            onAnswer = { onAnswer(false) },
+                            auto = true,
                         )
                     }
 
                     false -> {
                         TextToInput(
                             text = word.greek,
-                            title = "Greek word",
-                            onEntered = { onAnswer(true) }
-                        )
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Unknown",
-                            style = ChipStyle.chip,
-                            onClick = { isUnknown = true }
+                            onAnswer = { correct ->
+                                when (correct) {
+                                    false -> isError = true
+                                    true -> onAnswer(true)
+                                }
+                            },
+                            auto = false,
                         )
                     }
                 }
@@ -180,25 +189,51 @@ fun WordContent(
 @Composable
 private fun TextToInput(
     text: String,
-    title: String,
-    onEntered: () -> Unit,
+    onAnswer: (isCorrect: Boolean) -> Unit,
+    auto: Boolean,
 ) {
-    var enteredText: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
-    val focusRequester = remember { FocusRequester() }
-    TextField(
-        value = enteredText,
-        onValueChange = { newEnteredText ->
-            if (newEnteredText.text.normalize == text.normalize) {
-                onEntered()
-            }
-            enteredText = newEnteredText
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
-        label = { Text(title) },
-    )
-    LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        var enteredText: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
+        val focusRequester = remember { FocusRequester() }
+        val isEnteredCorrect: () -> Boolean = { enteredText.text.normalize == text.normalize }
+        val check: () -> Unit = { onAnswer(isEnteredCorrect()) }
+        val height = 52.dp
+        OutlinedTextField(
+            shape = HnauShape.inRow.start,
+            keyboardOptions = KeyboardOptions(
+                autoCorrect = false,
+                imeAction = ImeAction.None,
+                keyboardType = KeyboardType.Text,
+            ),
+            keyboardActions = KeyboardActions {},
+            singleLine = true,
+            value = enteredText,
+            onValueChange = { newEnteredText ->
+                enteredText = newEnteredText
+                if (auto && isEnteredCorrect()) {
+                    onAnswer(true)
+                }
+            },
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .weight(1f)
+                .height(height),
+        )
+        LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+        if (!auto) {
+            Button(
+                style = ChipStyle.button,
+                text = "Ok",
+                onClick = check,
+                shape = HnauShape.inRow.end,
+                size = ChipSize.large.copy(
+                    height = height,
+                )
+            )
+        }
+    }
 }
 
 private val String.normalize: String
@@ -212,10 +247,11 @@ private fun Button(
     style: ChipStyle = ChipStyle.button,
     error: Boolean = false,
     shape: Shape = HnauShape(),
+    size: ChipSize = ChipSize.large,
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
-    size = ChipSize.large,
+    size = size,
     content = { Text(text = text) },
     activeColor = when (error) {
         true -> MaterialTheme.colors.error
