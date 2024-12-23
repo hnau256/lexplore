@@ -69,10 +69,10 @@ class Engine(
         val factor: Float,
     ) {
         Low(
-            factor = 0.1f,
+            factor = 0.25f,
         ),
         Medium(
-            factor = 0.3f,
+            factor = 0.5f,
         ),
         Height(
             factor = 1f,
@@ -129,7 +129,8 @@ class Engine(
             .filter { it != currentWord }
             .map { word ->
                 val knownLevel = getLevel(word)
-                val weight = 1f - knownLevel
+                val weightRaw = 1f - knownLevel
+                val weight = weightRaw.pow(2)
                 word to weight
             }
 
@@ -151,9 +152,9 @@ class Engine(
 
     companion object {
 
-        private const val wordsWindow: Int = 10
+        private const val wordsWindow: Int = 15
         private const val wellKnownLevel: Float = 0.75f
         private const val correctFactor: Float = 0.5f
-        private const val incorrectFactor: Float = 0.5f
+        private const val incorrectFactor: Float = 0.6f
     }
 }
