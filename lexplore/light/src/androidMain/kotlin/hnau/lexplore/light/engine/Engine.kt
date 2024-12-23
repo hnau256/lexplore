@@ -6,6 +6,7 @@ import hnau.common.kotlin.sumOf
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.pow
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
@@ -56,10 +57,11 @@ class Engine(
         )
     )
 
-    val currentWord: StateFlow<WordWithTranslation> = _currentWord.mapStateLite {
+    val currentWord: StateFlow<WordWithTranslation> = _currentWord.mapStateLite { greek ->
         WordWithTranslation(
-            greek = it,
-            russian = wordsWithTranslations.getValue(it),
+            greek = greek,
+            russian = wordsWithTranslations.getValue(greek),
+            knowledgeLevel = getLevel(greek)
         )
     }
 
@@ -79,23 +81,39 @@ class Engine(
         )
     }
 
-    fun onAnswer(
-        isCorrect: Boolean,
+    enum class Sureness(
+        val factor: Float,
     ) {
-        val word = _currentWord.value
-        val currentLevel = levels.getOrDefault(word, 0f)
-        val newLevel = when (isCorrect) {
-            true -> currentLevel + (1 - currentLevel) * correctFactor
-            false -> currentLevel * incorrectFactor
-        }
-        updateLevel(
-            newLevel = newLevel
+        Medium(
+            factor = 0.3f,
+        ),
+        Height(
+            factor = 1f,
         )
     }
 
-    fun markAsKnown() {
+    sealed interface Result {
+        data object Incorrect : Result
+
+        data object Useless : Result
+
+        data class Correct(
+            val sureness: Sureness,
+        ) : Result
+    }
+
+    fun onResult(
+        result: Result,
+    ) {
+        val word = _currentWord.value
+        val currentLevel = getLevel(word)
+        val newLevel = when (result) {
+            is Result.Correct -> currentLevel + (1 - currentLevel) * correctFactor * result.sureness.factor
+            Result.Incorrect -> currentLevel * incorrectFactor
+            Result.Useless -> 1f
+        }
         updateLevel(
-            newLevel = 1f,
+            newLevel = newLevel
         )
     }
 
@@ -111,7 +129,7 @@ class Engine(
             .take(wordsToChooseCount)
             .filter { it != currentWord }
             .map { word ->
-                val knownLevel = levels.getOrDefault(word, 0f)
+                val knownLevel = getLevel(word)
                 val weight = 1f - knownLevel
                 word to weight
             }
@@ -130,12 +148,13 @@ class Engine(
             .last()
     }
 
+    private fun getLevel(word: String): Float = levels[word] ?: 0f
 
     companion object {
 
         private const val wordsWindow: Int = 10
         private const val wellKnownLevel: Float = 0.75f
-        private const val correctFactor: Float = 0.2f
+        private const val correctFactor: Float = 0.5f
         private const val incorrectFactor: Float = 0.5f
     }
 }

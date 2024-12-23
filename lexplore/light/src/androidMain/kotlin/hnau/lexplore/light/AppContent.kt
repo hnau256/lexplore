@@ -14,7 +14,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +36,7 @@ import hnau.common.compose.uikit.chip.Chip
 import hnau.common.compose.uikit.chip.ChipSize
 import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
+import hnau.common.compose.uikit.row.ChipsRow
 import hnau.common.compose.uikit.shape.HnauShape
 import hnau.common.compose.uikit.shape.end
 import hnau.common.compose.uikit.shape.inRow
@@ -69,8 +69,7 @@ fun AppContent(
             WordContent(
                 word = localCurrentWord,
                 tts = tts,
-                onAnswer = engine::onAnswer,
-                markAsKnown = engine::markAsKnown,
+                onResult = engine::onResult,
                 autoTTS = autoTTS,
                 switchAutoTTS = { autoTTS = !autoTTS },
             )
@@ -82,15 +81,12 @@ fun AppContent(
 fun WordContent(
     word: WordWithTranslation,
     tts: TTS,
-    onAnswer: (isCorrect: Boolean) -> Unit,
-    markAsKnown: () -> Unit,
+    onResult: (result: Engine.Result) -> Unit,
     autoTTS: Boolean,
     switchAutoTTS: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimens.largeSeparation),
+        modifier = Modifier.fillMaxSize().padding(Dimens.largeSeparation),
         verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -102,11 +98,11 @@ fun WordContent(
             ),
         ) {
             Chip(
-                onClick = markAsKnown,
+                onClick = { onResult(Engine.Result.Useless) },
                 size = ChipSize.large,
                 content = {
                     Text(
-                        text = "Known",
+                        text = "Useless",
                     )
                 },
                 style = ChipStyle.chip,
@@ -128,57 +124,101 @@ fun WordContent(
 
 
         Text(
+            text = "Knowledge level: ${word.knowledgeLevel.times(100).toInt()}%",
+        )
+        Text(
             text = word.russian,
             style = MaterialTheme.typography.h4,
         )
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        var isError: Boolean by remember { mutableStateOf(false) }
+        var incorrectWord: String? by remember { mutableStateOf(null) }
         AnimatedContent(
-            targetState = isError,
+            targetState = incorrectWord,
             label = "KnownOrNot",
+            contentKey = { it == null },
             modifier = Modifier.fillMaxWidth(),
-        ) { localIsError ->
+        ) { localIncorrectWord ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Dimens.separation),
             ) {
-                when (localIsError) {
-                    true -> {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
-                            verticalAlignment = Alignment.CenterVertically,
+                var selectedSureness: Engine.Sureness by remember {
+                    mutableStateOf(
+                        Engine.Sureness.Medium
+                    )
+                }
+                val onCorrect: () -> Unit = { onResult(Engine.Result.Correct(selectedSureness)) }
+                when (localIncorrectWord) {
+
+                    null -> {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
                         ) {
+                            ChipsRow(
+                                all = Engine.Sureness.entries.toList(),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) { sureness, shape ->
+                                Chip(
+                                    modifier = Modifier,
+                                    content = { Text(sureness.name) },
+                                    shape = shape,
+                                    style = ChipStyle.chipSelected(sureness == selectedSureness),
+                                    onClick = { selectedSureness = sureness },
+                                )
+                            }
+                            TextToInput(
+                                text = word.greek,
+                                onResult = { enteredIncorrectWord ->
+                                    when (enteredIncorrectWord) {
+                                        null -> onCorrect()
+                                        else -> incorrectWord = enteredIncorrectWord
+                                    }
+                                },
+                                auto = false,
+                            )
+                        }
+                    }
+
+                    else -> {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+                        ) {
+                            Text(
+                                text = "Incorrect: $incorrectWord",
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(Dimens.chipsSeparation),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Button(
+                                    text = "Typo",
+                                    onClick = onCorrect,
+                                    error = true,
+                                    shape = HnauShape.inRow.start,
+                                )
+                                SpeakButton(
+                                    word = word.greek,
+                                    tts = tts,
+                                    auto = autoTTS,
+                                    shape = HnauShape.inRow.end,
+                                )
+                            }
                             Text(
                                 text = word.greek,
                                 style = MaterialTheme.typography.h4,
-                                modifier = Modifier.weight(1f),
                             )
-                            SpeakButton(
-                                word = word.greek,
-                                tts = tts,
-                                auto = autoTTS,
+                            TextToInput(
+                                text = word.greek,
+                                onResult = { onResult(Engine.Result.Incorrect) },
+                                auto = true,
                             )
                         }
-                        TextToInput(
-                            text = word.greek,
-                            onAnswer = { onAnswer(false) },
-                            auto = true,
-                        )
-                    }
-
-                    false -> {
-                        TextToInput(
-                            text = word.greek,
-                            onAnswer = { correct ->
-                                when (correct) {
-                                    false -> isError = true
-                                    true -> onAnswer(true)
-                                }
-                            },
-                            auto = false,
-                        )
                     }
                 }
             }
@@ -189,7 +229,7 @@ fun WordContent(
 @Composable
 private fun TextToInput(
     text: String,
-    onAnswer: (isCorrect: Boolean) -> Unit,
+    onResult: (incorrectWord: String?) -> Unit,
     auto: Boolean,
 ) {
     Row(
@@ -197,8 +237,8 @@ private fun TextToInput(
     ) {
         var enteredText: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
         val focusRequester = remember { FocusRequester() }
-        val isEnteredCorrect: () -> Boolean = { enteredText.text.normalize == text.normalize }
-        val check: () -> Unit = { onAnswer(isEnteredCorrect()) }
+        val getIncorrectWord: () -> String? = { enteredText.text.normalize.takeIf { it != text.normalize } }
+        val check: () -> Unit = { onResult(getIncorrectWord()) }
         val height = 52.dp
         OutlinedTextField(
             shape = HnauShape.inRow.start,
@@ -212,14 +252,13 @@ private fun TextToInput(
             value = enteredText,
             onValueChange = { newEnteredText ->
                 enteredText = newEnteredText
-                if (auto && isEnteredCorrect()) {
-                    onAnswer(true)
+                if (auto) {
+                    if (getIncorrectWord() == null) {
+                        onResult(null)
+                    }
                 }
             },
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .weight(1f)
-                .height(height),
+            modifier = Modifier.focusRequester(focusRequester).weight(1f).height(height),
         )
         LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
         if (!auto) {
@@ -276,6 +315,7 @@ private fun SpeakButton(
     word: String,
     tts: TTS,
     auto: Boolean,
+    shape: Shape = HnauShape(),
 ) {
     var speakNumber by remember { mutableIntStateOf(0) }
     var isSpeaking by remember { mutableStateOf(false) }
@@ -298,6 +338,7 @@ private fun SpeakButton(
                 { speakNumber++ }
             }
         },
-        content = { Icon { RecordVoiceOver } }
+        content = { Icon { RecordVoiceOver } },
+        shape = shape,
     )
 }
