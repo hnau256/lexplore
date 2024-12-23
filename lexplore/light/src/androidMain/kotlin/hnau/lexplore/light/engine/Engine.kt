@@ -65,31 +65,23 @@ class Engine(
         )
     }
 
-    private fun updateLevel(
-        newLevel: Float,
-    ) {
-        val word = _currentWord.value
-        levels[word] = newLevel
-        knowledgeLevelDao.insert(
-            KnowledgeLevel(
-                greekWord = word,
-                fraction = newLevel,
-            )
-        )
-        _currentWord.value = resolveNextWord(
-            currentWord = word,
-        )
-    }
-
     enum class Sureness(
         val factor: Float,
     ) {
+        Low(
+            factor = 0.1f,
+        ),
         Medium(
             factor = 0.3f,
         ),
         Height(
             factor = 1f,
-        )
+        );
+
+        companion object {
+
+            val primary: Sureness = Medium
+        }
     }
 
     sealed interface Result {
@@ -112,8 +104,15 @@ class Engine(
             Result.Incorrect -> currentLevel * incorrectFactor
             Result.Useless -> 1f
         }
-        updateLevel(
-            newLevel = newLevel
+        levels[word] = newLevel
+        knowledgeLevelDao.insert(
+            KnowledgeLevel(
+                greekWord = word,
+                fraction = newLevel,
+            )
+        )
+        _currentWord.value = resolveNextWord(
+            currentWord = word,
         )
     }
 
@@ -139,7 +138,7 @@ class Engine(
         var currentWeight = 0f
         wordsToChooseWithWeights.forEach { (word, weight) ->
             currentWeight += weight
-            if (currentWeight > targetWeight) {
+            if (currentWeight >= targetWeight) {
                 return word
             }
         }

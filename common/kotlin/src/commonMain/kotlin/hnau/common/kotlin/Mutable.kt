@@ -9,7 +9,7 @@ data class Mutable<T>(
     var value: T,
 ) : ReadWriteProperty<Any?, T> {
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>) = value
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value

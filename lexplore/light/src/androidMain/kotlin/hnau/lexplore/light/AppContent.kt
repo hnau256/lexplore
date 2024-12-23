@@ -44,6 +44,7 @@ import hnau.common.compose.uikit.shape.start
 import hnau.common.compose.uikit.utils.Dimens
 import hnau.common.compose.utils.Icon
 import hnau.common.compose.utils.getTransitionSpecForHorizontalSlide
+import hnau.common.kotlin.Mutable
 import hnau.lexplore.light.engine.Engine
 import hnau.lexplore.light.engine.WordWithTranslation
 import hnau.lexplore.light.ui.LexplorerTheme
@@ -76,6 +77,16 @@ fun AppContent(
         }
     }
 }
+
+private val surenessList: List<Engine.Sureness> = Engine
+    .Sureness
+    .entries
+    .sortedBy { sureness ->
+        when (sureness) {
+            Engine.Sureness.primary -> Engine.Sureness.entries.size
+            else -> sureness.ordinal
+        }
+    }
 
 @Composable
 fun WordContent(
@@ -134,6 +145,9 @@ fun WordContent(
             modifier = Modifier.weight(1f),
         )
         var incorrectWord: String? by remember { mutableStateOf(null) }
+        var selectedSureness: Engine.Sureness by remember<Mutable<Engine.Sureness>> {
+            Mutable(Engine.Sureness.primary)
+        }
         AnimatedContent(
             targetState = incorrectWord,
             label = "KnownOrNot",
@@ -144,11 +158,6 @@ fun WordContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Dimens.separation),
             ) {
-                var selectedSureness: Engine.Sureness by remember {
-                    mutableStateOf(
-                        Engine.Sureness.Medium
-                    )
-                }
                 val onCorrect: () -> Unit = { onResult(Engine.Result.Correct(selectedSureness)) }
                 when (localIncorrectWord) {
 
@@ -157,30 +166,39 @@ fun WordContent(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(Dimens.separation),
                         ) {
+                            var enteredWord: InputTextState by remember {
+                                mutableStateOf(
+                                    InputTextState(
+                                        word = "",
+                                        correct = false,
+                                    )
+                                )
+                            }
+                            TextToInput(
+                                text = word.greek,
+                                onChanged = { enteredWord = it },
+                            )
                             ChipsRow(
-                                all = Engine.Sureness.entries.toList(),
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalAlignment = Alignment.CenterVertically,
+                                all = surenessList,
+                                modifier = Modifier.align(Alignment.End),
                             ) { sureness, shape ->
                                 Chip(
                                     modifier = Modifier,
                                     content = { Text(sureness.name) },
                                     shape = shape,
-                                    style = ChipStyle.chipSelected(sureness == selectedSureness),
-                                    onClick = { selectedSureness = sureness },
+                                    style = when (sureness) {
+                                        Engine.Sureness.primary -> ChipStyle.button
+                                        else -> ChipStyle.chip
+                                    },
+                                    onClick = {
+                                        selectedSureness = sureness
+                                        when (enteredWord.correct) {
+                                            true -> onCorrect()
+                                            false -> incorrectWord = enteredWord.word
+                                        }
+                                    },
                                 )
                             }
-                            TextToInput(
-                                text = word.greek,
-                                onResult = { enteredIncorrectWord ->
-                                    when (enteredIncorrectWord) {
-                                        null -> onCorrect()
-                                        else -> incorrectWord = enteredIncorrectWord
-                                    }
-                                },
-                                auto = false,
-                            )
                         }
                     }
 
@@ -215,8 +233,11 @@ fun WordContent(
                             )
                             TextToInput(
                                 text = word.greek,
-                                onResult = { onResult(Engine.Result.Incorrect) },
-                                auto = true,
+                                onChanged = { (_, correct) ->
+                                    if (correct) {
+                                        onResult(Engine.Result.Incorrect)
+                                    }
+                                },
                             )
                         }
                     }
@@ -226,22 +247,24 @@ fun WordContent(
     }
 }
 
+private data class InputTextState(
+    val word: String,
+    val correct: Boolean,
+)
+
 @Composable
 private fun TextToInput(
     text: String,
-    onResult: (incorrectWord: String?) -> Unit,
-    auto: Boolean,
+    onChanged: (InputTextState) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         var enteredText: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
         val focusRequester = remember { FocusRequester() }
-        val getIncorrectWord: () -> String? = { enteredText.text.normalize.takeIf { it != text.normalize } }
-        val check: () -> Unit = { onResult(getIncorrectWord()) }
         val height = 52.dp
         OutlinedTextField(
-            shape = HnauShape.inRow.start,
+            shape = HnauShape(),
             keyboardOptions = KeyboardOptions(
                 autoCorrect = false,
                 imeAction = ImeAction.None,
@@ -252,26 +275,17 @@ private fun TextToInput(
             value = enteredText,
             onValueChange = { newEnteredText ->
                 enteredText = newEnteredText
-                if (auto) {
-                    if (getIncorrectWord() == null) {
-                        onResult(null)
-                    }
-                }
+                val word = newEnteredText.text.normalize
+                onChanged(
+                    InputTextState(
+                        word = word,
+                        correct = word == text.normalize,
+                    )
+                )
             },
             modifier = Modifier.focusRequester(focusRequester).weight(1f).height(height),
         )
         LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
-        if (!auto) {
-            Button(
-                style = ChipStyle.button,
-                text = "Ok",
-                onClick = check,
-                shape = HnauShape.inRow.end,
-                size = ChipSize.large.copy(
-                    height = height,
-                )
-            )
-        }
     }
 }
 
