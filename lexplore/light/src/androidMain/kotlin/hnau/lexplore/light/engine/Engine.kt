@@ -129,8 +129,7 @@ class Engine(
             .filter { it != currentWord }
             .map { word ->
                 val knownLevel = getLevel(word)
-                val weightRaw = 1f - knownLevel
-                val weight = weightRaw.pow(2)
+                val weight = 1f - knownLevel
                 word to weight
             }
 
