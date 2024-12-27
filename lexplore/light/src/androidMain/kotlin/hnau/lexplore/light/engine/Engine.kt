@@ -6,7 +6,6 @@ import hnau.common.kotlin.sumOf
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.math.pow
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
@@ -119,19 +118,20 @@ class Engine(
     private fun resolveNextWord(
         currentWord: String?,
     ): String {
-        val wellKnownWordsCount = levels.count { (_, level) ->
-            level >= wellKnownLevel
-        }
-        val wordsToChooseCount = (wellKnownWordsCount + wordsWindow).coerceAtMost(words.lastIndex)
 
+        var currentUnknownSum = 0f
         val wordsToChooseWithWeights = words
-            .take(wordsToChooseCount)
+            .asSequence()
             .filter { it != currentWord }
             .map { word ->
-                val knownLevel = getLevel(word)
-                val weight = 1f - knownLevel
-                word to weight
+                val unknownLevel = 1 - getLevel(word)
+                word to unknownLevel
             }
+            .takeWhile { (_, unknownLevel) ->
+                currentUnknownSum += unknownLevel
+                currentUnknownSum < unknownSum
+            }
+            .toList()
 
         val weightSum = wordsToChooseWithWeights.sumOf { it.second }
         val targetWeight = Random.nextFloat() * weightSum
@@ -151,8 +151,7 @@ class Engine(
 
     companion object {
 
-        private const val wordsWindow: Int = 15
-        private const val wellKnownLevel: Float = 0.75f
+        private const val unknownSum: Float = 10.0f
         private const val correctFactor: Float = 0.5f
         private const val incorrectFactor: Float = 0.6f
     }
