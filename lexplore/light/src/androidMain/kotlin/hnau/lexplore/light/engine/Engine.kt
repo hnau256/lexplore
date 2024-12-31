@@ -128,7 +128,9 @@ class Engine(
                 word to unknownLevel
             }
             .takeWhile { (_, unknownLevel) ->
-                currentUnknownSum += unknownLevel
+                if (unknownLevel > insignificantUnknownLevel) {
+                    currentUnknownSum += unknownLevel
+                }
                 currentUnknownSum < unknownSum
             }
             .toList()
@@ -151,6 +153,7 @@ class Engine(
 
     companion object {
 
+        private const val insignificantUnknownLevel: Float = 0.1f
         private const val unknownSum: Float = 10.0f
         private const val correctFactor: Float = 0.5f
         private const val incorrectFactor: Float = 0.6f
