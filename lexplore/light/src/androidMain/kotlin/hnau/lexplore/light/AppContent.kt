@@ -21,7 +21,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +51,7 @@ import hnau.common.compose.uikit.chip.ChipStyle
 import hnau.common.compose.uikit.progressindicator.chipInProgressLeadingContent
 import hnau.common.compose.uikit.row.ChipsRow
 import hnau.common.compose.uikit.shape.HnauShape
+import hnau.common.compose.uikit.shape.center
 import hnau.common.compose.uikit.shape.end
 import hnau.common.compose.uikit.shape.inRow
 import hnau.common.compose.uikit.shape.start
@@ -116,32 +121,41 @@ fun WordContent(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(
-                space = Dimens.separation,
+                space = Dimens.chipsSeparation,
                 alignment = Alignment.CenterHorizontally,
             ),
         ) {
             Chip(
+                onClick = { onResult(Engine.Result.AlmostKnown) },
+                size = ChipSize.large,
+                content = { Icon { School } },
+                style = ChipStyle.chip,
+                shape = HnauShape.inRow.start,
+            )
+            Chip(
                 onClick = { onResult(Engine.Result.Useless) },
                 size = ChipSize.large,
-                content = {
-                    Text(
-                        text = "Useless",
-                    )
-                },
-                style = ChipStyle.chip,
+                content = { Icon { Close } },
+                style = ChipStyle.chipHighlighted,
+                activeColor = MaterialTheme.colors.error,
+                shape = HnauShape.inRow.center,
             )
             Chip(
                 onClick = switchAutoTTS,
                 size = ChipSize.large,
                 content = {
-                    Text(
-                        text = "Auto TTS",
-                    )
+                    Icon {
+                        when (autoTTS) {
+                            false -> VolumeUp
+                            true -> VolumeOff
+                        }
+                    }
                 },
                 style = when (autoTTS) {
                     true -> ChipStyle.chipSelected
                     false -> ChipStyle.chip
                 },
+                shape = HnauShape.inRow.end,
             )
         }
 

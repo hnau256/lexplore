@@ -88,6 +88,8 @@ class Engine(
 
         data object Useless : Result
 
+        data object AlmostKnown : Result
+
         data class Correct(
             val sureness: Sureness,
         ) : Result
@@ -102,6 +104,7 @@ class Engine(
             is Result.Correct -> currentLevel + (1 - currentLevel) * correctFactor * result.sureness.factor
             Result.Incorrect -> currentLevel * incorrectFactor
             Result.Useless -> 1f
+            Result.AlmostKnown -> 1f - insignificantUnknownLevel
         }
         levels[word] = newLevel
         knowledgeLevelDao.insert(
