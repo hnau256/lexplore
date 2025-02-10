@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">LEXplore</string>
+    <string name="exercises_title">Exercises</string>
+    <string name="exercises_preparing">Preparing exercise</string>
+    <string name="exercise_cancel_title">Exercise cancellation</string>
+    <string name="exercise_cancel_text">Do you want to exit exercise?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="question_incorrect">Incorrect</string>
+    <string name="question_typo">Typo</string>
+    <string name="dictionaries_title">Dictionaries</string>
+    <string name="dictionaries_start">Start</string>
+    <string name="dictionaries_all">All</string>
+    <string name="dictionaries_none">None</string>
+    <string name="edit_incorrect_number">Incorrect number format</string>
+</resources>
