@@ -64,7 +64,8 @@ class Engine(
                 word to wordInfo
             }
             .filter { (_, info) ->
-                info.knowLevel <= LearningConstants.maxKnowLevelToAsk || !filterByKnowLevel
+                !filterByKnowLevel ||
+                        info.knowLevel <= LearningConstants.maxKnowLevelToAsk
             }
             .toList()
             .toNonEmptyListOrNull()
