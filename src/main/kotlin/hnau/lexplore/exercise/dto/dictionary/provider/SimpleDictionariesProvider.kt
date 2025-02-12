@@ -28,12 +28,10 @@ object SimpleDictionariesProvider : DictionariesProvider {
             }
             Dictionary(
                 name = name,
-                loadWords = {
-                    loadWords(
-                        assets = assets,
-                        dictionaryFileName = dictionaryFileName,
-                    )
-                }
+                words = loadWords(
+                    assets = assets,
+                    dictionaryFileName = dictionaryFileName,
+                )
             )
         }
     }
@@ -45,7 +43,7 @@ object SimpleDictionariesProvider : DictionariesProvider {
         .readBlocksWithIndexRanges(
             stream = assets.open(dictionariesPath + dictionaryFileName)
         )
-        .flatMap {indexedWords ->
+        .flatMap { indexedWords ->
             indexedWords
                 .build()
         }
