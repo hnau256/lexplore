@@ -7,12 +7,10 @@ import hnau.lexplore.exercise.dto.dictionary.provider.SimpleDictionariesProvider
 import hnau.lexplore.exercise.dto.dictionary.provider.VerbsDictionariesProvider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Dictionary(
     val name: String,
-    val words: List<Word>,
+    val loadWords: suspend () -> List<Word>,
 ) {
 
     companion object {

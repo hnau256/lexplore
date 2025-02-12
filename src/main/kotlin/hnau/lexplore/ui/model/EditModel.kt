@@ -24,7 +24,6 @@ import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.LearningConstants
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +38,8 @@ class EditModel(
 
     @Serializable
     data class Skeleton(
-        val dictionary: Dictionary,
+        val dictionaryName: String,
+        val words: List<Word>,
         @Serializable(LazyListStateSerializer::class)
         val scrollState: LazyListState = LazyListState(),
         @Serializable(MutableStateFlowSerializer::class)
@@ -49,7 +49,6 @@ class EditModel(
 
     private val editWordModel: StateFlow<Pair<WordToLearn, EditWordModel>?> = run {
         val wordsByToLearn: Map<WordToLearn, Word> = skeleton
-            .dictionary
             .words
             .associateBy(Word::toLearn)
 
@@ -93,7 +92,7 @@ class EditModel(
             dependencies = remember(dependencies) { dependencies.screenContent() },
             topAppBarContent = {
                 Title(
-                    text = skeleton.dictionary.name,
+                    text = skeleton.dictionaryName,
                 )
             }
         ) { contentPadding ->
@@ -104,7 +103,7 @@ class EditModel(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 items(
-                    skeleton.dictionary.words,
+                    skeleton.words,
                 ) { word ->
                     WordContent(
                         word = word,

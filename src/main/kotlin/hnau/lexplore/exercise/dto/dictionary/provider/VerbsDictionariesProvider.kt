@@ -19,9 +19,11 @@ object VerbsDictionariesProvider : DictionariesProvider {
     ): List<Dictionary> = listOf(
         Dictionary(
             name = "Спряжение глаголов",
-            words = loadWords(
-                context = context,
-            )
+            loadWords = {
+                loadWords(
+                    context = context,
+                )
+            }
         )
     )
 

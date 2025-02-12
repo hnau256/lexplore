@@ -71,13 +71,14 @@ class MainStackModel(
                         .stack
                         .push(MainStackElementModel.Skeleton.Exercise(words))
                 },
-                edit = { dictionary ->
+                edit = { words, dictionaryName ->
                     this
                         .skeleton
                         .stack
                         .push(
                             MainStackElementModel.Skeleton.Edit(
-                                dictionary = dictionary,
+                                dictionaryName = dictionaryName,
+                                words = words
                             )
                         )
                 }
