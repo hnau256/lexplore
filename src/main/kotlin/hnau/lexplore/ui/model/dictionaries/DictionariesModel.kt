@@ -45,13 +45,11 @@ import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
 import hnau.lexplore.common.ui.utils.plus
 import hnau.lexplore.data.settings.AppSettings
-import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,7 +61,7 @@ class DictionariesModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     private val openQuestions: (words: List<Word>) -> Unit,
-    private val edit: (words: List<Word>, dictionaryName: String) -> Unit,
+    private val edit: (dictionary: Dictionary) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
@@ -130,11 +128,9 @@ class DictionariesModel(
             scope.launch {
                 loadingWordsInProgressRegistry.executeRegistered {
                     unselectedDictionariesDelegate.apply()
-                    val wordsRaw = dictionariesToStart
-                        .map { dictionary -> async { dictionary.loadWords() } }
-                        .awaitAll()
                     val words: List<Word> = withContext(Dispatchers.Default) {
-                        wordsRaw
+                        dictionariesToStart
+                            .map { dictionary -> dictionary.words }
                             .flatten()
                             .sortedBy(Word::index)
                     }
@@ -274,14 +270,7 @@ class DictionariesModel(
             },
             trailingContent = {
                 IconButton(
-                    onClick = {
-                        scope.launch {
-                            loadingWordsInProgressRegistry.executeRegistered {
-                                val words = dictionary.loadWords()
-                                edit(words, dictionary.name)
-                            }
-                        }
-                    }
+                    onClick = { edit(dictionary) }
                 ) {
                     Icon { Edit }
                 }
