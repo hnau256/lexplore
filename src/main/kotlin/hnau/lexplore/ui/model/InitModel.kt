@@ -36,6 +36,8 @@ import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.data.db.AppDatabase
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.data.settings.AppSettings
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
+import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.lexplore.utils.TTS
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +65,7 @@ class InitModel(
         fun mainStack(
             knowledgeRepository: KnowledgeRepository,
             appSettings: AppSettings,
+            dictionaries: Dictionaries,
             tts: TTS,
         ): MainStackModel.Dependencies
 
@@ -77,6 +80,7 @@ class InitModel(
     private data class Initialized(
         val knowledgeRepository: KnowledgeRepository,
         val appSettings: AppSettings,
+        val dictionaries: Dictionaries,
     )
 
     private val mainStackModel: StateFlow<Loadable<MainStackModel>> = LoadableStateFlow(scope) {
@@ -94,9 +98,15 @@ class InitModel(
                     database = database,
                 )
             }
+            val dictionaries = async {
+                Dictionary.loadList(
+                    context = dependencies.context
+                )
+            }
             Initialized(
                 knowledgeRepository = knowledgeRepositoryDeferred.await(),
                 appSettings = appSettingsDeferred.await(),
+                dictionaries = dictionaries.await(),
             )
         }
     }
@@ -107,6 +117,7 @@ class InitModel(
                     dependencies = dependencies.mainStack(
                         knowledgeRepository = initialized.knowledgeRepository,
                         appSettings = initialized.appSettings,
+                        dictionaries = initialized.dictionaries,
                         tts = tts,
                     ),
                     skeleton = skeleton::mainStack

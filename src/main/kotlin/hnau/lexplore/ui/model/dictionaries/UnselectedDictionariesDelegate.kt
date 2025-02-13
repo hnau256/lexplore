@@ -6,9 +6,11 @@ import hnau.lexplore.common.kotlin.coroutines.mapStateLite
 import hnau.lexplore.common.kotlin.mapper.Mapper
 import hnau.lexplore.common.kotlin.mapper.plus
 import hnau.lexplore.common.kotlin.mapper.stringSplit
+import hnau.lexplore.common.kotlin.mapper.toListMapper
 import hnau.lexplore.data.settings.AppSettings
 import hnau.lexplore.data.settings.Setting
 import hnau.lexplore.data.settings.map
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,18 +18,19 @@ import kotlinx.coroutines.flow.StateFlow
 class UnselectedDictionariesDelegate(
     scope: CoroutineScope,
     settings: AppSettings,
-    private val overwritten: MutableStateFlow<Set<String>?>,
+    private val overwritten: MutableStateFlow<Set<DictionaryName>?>,
 ) {
 
-    private val setting: Setting<Set<String>> =
+    private val setting: Setting<Set<DictionaryName>> =
         settings["unselected_dictionaries"]
             .map(
                 Mapper.stringSplit('|') +
-                        Mapper(List<String>::toSet, Set<String>::toList),
+                Mapper(::DictionaryName, DictionaryName::name).toListMapper() +
+                        Mapper(List<DictionaryName>::toSet, Set<DictionaryName>::toList),
             )
 
-    val unselectedNames: StateFlow<Set<String>> =
-        overwritten.flatMapState(
+    val unselectedNames: StateFlow<Set<DictionaryName>> = overwritten
+        .flatMapState(
             scope = scope,
         ) { overwritten ->
             overwritten
@@ -36,7 +39,7 @@ class UnselectedDictionariesDelegate(
         }
 
     fun update(
-        newValue: (Set<String>) -> Set<String>,
+        newValue: (Set<DictionaryName>) -> Set<DictionaryName>,
     ) {
         overwritten.value = newValue(unselectedNames.value)
     }

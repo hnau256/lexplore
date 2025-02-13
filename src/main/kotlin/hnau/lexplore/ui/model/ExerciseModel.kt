@@ -24,6 +24,8 @@ import hnau.lexplore.common.ui.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.Engine
 import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +49,7 @@ class ExerciseModel(
         @Serializable(MutableStateFlowSerializer::class)
         val displayConfirmGoBack: MutableStateFlow<Boolean> =
             MutableStateFlow(false),
-        val words: List<Word>,
+        val dictionaries: Set<DictionaryName>,
     )
 
     @Shuffle
@@ -55,11 +57,25 @@ class ExerciseModel(
 
         val knowledgeRepository: KnowledgeRepository
 
+        val dictionaries: Dictionaries
+
         fun question(): PageModel.Dependencies
     }
 
     private val displayConfirmGoBack: StateFlow<Boolean>
         get() = skeleton.displayConfirmGoBack
+
+    private val engine = Engine(
+        words = skeleton
+            .dictionaries
+            .flatMap { name ->
+                dependencies
+                    .dictionaries[name]
+                    .words
+            }
+            .sortedBy(Word::index),
+        knowledgeRepository = dependencies.knowledgeRepository,
+    )
 
     val question: StateFlow<PageModel> = skeleton
         .page
@@ -73,10 +89,7 @@ class ExerciseModel(
                         wordToExclude = keyToExclude,
                     )
                 },
-                engine = Engine(
-                    words = skeleton.words,
-                    knowledgeRepository = dependencies.knowledgeRepository,
-                )
+                engine = engine,
             )
         }
 

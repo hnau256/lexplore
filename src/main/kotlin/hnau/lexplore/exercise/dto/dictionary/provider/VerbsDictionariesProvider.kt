@@ -10,20 +10,25 @@ import hnau.lexplore.common.kotlin.tokenize.tokenize
 import hnau.lexplore.exercise.dto.Translation
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 
 object VerbsDictionariesProvider : DictionariesProvider {
 
     override suspend fun loadList(
         context: Context,
-    ): List<Dictionary> = listOf(
-        Dictionary(
-            name = "Спряжение глаголов",
+    ): Dictionaries {
+        val name = DictionaryName("Спряжение глаголов")
+        val dictionary = Dictionary.create(
             words = loadWords(
                 context = context,
             )
         )
-    )
+        return Dictionaries(
+            mapOf(name to dictionary),
+        )
+    }
 
     private suspend fun loadWords(
         context: Context,

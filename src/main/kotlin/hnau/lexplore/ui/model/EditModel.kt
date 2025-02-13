@@ -24,7 +24,9 @@ import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.LearningConstants
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +41,7 @@ class EditModel(
 
     @Serializable
     data class Skeleton(
-        val dictionary: Dictionary,
+        val name: DictionaryName,
         @Serializable(LazyListStateSerializer::class)
         val scrollState: LazyListState = LazyListState(),
         @Serializable(MutableStateFlowSerializer::class)
@@ -47,11 +49,30 @@ class EditModel(
             MutableStateFlow(null),
     )
 
+    @Shuffle
+    interface Dependencies {
+
+        val knowledgeRepository: KnowledgeRepository
+
+        val dictionaries: Dictionaries
+
+        fun word(): EditWordModel.Dependencies
+    }
+
+    @Shuffle
+    interface ContentDependencies {
+
+        fun screenContent(): ScreenContentDependencies
+
+        fun word(): EditWordModel.ContentDependencies
+    }
+
+    private val words = dependencies
+        .dictionaries[skeleton.name]
+        .words
+
     private val editWordModel: StateFlow<Pair<WordToLearn, EditWordModel>?> = run {
-        val wordsByToLearn: Map<WordToLearn, Word> = skeleton
-            .dictionary
-            .words
-            .associateBy(Word::toLearn)
+        val wordsByToLearn: Map<WordToLearn, Word> = words.associateBy(Word::toLearn)
 
         skeleton
             .selectedWord
@@ -69,22 +90,6 @@ class EditModel(
             }
     }
 
-    @Shuffle
-    interface Dependencies {
-
-        val knowledgeRepository: KnowledgeRepository
-
-        fun word(): EditWordModel.Dependencies
-    }
-
-    @Shuffle
-    interface ContentDependencies {
-
-        fun screenContent(): ScreenContentDependencies
-
-        fun word(): EditWordModel.ContentDependencies
-    }
-
     @Composable
     fun Content(
         dependencies: ContentDependencies,
@@ -93,7 +98,7 @@ class EditModel(
             dependencies = remember(dependencies) { dependencies.screenContent() },
             topAppBarContent = {
                 Title(
-                    text = skeleton.dictionary.name,
+                    text = skeleton.name.name,
                 )
             }
         ) { contentPadding ->
@@ -104,7 +109,7 @@ class EditModel(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 items(
-                    skeleton.dictionary.words,
+                    words,
                 ) { word ->
                     WordContent(
                         word = word,

@@ -6,7 +6,9 @@ import hnau.lexplore.common.kotlin.ifNull
 import hnau.lexplore.exercise.dto.Translation
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -14,26 +16,28 @@ object SimpleDictionariesProvider : DictionariesProvider {
 
     override suspend fun loadList(
         context: Context,
-    ): List<Dictionary> {
+    ): Dictionaries {
         val assets = context.assets
         val names: Array<out String> = withContext(Dispatchers.IO) {
             assets
                 .list(dictionariesPath)
                 .orEmpty()
         }
-        return names.map { dictionaryFileName ->
-            val name = dictionaryFileName.removeSuffix(".txt")
-            if (name == dictionaryFileName) {
-                error("Expected '*.txt' file, got $dictionaryFileName")
-            }
-            Dictionary(
-                name = name,
-                words = loadWords(
-                    assets = assets,
-                    dictionaryFileName = dictionaryFileName,
+        return Dictionaries(
+            names.associate { dictionaryFileName ->
+                val name = dictionaryFileName.removeSuffix(".txt")
+                if (name == dictionaryFileName) {
+                    error("Expected '*.txt' file, got $dictionaryFileName")
+                }
+                val dictionary = Dictionary.create(
+                    words = loadWords(
+                        assets = assets,
+                        dictionaryFileName = dictionaryFileName,
+                    )
                 )
-            )
-        }
+                DictionaryName(name) to dictionary
+            }
+        )
     }
 
     private suspend fun loadWords(

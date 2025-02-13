@@ -1,6 +1,7 @@
 package hnau.lexplore.exercise.dto.dictionary
 
 import android.content.Context
+import arrow.core.identity
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.dictionary.provider.DictionariesProvider
 import hnau.lexplore.exercise.dto.dictionary.provider.SimpleDictionariesProvider
@@ -10,12 +11,17 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Dictionary(
-    val name: String,
+data class Dictionary private constructor(
     val words: List<Word>,
 ) {
 
     companion object {
+
+        fun create(
+            words: List<Word>,
+        ): Dictionary = Dictionary(
+            words = words.sortedBy { it.index }
+        )
 
         private val providers: List<DictionariesProvider> = listOf(
             SimpleDictionariesProvider,
@@ -24,7 +30,7 @@ data class Dictionary(
 
         suspend fun loadList(
             context: Context,
-        ): List<Dictionary> = coroutineScope {
+        ): Dictionaries = coroutineScope {
             providers
                 .map { provider ->
                     async {
@@ -33,10 +39,11 @@ data class Dictionary(
                         )
                     }
                 }
-                .flatMap { deferredDictionaries ->
-                    deferredDictionaries.await()
+                .fold(
+                    initial = Dictionaries.empty,
+                ) {acc, dictionaries ->
+                    acc + dictionaries.await()
                 }
-                .sortedBy(Dictionary::name)
         }
     }
 }

@@ -17,25 +17,6 @@ import java.io.Reader
 
 object DictionariesProviderUtils {
 
-    fun buildWords(
-        minIndex: Float,
-        maxIndex: Float,
-        words: List<Pair<WordToLearn, Translation>>,
-    ): List<Word> {
-        val lastValue = words.lastIndex.takeIf { it > 0 }?.toFloat()
-        return words.mapIndexed { i, (toLearn, translation) ->
-            Word(
-                index = lerp(
-                    start = minIndex,
-                    stop = maxIndex,
-                    fraction = lastValue?.let { i / it } ?: 0f,
-                ),
-                toLearn = toLearn,
-                translation = translation,
-            )
-        }
-    }
-
     private suspend fun readLines(
         stream: InputStream,
     ): Sequence<String> = withContext(Dispatchers.IO) {

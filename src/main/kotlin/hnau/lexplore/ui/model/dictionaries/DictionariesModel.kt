@@ -1,6 +1,5 @@
 package hnau.lexplore.ui.model.dictionaries
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,16 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import arrow.core.toNonEmptyListOrNull
 import hnau.lexplore.R
-import hnau.lexplore.common.kotlin.Loadable
-import hnau.lexplore.common.kotlin.LoadableStateFlow
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
-import hnau.lexplore.common.kotlin.coroutines.combineState
 import hnau.lexplore.common.kotlin.coroutines.mapState
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
-import hnau.lexplore.common.ui.uikit.Content
 import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.common.ui.uikit.progressindicator.ProgressIndicatorPanel
@@ -45,23 +39,21 @@ import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
 import hnau.lexplore.common.ui.utils.plus
 import hnau.lexplore.data.settings.AppSettings
-import hnau.lexplore.exercise.dto.Word
-import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.exercise.dto.dictionary.Dictionaries
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 class DictionariesModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val openQuestions: (words: List<Word>) -> Unit,
-    private val edit: (dictionary: Dictionary) -> Unit,
+    private val openQuestions: (Set<DictionaryName>) -> Unit,
+    private val edit: (DictionaryName) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
@@ -70,16 +62,16 @@ class DictionariesModel(
         val scrollState: LazyListState = LazyListState(),
 
         @Serializable(MutableStateFlowSerializer::class)
-        val overwrittenUnselectedDictionaries: MutableStateFlow<Set<String>?> =
+        val overwrittenUnselectedDictionaries: MutableStateFlow<Set<DictionaryName>?> =
             MutableStateFlow(null),
     )
 
     @Shuffle
     interface Dependencies {
 
-        val context: Context
-
         val appSettings: AppSettings
+
+        val dictionaries: Dictionaries
     }
 
     private val unselectedDictionariesDelegate = UnselectedDictionariesDelegate(
@@ -94,51 +86,33 @@ class DictionariesModel(
         fun screenContent(): ScreenContentDependencies
     }
 
-    private val dictionaries: StateFlow<Loadable<List<Dictionary>>> = LoadableStateFlow(
-        scope = scope,
-    ) {
-        Dictionary.loadList(
-            context = dependencies.context,
-        )
-    }
-
-    private val allDictionaryNames: StateFlow<Set<String>?> =
-        dictionaries.mapState(scope) { dictionariesOrLoading ->
-            dictionariesOrLoading
-                .orNull()
-                ?.map(Dictionary::name)
-                ?.toSet()
-        }
-
     private val loadingWordsInProgressRegistry = InProgressRegistry()
 
-    private val start: StateFlow<(() -> Unit)?> = combineState(
-        scope = scope,
-        a = dictionaries,
-        b = unselectedDictionariesDelegate.unselectedNames,
-    ) { dictionariesOrLoading, unselectedDictionaries ->
-        val dictionaries = dictionariesOrLoading
-            .orNull()
-            ?: return@combineState null
-        val dictionariesToStart = dictionaries
-            .filter { dictionary -> dictionary.name !in unselectedDictionaries }
-            .toNonEmptyListOrNull()
-            ?: return@combineState null
-        {
-            scope.launch {
-                loadingWordsInProgressRegistry.executeRegistered {
-                    unselectedDictionariesDelegate.apply()
-                    val words: List<Word> = withContext(Dispatchers.Default) {
-                        dictionariesToStart
-                            .map { dictionary -> dictionary.words }
-                            .flatten()
-                            .sortedBy(Word::index)
+    private val start: StateFlow<(() -> Unit)?> = unselectedDictionariesDelegate
+        .unselectedNames
+        .mapState(
+            scope = scope,
+        ) { unselectedDictionaries ->
+            val dictionariesToStart = dependencies
+                .dictionaries
+                .names
+                .filter { name -> name !in unselectedDictionaries }
+                .takeIf { it.isNotEmpty() }
+                ?: return@mapState null
+            {
+                scope.launch {
+                    loadingWordsInProgressRegistry.executeRegistered {
+                        unselectedDictionariesDelegate.apply()
+                        openQuestions(dictionariesToStart.toSet())
                     }
-                    openQuestions(words)
                 }
             }
         }
-    }
+
+    private val allDictionaryNames: Set<DictionaryName> = dependencies
+        .dictionaries
+        .names
+        .toSet()
 
     @Composable
     fun Content(
@@ -152,7 +126,7 @@ class DictionariesModel(
                 )
                 SelectButton(
                     text = stringResource(R.string.dictionaries_none),
-                    targetNames = allDictionaryNames.collectAsState().value,
+                    targetNames = allDictionaryNames,
                 )
                 SelectButton(
                     text = stringResource(R.string.dictionaries_all),
@@ -160,12 +134,9 @@ class DictionariesModel(
                 )
             }
         ) { contentPadding ->
-            dictionaries.Content { dictionaries ->
-                Dictionaries(
-                    dictionaries = dictionaries,
-                    contentPadding = contentPadding,
-                )
-            }
+            Dictionaries(
+                contentPadding = contentPadding,
+            )
             StartButton()
             AnimatedVisibility(
                 visible = loadingWordsInProgressRegistry.isProgress.collectAsState().value,
@@ -178,13 +149,13 @@ class DictionariesModel(
     @Composable
     private fun TopAppBarScope.SelectButton(
         text: String,
-        targetNames: Set<String>?,
+        targetNames: Set<DictionaryName>,
     ) {
         val unselectedDictionariesValue by unselectedDictionariesDelegate.unselectedNames.collectAsState()
         val onClick =
             remember(targetNames, unselectedDictionariesDelegate, unselectedDictionariesValue) {
                 val existingTargetNames = targetNames
-                    ?.takeIf { it != unselectedDictionariesValue }
+                    .takeIf { it != unselectedDictionariesValue }
                     ?: return@remember null
                 {
                     unselectedDictionariesDelegate.update { existingTargetNames }
@@ -221,9 +192,8 @@ class DictionariesModel(
     @Composable
     private fun Dictionaries(
         contentPadding: PaddingValues,
-        dictionaries: List<Dictionary>,
     ) {
-        val currentUnselectedDictionaries: Set<String> by unselectedDictionariesDelegate
+        val currentUnselectedDictionaries: Set<DictionaryName> by unselectedDictionariesDelegate
             .unselectedNames
             .collectAsState()
         LazyColumn(
@@ -231,13 +201,14 @@ class DictionariesModel(
             contentPadding = contentPadding + PaddingValues(bottom = 96.dp),
         ) {
             items(
-                items = dictionaries,
-                key = { it.name },
-            ) { dictionary ->
-                val name = dictionary.name
+                items = dependencies
+                    .dictionaries
+                    .names,
+                key = DictionaryName::name,
+            ) { name ->
                 val selected = name !in currentUnselectedDictionaries
                 Dictionary(
-                    dictionary = dictionary,
+                    name = name,
                     selected = selected,
                     setIsSelected = remember(name, unselectedDictionariesDelegate) {
                         { newSelected ->
@@ -256,12 +227,12 @@ class DictionariesModel(
 
     @Composable
     private fun Dictionary(
-        dictionary: Dictionary,
+        name: DictionaryName,
         selected: Boolean,
         setIsSelected: (Boolean) -> Unit,
     ) {
         ListItem(
-            headlineContent = { Text(dictionary.name) },
+            headlineContent = { Text(name.name) },
             leadingContent = {
                 Switch(
                     checked = selected,
@@ -270,7 +241,7 @@ class DictionariesModel(
             },
             trailingContent = {
                 IconButton(
-                    onClick = { edit(dictionary) }
+                    onClick = { edit(name) }
                 ) {
                     Icon { Edit }
                 }

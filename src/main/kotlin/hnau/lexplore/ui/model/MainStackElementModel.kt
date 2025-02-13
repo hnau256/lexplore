@@ -1,8 +1,7 @@
 package hnau.lexplore.ui.model
 
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
-import hnau.lexplore.exercise.dto.Word
-import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.ui.model.dictionaries.DictionariesModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -37,10 +36,10 @@ sealed interface MainStackElementModel : GoBackHandlerProvider {
         ) : Skeleton {
 
             constructor(
-                words: List<Word>,
+                words: Set<DictionaryName>,
             ) : this(
                 exercise = ExerciseModel.Skeleton(
-                    words = words,
+                    dictionaries = words,
                 )
             )
         }
@@ -52,10 +51,10 @@ sealed interface MainStackElementModel : GoBackHandlerProvider {
         ) : Skeleton {
 
             constructor(
-                dictionary: Dictionary,
+                name: DictionaryName,
             ) : this(
                 edit = EditModel.Skeleton(
-                    dictionary = dictionary,
+                    name = name,
                 )
             )
         }
