@@ -1,7 +1,6 @@
 package hnau.lexplore.exercise.dto.dictionary
 
 import android.content.Context
-import arrow.core.identity
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.dictionary.provider.DictionariesProvider
 import hnau.lexplore.exercise.dto.dictionary.provider.SimpleDictionariesProvider

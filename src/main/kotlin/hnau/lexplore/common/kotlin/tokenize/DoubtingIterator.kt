@@ -1,8 +1,8 @@
 package hnau.lexplore.common.kotlin.tokenize
 
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.None
 
 internal interface DoubtingIterator<T> {
 

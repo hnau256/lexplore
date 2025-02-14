@@ -1,7 +1,5 @@
 package hnau.lexplore.ui.model.page
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import hnau.lexplore.common.kotlin.Loadable
 import hnau.lexplore.common.kotlin.LoadableStateFlow
 import hnau.lexplore.common.kotlin.coroutines.flatMapState
@@ -10,7 +8,6 @@ import hnau.lexplore.common.kotlin.getOrInit
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.model.goback.NeverGoBackHandler
-import hnau.lexplore.common.ui.uikit.Content
 import hnau.lexplore.exercise.Engine
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.question.QuestionModel

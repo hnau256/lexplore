@@ -1,15 +1,11 @@
 package hnau.lexplore.exercise.dto.dictionary.provider
 
-import androidx.compose.ui.util.lerp
 import arrow.core.Either
 import hnau.lexplore.common.kotlin.ifNull
 import hnau.lexplore.common.kotlin.removePrefixOrNull
 import hnau.lexplore.common.kotlin.removeSuffixOrNull
 import hnau.lexplore.common.kotlin.tokenize.Tokenizer
 import hnau.lexplore.common.kotlin.tokenize.tokenize
-import hnau.lexplore.exercise.dto.Translation
-import hnau.lexplore.exercise.dto.Word
-import hnau.lexplore.exercise.dto.WordToLearn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream

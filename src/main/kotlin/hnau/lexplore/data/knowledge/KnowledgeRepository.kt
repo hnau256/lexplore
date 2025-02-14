@@ -1,6 +1,5 @@
 package hnau.lexplore.data.knowledge
 
-import android.content.Context
 import hnau.lexplore.data.db.AppDatabase
 import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordInfo

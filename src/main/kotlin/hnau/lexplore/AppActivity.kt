@@ -1,6 +1,5 @@
 package hnau.lexplore
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,13 +7,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.remember
 import androidx.lifecycle.lifecycleScope
 import hnau.lexplore.ui.AppViewModel
-import hnau.lexplore.ui.model.init.InitModel
-import hnau.lexplore.ui.model.init.impl
 import hnau.lexplore.ui.model.init.InitProjector
-import hnau.lexplore.ui.model.mainstack.MainStackProjector
+import hnau.lexplore.ui.model.init.impl
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

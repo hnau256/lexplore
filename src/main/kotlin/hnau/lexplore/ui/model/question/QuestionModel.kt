@@ -6,8 +6,8 @@ import hnau.lexplore.common.kotlin.getOrInit
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
-import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.Question
+import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.ui.model.error.ErrorModel
 import hnau.lexplore.ui.model.input.InputModel
