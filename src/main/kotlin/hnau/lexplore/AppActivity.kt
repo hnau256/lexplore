@@ -11,8 +11,10 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.remember
 import androidx.lifecycle.lifecycleScope
 import hnau.lexplore.ui.AppViewModel
-import hnau.lexplore.ui.model.InitModel
-import hnau.lexplore.ui.model.impl
+import hnau.lexplore.ui.model.init.InitModel
+import hnau.lexplore.ui.model.init.impl
+import hnau.lexplore.ui.model.init.InitProjector
+import hnau.lexplore.ui.model.mainstack.MainStackProjector
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -33,15 +35,15 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         initOnBackPressedDispatcherCallback()
-        setContent {
-            val context: Context = this@AppActivity
-            viewModel.initModel.Content(
-                dependencies = remember(context) {
-                    InitModel.ContentDependencies.impl(
-                        context = context
-                    )
-                }
+        val projector = InitProjector(
+            scope = lifecycleScope,
+            model = viewModel.initModel,
+            dependencies = InitProjector.Dependencies.impl(
+                context = this,
             )
+        )
+        setContent {
+            projector.Content()
         }
     }
 

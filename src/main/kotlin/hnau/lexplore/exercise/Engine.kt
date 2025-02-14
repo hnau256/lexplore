@@ -11,6 +11,7 @@ import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -34,10 +35,7 @@ class Engine(
             info = word.second,
             answer = { answer ->
                 val newForgettingFactor = answer.calcNewForgettingFactor(
-                    current = word
-                        .second
-                        ?.forgettingFactor
-                        ?: LearningConstants.initialForgettingFactor,
+                    current = word.second.forgettingFactor,
                 )
                 knowledgeRepository.update(
                     key = word.first.toLearn,

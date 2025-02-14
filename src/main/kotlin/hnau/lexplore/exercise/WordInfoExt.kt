@@ -2,6 +2,7 @@ package hnau.lexplore.exercise
 
 import hnau.lexplore.exercise.dto.KnowLevel
 import hnau.lexplore.exercise.dto.WordInfo
+import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlinx.datetime.Clock
 import kotlin.math.exp
 import kotlin.math.pow
@@ -10,7 +11,7 @@ val WordInfo?.knowLevel: KnowLevel
     get() {
         val now = Clock.System.now()
         val info = this ?: WordInfo(
-            forgettingFactor = LearningConstants.initialForgettingFactor,
+            forgettingFactor = forgettingFactor,
             lastAnswerTimestamp = now - LearningConstants.newWordFakeLastAnswerBefore
         )
         val durationFromLastAnswer = now - info.lastAnswerTimestamp

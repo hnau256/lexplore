@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.StateFlow
 class UnselectedDictionariesDelegate(
     scope: CoroutineScope,
     settings: AppSettings,
-    private val overwritten: MutableStateFlow<Set<DictionaryName>?>,
+    @PublishedApi
+    internal val overwritten: MutableStateFlow<Set<DictionaryName>?>,
 ) {
 
     private val setting: Setting<Set<DictionaryName>> =
@@ -38,7 +39,7 @@ class UnselectedDictionariesDelegate(
                 ?: setting.state.mapStateLite { it.getOrElse { emptySet() } }
         }
 
-    fun update(
+    inline fun update(
         newValue: (Set<DictionaryName>) -> Set<DictionaryName>,
     ) {
         overwritten.value = newValue(unselectedNames.value)

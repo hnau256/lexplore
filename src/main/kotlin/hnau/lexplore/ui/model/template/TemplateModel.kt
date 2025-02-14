@@ -1,6 +1,5 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.template
 
-import androidx.compose.runtime.Composable
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
@@ -18,19 +17,5 @@ class TemplateModel(
     )
 
     @Shuffle
-    interface Dependencies {
-
-    }
-
-    @Shuffle
-    interface ContentDependencies {
-
-    }
-
-    @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
-        TODO()
-    }
+    interface Dependencies
 }

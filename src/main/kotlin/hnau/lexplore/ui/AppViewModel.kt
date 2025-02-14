@@ -9,8 +9,8 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import hnau.lexplore.common.kotlin.mapper.toMapper
-import hnau.lexplore.ui.model.InitModel
-import hnau.lexplore.ui.model.impl
+import hnau.lexplore.ui.model.init.InitModel
+import hnau.lexplore.ui.model.init.impl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel

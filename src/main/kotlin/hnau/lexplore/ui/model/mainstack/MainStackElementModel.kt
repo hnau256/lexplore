@@ -1,8 +1,10 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.mainstack
 
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.ui.model.dictionaries.DictionariesModel
+import hnau.lexplore.ui.model.edit.EditModel
+import hnau.lexplore.ui.model.exercise.ExerciseModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

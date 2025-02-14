@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.page
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,7 +39,7 @@ class PageModel(
         fun question(): QuestionModel.Dependencies
     }
 
-    private val question: StateFlow<Loadable<QuestionModel>> = LoadableStateFlow(scope) {
+    val question: StateFlow<Loadable<QuestionModel>> = LoadableStateFlow(scope) {
         engine.generateNewQuestion(
             wordToExclude = skeleton.wordToExclude,
         )
@@ -66,21 +66,4 @@ class PageModel(
                 ifReady = GoBackHandlerProvider::goBackHandler,
             )
         }
-
-    @Shuffle
-    interface ContentDependencies {
-
-        fun question(): QuestionModel.ContentDependencies
-    }
-
-    @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
-        question.Content { question ->
-            question.Content(
-                dependencies = remember(dependencies) { dependencies.question() },
-            )
-        }
-    }
 }

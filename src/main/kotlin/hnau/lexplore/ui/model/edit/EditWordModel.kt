@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.edit
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -67,15 +67,12 @@ class EditWordModel(
         val knowledgeRepository: KnowledgeRepository
     }
 
-    @Shuffle
-    interface ContentDependencies {
-
-        val bubblesShower: BubblesShower
-    }
+    val input: MutableStateFlow<TextFieldValue>
+        get() = skeleton.input
 
     private val savingInProgressRegistry = InProgressRegistry()
 
-    private fun save(): Boolean {
+    fun save(): Boolean {
         val newForgettingFactor = skeleton
             .input
             .value
@@ -93,36 +90,5 @@ class EditWordModel(
             onReady()
         }
         return true
-    }
-
-    @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
-        val context = LocalContext.current
-        val focusRequester = remember { FocusRequester() }
-        TextInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Dimens.separation)
-                .focusRequester(focusRequester),
-            value = skeleton.input,
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions {
-                val saveResult = save()
-                if (!saveResult) {
-                    dependencies.bubblesShower.showBubble(
-                        Bubble(
-                            text = context.getString(R.string.edit_incorrect_number)
-                        )
-                    )
-                }
-            }
-        )
-        LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
     }
 }

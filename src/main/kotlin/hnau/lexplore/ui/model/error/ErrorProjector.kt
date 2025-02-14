@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model.question
+package hnau.lexplore.ui.model.error
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,11 +24,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import hnau.lexplore.R
-import hnau.lexplore.common.kotlin.coroutines.onSet
-import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
-import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
@@ -39,56 +35,21 @@ import hnau.lexplore.common.ui.uikit.shape.inRow
 import hnau.lexplore.common.ui.uikit.shape.start
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
-import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
-import hnau.lexplore.exercise.dto.Sureness
-import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.utils.TTS
-import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.Serializable
 
-class ErrorModel(
+class ErrorProjector(
     private val scope: CoroutineScope,
-    private val skeleton: Skeleton,
+    private val model: ErrorModel,
     private val dependencies: Dependencies,
-    private val wordToLearn: WordToLearn,
-    private val onTypo: (sureness: Sureness) -> Unit,
-    private val onEnteredCorrect: () -> Unit,
-) : GoBackHandlerProvider {
-
-    @Serializable
-    data class Skeleton(
-        val incorrectInput: String,
-        val selectedSureness: Sureness,
-        @Serializable(MutableStateFlowSerializer::class)
-        val input: MutableStateFlow<@Serializable(TextFieldValueSerializer::class) TextFieldValue> =
-            MutableStateFlow(TextFieldValue()),
-    )
-
-    private val input: MutableStateFlow<TextFieldValue> = skeleton
-        .input
-        .onSet { newValue ->
-            if (newValue.text.normalized == wordToLearn.word.normalized) {
-                onEnteredCorrect()
-            }
-        }
+) {
 
     @Shuffle
-    interface Dependencies {
-
-        val tts: TTS
-    }
-
-    @Shuffle
-    interface ContentDependencies
+    interface Dependencies
 
     @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
+    fun Content() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,7 +57,7 @@ class ErrorModel(
             verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         ) {
             Text(
-                text = stringResource(R.string.question_incorrect) + ":  " + skeleton.incorrectInput,
+                text = stringResource(R.string.question_incorrect) + ":  " + model.incorrectInput,
                 style = MaterialTheme.typography.bodyLarge,
             )
             Row(
@@ -107,7 +68,7 @@ class ErrorModel(
                     content = { Text(text = stringResource(R.string.question_typo)) },
                     activeColor = MaterialTheme.colorScheme.error,
                     style = ChipStyle.button,
-                    onClick = { onTypo(skeleton.selectedSureness) },
+                    onClick = { model.onTypo(model.selectedSureness) },
                     shape = HnauShape.inRow.start,
                 )
                 SpeakButton(
@@ -115,12 +76,12 @@ class ErrorModel(
                 )
             }
             Text(
-                text = wordToLearn.word,
+                text = model.wordToLearn.word,
                 style = MaterialTheme.typography.headlineMedium,
             )
             val focusRequester = remember { FocusRequester() }
             TextInput(
-                value = input,
+                value = model.input,
                 shape = HnauShape(),
                 keyboardOptions = KeyboardOptions(
                     autoCorrectEnabled = false,
@@ -143,8 +104,8 @@ class ErrorModel(
     ) {
         var speakNumber by remember { mutableIntStateOf(0) }
         var isSpeaking by remember { mutableStateOf(false) }
-        val tts = dependencies.tts
-        val word = wordToLearn.word
+        val tts = model.tts
+        val word = model.wordToLearn.word
         LaunchedEffect(speakNumber, tts, word) {
             if (speakNumber > 0) {
                 isSpeaking = true

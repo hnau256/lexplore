@@ -1,12 +1,9 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.mainstack
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandler
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.model.goback.fallback
-import hnau.lexplore.common.model.stack.Content
 import hnau.lexplore.common.model.stack.NonEmptyStack
 import hnau.lexplore.common.model.stack.StackModelElements
 import hnau.lexplore.common.model.stack.push
@@ -14,6 +11,8 @@ import hnau.lexplore.common.model.stack.stackGoBackHandler
 import hnau.lexplore.common.model.stack.tailGoBackHandler
 import hnau.lexplore.common.model.stack.tryDropLast
 import hnau.lexplore.ui.model.dictionaries.DictionariesModel
+import hnau.lexplore.ui.model.edit.EditModel
+import hnau.lexplore.ui.model.exercise.ExerciseModel
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +42,7 @@ class MainStackModel(
         fun edit(): EditModel.Dependencies
     }
 
-    private val stack: StateFlow<NonEmptyStack<MainStackElementModel>> = run {
+    val stack: StateFlow<NonEmptyStack<MainStackElementModel>> = run {
         val stack = skeleton.stack
         StackModelElements(
             scope = scope,
@@ -108,43 +107,4 @@ class MainStackModel(
             scope = scope,
             fallback = skeleton.stack.stackGoBackHandler(scope),
         )
-
-    @Shuffle
-    interface ContentDependencies {
-
-        fun exerice(): ExerciseModel.ContentDependencies
-
-        fun dictionaries(): DictionariesModel.ContentDependencies
-
-        fun edit(): EditModel.ContentDependencies
-    }
-
-    @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
-        stack.Content(
-            extractKey = { element ->
-                when (element) {
-                    is MainStackElementModel.Dictionaries -> 0
-                    is MainStackElementModel.Exercise -> 1
-                    is MainStackElementModel.Edit -> 2
-                }
-            }
-        ) { element ->
-            when (element) {
-                is MainStackElementModel.Exercise -> element.exercise.Content(
-                    dependencies = remember(dependencies) { dependencies.exerice() }
-                )
-
-                is MainStackElementModel.Dictionaries -> element.dictionaries.Content(
-                    dependencies = remember(dependencies) { dependencies.dictionaries() }
-                )
-
-                is MainStackElementModel.Edit -> element.edit.Content(
-                    dependencies = remember(dependencies) { dependencies.edit() }
-                )
-            }
-        }
-    }
 }

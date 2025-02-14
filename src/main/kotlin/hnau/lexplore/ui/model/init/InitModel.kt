@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model
+package hnau.lexplore.ui.model.init
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -38,6 +38,7 @@ import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.data.settings.AppSettings
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
+import hnau.lexplore.ui.model.mainstack.MainStackModel
 import hnau.lexplore.utils.TTS
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +84,7 @@ class InitModel(
         val dictionaries: Dictionaries,
     )
 
-    private val mainStackModel: StateFlow<Loadable<MainStackModel>> = LoadableStateFlow(scope) {
+    val mainStackModel: StateFlow<Loadable<MainStackModel>> = LoadableStateFlow(scope) {
         coroutineScope {
             val database = AppDatabase.create(
                 context = dependencies.context,
@@ -134,80 +135,4 @@ class InitModel(
                 ifReady = GoBackHandlerProvider::goBackHandler,
             )
         }
-
-    private val bubblesHolder = SharedBubblesHolder(
-        scope = scope,
-    )
-
-    @Shuffle
-    interface ContentDependencies {
-
-        val context: Context
-
-        fun mainStack(
-            bubblesShower: BubblesShower,
-            backButtonWidthProvider: BackButtonWidthProvider,
-        ): MainStackModel.ContentDependencies
-
-        companion object
-    }
-
-    @Composable
-    fun Content(
-        dependencies: ContentDependencies,
-    ) {
-        MaterialTheme(
-            colorScheme = buildColors(
-                primaryHue = MaterialHue.Yellow,
-                secondaryHue = MaterialHue.DeepPurple,
-                tertiaryHue = MaterialHue.Pink,
-            ),
-            shapes = remember {
-                val cornerSize = CornerSize(Dimens.cornerRadius)
-                val shape = RoundedCornerShape(cornerSize)
-                Shapes(
-                    extraSmall = shape,
-                    small = shape,
-                    medium = shape,
-                    large = shape,
-                    extraLarge = shape,
-                )
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.TopStart,
-            ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-                    LocalDensity provides Density(LocalDensity.current.density * 1.1f),
-                ) {
-                    val backButtonDelegate = remember(goBackHandler) {
-                        BackButtonDelegate(
-                            goBackHandler = goBackHandler,
-                        )
-                    }
-
-                    mainStackModel.Content { model ->
-                        model.Content(
-                            dependencies = remember(
-                                dependencies,
-                                backButtonDelegate,
-                                bubblesHolder,
-                            ) {
-                                dependencies.mainStack(
-                                    bubblesShower = bubblesHolder,
-                                    backButtonWidthProvider = backButtonDelegate,
-                                )
-                            }
-                        )
-                    }
-                    backButtonDelegate.Content()
-                    bubblesHolder.Content()
-                }
-            }
-        }
-    }
 }
