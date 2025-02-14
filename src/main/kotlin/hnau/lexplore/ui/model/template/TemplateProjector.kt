@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class TemplateProjector(
     private val scope: CoroutineScope,
-    private val model : TemplateModel,
+    private val model: TemplateModel,
     private val dependencies: Dependencies,
 ) {
 

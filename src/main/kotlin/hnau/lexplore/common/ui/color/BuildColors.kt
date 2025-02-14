@@ -187,7 +187,7 @@ private fun buildStaticColors(
 }
 
 private object Lightness {
-    
+
     enum class Direction { Near, AlmostNear, AlmostFar, Far }
 
     data class Collection(
@@ -243,5 +243,5 @@ private object Lightness {
             )
         }
     }
-    
+
 }

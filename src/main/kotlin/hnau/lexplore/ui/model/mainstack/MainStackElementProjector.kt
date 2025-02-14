@@ -11,8 +11,8 @@ sealed interface MainStackElementProjector {
     fun Content()
 
     data class Dictionaries(
-        private val dictionaries: DictionariesProjector
-    ): MainStackElementProjector {
+        private val dictionaries: DictionariesProjector,
+    ) : MainStackElementProjector {
 
         @Composable
         override fun Content() {
@@ -21,8 +21,8 @@ sealed interface MainStackElementProjector {
     }
 
     data class Edit(
-        private val edit: EditProjector
-    ): MainStackElementProjector {
+        private val edit: EditProjector,
+    ) : MainStackElementProjector {
 
         @Composable
         override fun Content() {
@@ -31,8 +31,8 @@ sealed interface MainStackElementProjector {
     }
 
     data class Exercise(
-        private val exercise: ExerciseProjector
-    ): MainStackElementProjector {
+        private val exercise: ExerciseProjector,
+    ) : MainStackElementProjector {
 
         @Composable
         override fun Content() {

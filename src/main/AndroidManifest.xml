@@ -5,12 +5,12 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.LEXplore"
-        tools:targetApi="31"
-        android:enableOnBackInvokedCallback="true">
+        tools:targetApi="31">
         <activity
             android:name=".AppActivity"
             android:exported="true"

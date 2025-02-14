@@ -40,7 +40,7 @@ data class Dictionary private constructor(
                 }
                 .fold(
                     initial = Dictionaries.empty,
-                ) {acc, dictionaries ->
+                ) { acc, dictionaries ->
                     acc + dictionaries.await()
                 }
         }

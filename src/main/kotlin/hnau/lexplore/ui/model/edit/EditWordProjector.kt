@@ -23,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class EditWordProjector(
     private val scope: CoroutineScope,
-    private val model : EditWordModel,
+    private val model: EditWordModel,
     private val dependencies: Dependencies,
 ) {
 
@@ -34,7 +34,8 @@ class EditWordProjector(
     }
 
     @Composable
-    fun Content() {val context = LocalContext.current
+    fun Content() {
+        val context = LocalContext.current
         val focusRequester = remember { FocusRequester() }
         TextInput(
             modifier = Modifier

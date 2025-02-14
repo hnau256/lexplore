@@ -12,7 +12,6 @@ internal interface DoubtingIterator<T> {
 }
 
 
-
 internal fun <T> Iterator<T>.doubting(): DoubtingIterator<T> = object : DoubtingIterator<T> {
 
     private val source: Iterator<T>

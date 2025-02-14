@@ -3,7 +3,7 @@ package hnau.lexplore.common.ui.uikit.topappbar
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 
-interface TopAppBarScope: RowScope {
+interface TopAppBarScope : RowScope {
 
     @Composable
     fun Title(

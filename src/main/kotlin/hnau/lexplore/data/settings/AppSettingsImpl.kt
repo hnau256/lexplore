@@ -21,7 +21,7 @@ class AppSettingsImpl(
     ) {
         SettingImpl(
             initialValue = initial.getOrNone(key),
-            update = {update(key, it)}
+            update = { update(key, it) }
         )
     }
 

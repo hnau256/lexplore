@@ -26,7 +26,7 @@ class UnselectedDictionariesDelegate(
         settings["unselected_dictionaries"]
             .map(
                 Mapper.stringSplit('|') +
-                Mapper(::DictionaryName, DictionaryName::name).toListMapper() +
+                        Mapper(::DictionaryName, DictionaryName::name).toListMapper() +
                         Mapper(List<DictionaryName>::toSet, Set<DictionaryName>::toList),
             )
 
