@@ -103,7 +103,7 @@ class InitProjector(
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-                    LocalDensity provides Density(LocalDensity.current.density * 1.1f),
+                    //LocalDensity provides Density(LocalDensity.current.density * 1.1f),
                 ) {
                     mainSackProjector.Content { mainStackProjector ->
                         mainStackProjector.Content()

@@ -59,7 +59,7 @@ class ExerciseModel(
                     .dictionaries[name]
                     .words
             }
-            .sortedBy(Word::index),
+            .sortedByDescending(Word::weight),
         knowledgeRepository = dependencies.knowledgeRepository,
     )
 

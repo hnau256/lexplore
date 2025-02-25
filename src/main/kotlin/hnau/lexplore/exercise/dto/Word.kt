@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Word(
-    val index: Float,
+    val weight: Float,
     val toLearn: WordToLearn,
     val translation: Translation,
 )
