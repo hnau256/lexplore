@@ -71,7 +71,9 @@ class DictionariesProjector(
             Dictionaries(
                 contentPadding = contentPadding,
             )
-            StartButton()
+            StartButton(
+                contentPadding = contentPadding,
+            )
             AnimatedVisibility(
                 visible = model.isLoadingWords.collectAsState().value,
             ) {
@@ -102,10 +104,13 @@ class DictionariesProjector(
     }
 
     @Composable
-    private fun StartButton() {
+    private fun StartButton(
+        contentPadding: PaddingValues,
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(contentPadding)
                 .padding(Dimens.largeSeparation),
             contentAlignment = Alignment.BottomEnd,
         ) {

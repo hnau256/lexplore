@@ -1,6 +1,6 @@
 plugins {
     val kotlinVersion = "2.1.0"
-    id("com.android.application") version "8.7.3"
+    id("com.android.application") version "8.8.1"
     id("org.jetbrains.kotlin.plugin.compose") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
