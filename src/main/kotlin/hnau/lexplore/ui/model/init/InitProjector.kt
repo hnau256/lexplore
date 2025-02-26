@@ -80,8 +80,6 @@ class InitProjector(
         MaterialTheme(
             colorScheme = buildColors(
                 primaryHue = MaterialHue.Blue,
-                secondaryHue = MaterialHue.BlueGrey,
-                tertiaryHue = MaterialHue.Brown,
                 tryUseDynamicColors = false,
             ),
             shapes = remember {

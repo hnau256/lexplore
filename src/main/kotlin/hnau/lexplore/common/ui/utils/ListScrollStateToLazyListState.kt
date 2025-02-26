@@ -1,5 +1,5 @@
 /*
-package hnau.lexplore.common.ui.utils
+package hnau.lexplore.common.ui.hnau.lexplore.common.ui.color.material.utils.utils
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable

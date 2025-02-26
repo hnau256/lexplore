@@ -231,9 +231,7 @@ private fun ColorsExampleVariant(
 ) {
     MaterialTheme(
         colorScheme = buildColors(
-            primaryHue = MaterialHue.Blue,
-            secondaryHue = MaterialHue.BlueGrey,
-            tertiaryHue = MaterialHue.Brown,
+            primaryHue = MaterialHue.Lime,
             isDark = isDark,
             tryUseDynamicColors = isDynamic,
         )

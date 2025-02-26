@@ -15,13 +15,12 @@ import hnau.lexplore.common.ui.color.material.MaterialColors
 import hnau.lexplore.common.ui.color.material.MaterialHue
 import hnau.lexplore.common.ui.color.material.MaterialLightness
 import hnau.lexplore.common.ui.color.material.get
+import scheme.Scheme
 
 
 @Composable
 fun buildColors(
     primaryHue: MaterialHue,
-    secondaryHue: MaterialHue,
-    tertiaryHue: MaterialHue,
     isDark: Boolean = isSystemInDarkTheme(),
     tryUseDynamicColors: Boolean = true,
 ): ColorScheme = when {
@@ -31,8 +30,6 @@ fun buildColors(
 
     else -> buildStaticColors(
         primaryHue = primaryHue,
-        secondaryHue = secondaryHue,
-        tertiaryHue = tertiaryHue,
         isDark = isDark,
     )
 }
@@ -49,65 +46,55 @@ private fun buildDynamicColors(
     }
 }
 
-private val errorHue = MaterialHue.Red
-
 @Composable
 private fun buildStaticColors(
     primaryHue: MaterialHue,
-    secondaryHue: MaterialHue,
-    tertiaryHue: MaterialHue,
     isDark: Boolean,
 ): ColorScheme {
-
-    val lightness = when (isDark) {
-        true -> Lightness.Collection.dark
-        false -> Lightness.Collection.light
+    val argb = MaterialColors[primaryHue].v600.let { color ->
+        color.r.toInt().shl(16) +
+                color.g.toInt().shl(8) +
+                color.b.toInt().shl(0)
+    }
+    val scheme = when (isDark) {
+        true -> Scheme.dark(argb)
+        false -> Scheme.light(argb)
     }
 
-    fun chooseColor(
-        hue: MaterialHue,
-        direction: Lightness.Direction,
-    ): Color {
-        val materialLightness = lightness[direction]
-        return MaterialColors[hue][materialLightness].compose
-    }
-
-    val primary = chooseColor(hue = primaryHue, direction = Lightness.Direction.Far)
-    val onPrimary = chooseColor(hue = primaryHue, direction = Lightness.Direction.Near)
-    val secondary = chooseColor(hue = secondaryHue, direction = Lightness.Direction.Far)
-    val onSecondary = chooseColor(hue = secondaryHue, direction = Lightness.Direction.Near)
-    val tertiary = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Far)
-    val onTertiary = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Near)
-    val primaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.AlmostFar)
-    val onPrimaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.Near)
-    val secondaryContainer = chooseColor(hue = secondaryHue, direction = Lightness.Direction.AlmostFar)
-    val onSecondaryContainer =
-        chooseColor(hue = secondaryHue, direction = Lightness.Direction.Near)
-    val tertiaryContainer = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.AlmostFar)
-    val onTertiaryContainer =
-        chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Near)
-    val surface = lightness[0.1]
-    val onSurface = lightness[0.9]
-    val surfaceVariant = lightness[0.2]
-    val onSurfaceVariant = lightness[0.8]
-    val background = lightness[0.02]
-    val onBackground = lightness[0.98]
-    val error = chooseColor(hue = errorHue, direction = Lightness.Direction.Far)
-    val onError = chooseColor(hue = errorHue, direction = Lightness.Direction.Near)
-    val inverseSurface = lightness[0.9]
-    val inverseOnSurface = lightness[0.1]
-    val inversePrimary = chooseColor(hue = primaryHue, direction = Lightness.Direction.Near)
-    val outline = lightness[0.9]
-    val outlineVariant = lightness[1]
-    val surfaceTint = chooseColor(hue = primaryHue, direction = Lightness.Direction.Far)
-    val scrim = lightness[1]
-    val surfaceDim = lightness[0.05]
-    val surfaceBright = lightness[0.1]
-    val surfaceLowest = lightness[0]
-    val surfaceLow = lightness[0.05]
-    val surfaceContainer = lightness[0.09]
-    val surfaceHigh = lightness[0.13]
-    val surfaceHighest = lightness[0.17]
+    val primary = Color(scheme.primary)
+    val onPrimary = Color(scheme.onPrimary)
+    val secondary = Color(scheme.secondary)
+    val onSecondary = Color(scheme.onSecondary)
+    val tertiary = Color(scheme.tertiary)
+    val onTertiary = Color(scheme.onTertiary)
+    val primaryContainer = Color(scheme.primaryContainer)
+    val onPrimaryContainer = Color(scheme.onPrimaryContainer)
+    val secondaryContainer = Color(scheme.secondaryContainer)
+    val onSecondaryContainer = Color(scheme.onSecondaryContainer)
+    val tertiaryContainer = Color(scheme.tertiaryContainer)
+    val onTertiaryContainer = Color(scheme.onTertiaryContainer)
+    val surface = Color(scheme.surface)
+    val onSurface = Color(scheme.onSurface)
+    val surfaceVariant = Color(scheme.surfaceVariant)
+    val onSurfaceVariant = Color(scheme.onSurfaceVariant)
+    val surfaceContainerLowest = Color(scheme.surface)
+    val surfaceContainerLow = Color(scheme.surface)
+    val surfaceContainer = Color(scheme.surface)
+    val surfaceContainerHigh = Color(scheme.surface)
+    val surfaceContainerHighest = Color(scheme.surface)
+    val surfaceBright = Color(scheme.surface)
+    val surfaceDim = Color(scheme.surface)
+    val surfaceTint = Color(scheme.surface)
+    val inverseSurface = Color(scheme.inverseSurface)
+    val inverseOnSurface = Color(scheme.inverseOnSurface)
+    val inversePrimary = Color(scheme.inversePrimary)
+    val background = Color(scheme.background)
+    val onBackground = Color(scheme.onBackground)
+    val error = Color(scheme.error)
+    val onError = Color(scheme.onError)
+    val outline = Color(scheme.outline)
+    val outlineVariant = Color(scheme.outlineVariant)
+    val scrim = Color(scheme.scrim)
 
     return when (isDark) {
         true -> darkColorScheme(
@@ -127,11 +114,11 @@ private fun buildStaticColors(
             onSurface = onSurface,
             surfaceVariant = surfaceVariant,
             onSurfaceVariant = onSurfaceVariant,
-            surfaceContainerLowest = surfaceLowest,
-            surfaceContainerLow = surfaceLow,
+            surfaceContainerLowest = surfaceContainerLowest,
+            surfaceContainerLow = surfaceContainerLow,
             surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = surfaceHigh,
-            surfaceContainerHighest = surfaceHighest,
+            surfaceContainerHigh = surfaceContainerHigh,
+            surfaceContainerHighest = surfaceContainerHighest,
             surfaceBright = surfaceBright,
             surfaceDim = surfaceDim,
             surfaceTint = surfaceTint,
@@ -164,11 +151,11 @@ private fun buildStaticColors(
             onSurface = onSurface,
             surfaceVariant = surfaceVariant,
             onSurfaceVariant = onSurfaceVariant,
-            surfaceContainerLowest = surfaceLowest,
-            surfaceContainerLow = surfaceLow,
+            surfaceContainerLowest = surfaceContainerLowest,
+            surfaceContainerLow = surfaceContainerLow,
             surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = surfaceHigh,
-            surfaceContainerHighest = surfaceHighest,
+            surfaceContainerHigh = surfaceContainerHigh,
+            surfaceContainerHighest = surfaceContainerHighest,
             surfaceBright = surfaceBright,
             surfaceDim = surfaceDim,
             surfaceTint = surfaceTint,
