@@ -14,11 +14,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,6 +93,22 @@ private fun ColorsExampleVariant(
             Text(
                 text = name,
             )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = Dimens.separation,
+                    alignment = Alignment.CenterHorizontally,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Switch(
+                    checked = false,
+                    onCheckedChange = {},
+                )
+                Switch(
+                    checked = true,
+                    onCheckedChange = {},
+                )
+            }
             Container(
                 name = "PrimaryContainer",
                 background = MaterialTheme.colorScheme.primaryContainer,
@@ -213,11 +231,11 @@ private fun ColorsExampleVariant(
 ) {
     MaterialTheme(
         colorScheme = buildColors(
-            primaryHue = MaterialHue.Yellow,
-            secondaryHue = MaterialHue.DeepPurple,
-            tertiaryHue = MaterialHue.Pink,
+            primaryHue = MaterialHue.Blue,
+            secondaryHue = MaterialHue.BlueGrey,
+            tertiaryHue = MaterialHue.Brown,
             isDark = isDark,
-            isDynamic = isDynamic,
+            tryUseDynamicColors = isDynamic,
         )
     ) {
         val lightness = when (isDark) {

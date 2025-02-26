@@ -79,9 +79,10 @@ class InitProjector(
     fun Content() {
         MaterialTheme(
             colorScheme = buildColors(
-                primaryHue = MaterialHue.Yellow,
-                secondaryHue = MaterialHue.DeepPurple,
-                tertiaryHue = MaterialHue.Pink,
+                primaryHue = MaterialHue.Blue,
+                secondaryHue = MaterialHue.BlueGrey,
+                tertiaryHue = MaterialHue.Brown,
+                tryUseDynamicColors = false,
             ),
             shapes = remember {
                 val cornerSize = CornerSize(Dimens.cornerRadius)

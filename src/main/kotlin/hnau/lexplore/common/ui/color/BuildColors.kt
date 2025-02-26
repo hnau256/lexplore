@@ -23,9 +23,9 @@ fun buildColors(
     secondaryHue: MaterialHue,
     tertiaryHue: MaterialHue,
     isDark: Boolean = isSystemInDarkTheme(),
-    isDynamic: Boolean = true,
+    tryUseDynamicColors: Boolean = true,
 ): ColorScheme = when {
-    isDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> buildDynamicColors(
+    tryUseDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> buildDynamicColors(
         isDark = isDark,
     )
 
@@ -78,14 +78,14 @@ private fun buildStaticColors(
     val onSecondary = chooseColor(hue = secondaryHue, direction = Lightness.Direction.Near)
     val tertiary = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Far)
     val onTertiary = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Near)
-    val primaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.Near)
-    val onPrimaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.Far)
-    val secondaryContainer = chooseColor(hue = secondaryHue, direction = Lightness.Direction.Near)
+    val primaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.AlmostFar)
+    val onPrimaryContainer = chooseColor(hue = primaryHue, direction = Lightness.Direction.Near)
+    val secondaryContainer = chooseColor(hue = secondaryHue, direction = Lightness.Direction.AlmostFar)
     val onSecondaryContainer =
-        chooseColor(hue = secondaryHue, direction = Lightness.Direction.Far)
-    val tertiaryContainer = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Near)
+        chooseColor(hue = secondaryHue, direction = Lightness.Direction.Near)
+    val tertiaryContainer = chooseColor(hue = tertiaryHue, direction = Lightness.Direction.AlmostFar)
     val onTertiaryContainer =
-        chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Far)
+        chooseColor(hue = tertiaryHue, direction = Lightness.Direction.Near)
     val surface = lightness[0.1]
     val onSurface = lightness[0.9]
     val surfaceVariant = lightness[0.2]
@@ -107,7 +107,7 @@ private fun buildStaticColors(
     val surfaceLow = lightness[0.05]
     val surfaceContainer = lightness[0.09]
     val surfaceHigh = lightness[0.13]
-    val surfaceHigest = lightness[0.17]
+    val surfaceHighest = lightness[0.17]
 
     return when (isDark) {
         true -> darkColorScheme(
@@ -131,7 +131,7 @@ private fun buildStaticColors(
             surfaceContainerLow = surfaceLow,
             surfaceContainer = surfaceContainer,
             surfaceContainerHigh = surfaceHigh,
-            surfaceContainerHighest = surfaceHigest,
+            surfaceContainerHighest = surfaceHighest,
             surfaceBright = surfaceBright,
             surfaceDim = surfaceDim,
             surfaceTint = surfaceTint,
@@ -168,7 +168,7 @@ private fun buildStaticColors(
             surfaceContainerLow = surfaceLow,
             surfaceContainer = surfaceContainer,
             surfaceContainerHigh = surfaceHigh,
-            surfaceContainerHighest = surfaceHigest,
+            surfaceContainerHighest = surfaceHighest,
             surfaceBright = surfaceBright,
             surfaceDim = surfaceDim,
             surfaceTint = surfaceTint,
@@ -229,15 +229,15 @@ private object Lightness {
             val dark = Collection(
                 near = MaterialLightness.V900,
                 almostNear = MaterialLightness.V800,
-                almostFar = MaterialLightness.V100,
-                far = MaterialLightness.V50,
+                almostFar = MaterialLightness.V200,
+                far = MaterialLightness.V100,
                 positiveLightness = true,
             )
 
             val light = Collection(
                 near = MaterialLightness.V50,
                 almostNear = MaterialLightness.V100,
-                almostFar = MaterialLightness.V800,
+                almostFar = MaterialLightness.V700,
                 far = MaterialLightness.V900,
                 positiveLightness = false,
             )
