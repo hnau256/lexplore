@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "hnau.lexplore"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "hnau.lexplore"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -43,14 +43,14 @@ android {
 
 dependencies {
     implementation("androidx.compose.material3:material3:1.3.1")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.activity:activity-compose:1.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("io.arrow-kt:arrow-core:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.7")
 
-    val composeUi = "1.7.6"
+    val composeUi = "1.7.8"
     implementation("androidx.compose.ui:ui:$composeUi")
     implementation("androidx.compose.ui:ui-tooling:$composeUi")
     debugImplementation("androidx.compose.ui:ui-tooling-preview:$composeUi")

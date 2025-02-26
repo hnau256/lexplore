@@ -5,6 +5,7 @@ import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.dictionary.provider.DictionariesProvider
 import kotlinx.serialization.Serializable
 
+@ConsistentCopyVisibility
 @Serializable
 data class Dictionary private constructor(
     val words: List<Word>,

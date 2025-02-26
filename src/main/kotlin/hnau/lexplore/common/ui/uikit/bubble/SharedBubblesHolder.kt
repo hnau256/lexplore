@@ -1,6 +1,8 @@
 package hnau.lexplore.common.ui.uikit.bubble
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +21,8 @@ class SharedBubblesHolder(
         extraBufferCapacity = Int.MAX_VALUE,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override val visibleBubble: StateFlow<Bubble?> = bubbles
         .transformLatest { bubble ->
             emit(bubble)
