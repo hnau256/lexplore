@@ -28,6 +28,13 @@ class AppActivity : ComponentActivity() {
         get() = viewModel.initModel.goBackHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val a = listOf(0f).sorted().let { partsCounts ->
+            val count = partsCounts.size
+            when (count % 2) {
+                0 -> (partsCounts[count / 2] + partsCounts[count / 2 + 1]) / 2
+                else -> partsCounts[count / 2]
+            }
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         initOnBackPressedDispatcherCallback()

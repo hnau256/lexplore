@@ -26,7 +26,7 @@ sealed interface MainStackElementModel : GoBackHandlerProvider {
     sealed interface Skeleton {
 
         @Serializable
-        @SerialName("dictionaries")
+        @SerialName("data/dictionaries")
         data class Dictionaries(
             val dictionaries: DictionariesModel.Skeleton = DictionariesModel.Skeleton(),
         ) : Skeleton

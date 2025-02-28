@@ -22,7 +22,7 @@ class Frequencies private constructor(
         ): Frequencies {
             val list =  DictionariesProviderUtils
                 .readLines(
-                    stream = context.assets.open("frequency.txt")
+                    stream = context.assets.open("data/frequency.txt")
                 )
                 .map { line ->
                     val parts = line

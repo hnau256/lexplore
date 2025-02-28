@@ -1,10 +1,16 @@
 plugins {
     val kotlinVersion = "2.1.0"
-    id("com.android.application") version "8.8.1"
+    id("com.android.application") version "8.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     kotlin("android") version kotlinVersion
+}
+
+apply("scripts/build-dictionaries-assert.gradle.kts")
+
+tasks.named("preBuild").configure {
+    dependsOn("buildDictionariesAssert")
 }
 
 android {
@@ -43,7 +49,7 @@ android {
 
 dependencies {
     implementation("androidx.compose.material3:material3:1.3.1")
-    implementation("androidx.activity:activity-compose:1.10.0")
+    implementation("androidx.activity:activity-compose:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("io.arrow-kt:arrow-core:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")

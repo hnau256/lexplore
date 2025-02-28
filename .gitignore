@@ -6,3 +6,4 @@
 build
 /captures
 local.properties
+/src/main/assets/dictionaries.json

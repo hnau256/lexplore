@@ -70,5 +70,5 @@ object DictionariesProvider {
         }
         .toList()
 
-    private const val dictionariesPath = "dictionaries/"
+    private const val dictionariesPath = "data/dictionaries/"
 }
