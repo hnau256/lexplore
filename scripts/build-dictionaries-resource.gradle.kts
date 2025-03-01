@@ -3,12 +3,12 @@ import org.gradle.kotlin.dsl.*
 import java.io.File
 import java.text.Normalizer
 
-tasks.register<BuildDictionariesAssertTask>("buildDictionariesAssert") {
+tasks.register<BuildDictionariesResourceTask>("buildDictionariesResource") {
     sourceDir = file("data")
-    outputDir = file("src/main/assets")
+    outputDir = file("src/main/res/raw")
 }
 
-open class BuildDictionariesAssertTask : DefaultTask() {
+open class BuildDictionariesResourceTask : DefaultTask() {
 
     @InputDirectory
     lateinit var sourceDir: File
@@ -48,12 +48,12 @@ open class BuildDictionariesAssertTask : DefaultTask() {
                         }
                         val word = parts[0].trim().let(::Word)
                         val translation = parts[1].trim()
-                        val count = parts
+                        val weight = parts
                             .getOrNull(2)
                             ?.toFloat()
                             ?: word.calcCount(counts)
 
-                        Triple(word.build(), translation, count)
+                        Triple(word.build(), translation, weight)
                     }
                     .toList()
                     .sortedByDescending(Triple<String, String, Float>::third)
@@ -71,8 +71,8 @@ open class BuildDictionariesAssertTask : DefaultTask() {
                     prefix = "[",
                     postfix = "]",
                     separator = ",",
-                ) { (word, translation, count) ->
-                    "{\"word\":\"$word\",\"translation\":\"$translation\",\"count\":$count}"
+                ) { (word, translation, weight) ->
+                    "{\"word\":\"$word\",\"translation\":\"$translation\",\"weight\":$weight}"
                 }
                 "{\"name\":\"$name\",\"words\":$wordsJson}"
             }

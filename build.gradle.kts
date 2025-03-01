@@ -7,10 +7,10 @@ plugins {
     kotlin("android") version kotlinVersion
 }
 
-apply("scripts/build-dictionaries-assert.gradle.kts")
+apply("scripts/build-dictionaries-resource.gradle.kts")
 
 tasks.named("preBuild").configure {
-    dependsOn("buildDictionariesAssert")
+    dependsOn("buildDictionariesResource")
 }
 
 android {
