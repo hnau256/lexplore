@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -31,9 +32,7 @@ fun ProgressIndicatorPanel(
     ),
     horizontalAlignment = Alignment.CenterHorizontally,
 ) {
-    ProgressIndicator(
-        size = ProgressIndicatorSize.large,
-    )
+    CircularProgressIndicator()
     content?.let { contentNotNull ->
         Separator()
         CompositionLocalProvider(

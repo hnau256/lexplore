@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +36,6 @@ import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.common.ui.uikit.Separator
-import hnau.lexplore.common.ui.uikit.progressindicator.ProgressIndicatorPanel
 import hnau.lexplore.common.ui.uikit.state.NullableStateContent
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
@@ -162,7 +162,7 @@ class QuestionProjector(
             AnimatedVisibility(
                 visible = model.isAnswering.collectAsState().value,
             ) {
-                ProgressIndicatorPanel()
+                CircularProgressIndicator()
             }
         }
     }
