@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import hnau.lexplore.common.ui.uikit.utils.appInsets
-import hnau.lexplore.common.ui.uikit.Space as UiKitSpace
+import hnau.lexplore.common.ui.uikit.Separator as UiKitSpace
 
 @Composable
 fun BackButtonWidthProvider.Space() {

@@ -1,12 +1,20 @@
 package hnau.lexplore.ui.model.question
 
+import arrow.core.getOrElse
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
+import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.getOrInit
+import hnau.lexplore.common.kotlin.mapper.Mapper
+import hnau.lexplore.common.kotlin.mapper.stringToBoolean
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.data.knowledge.KnowledgeRepository
+import hnau.lexplore.data.settings.AppSettings
+import hnau.lexplore.data.settings.Setting
+import hnau.lexplore.data.settings.map
+import hnau.lexplore.data.settings.value
 import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
@@ -14,6 +22,7 @@ import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.error.ErrorModel
 import hnau.lexplore.ui.model.input.InputModel
+import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +42,8 @@ class QuestionModel(
     data class Skeleton(
         val wordToLearn: WordToLearn,
         @Serializable(MutableStateFlowSerializer::class)
+        val previousWord: MutableStateFlow<WordToLearn?>,
+        @Serializable(MutableStateFlowSerializer::class)
         val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
         var input: InputModel.Skeleton? = null,
     )
@@ -47,6 +58,57 @@ class QuestionModel(
         val exerciseWords: ExerciseWords
 
         val repository: KnowledgeRepository
+
+        val settings: AppSettings
+
+        val tts: TTS
+    }
+
+    private val autoTTSSetting: Setting<Boolean> = dependencies
+        .settings["auto_tts"]
+        .map(Mapper.stringToBoolean)
+
+    val autoTTS: Boolean
+        get() = autoTTSSetting.value.getOrElse { true }
+
+    val switchAutoTTS: StateFlow<(() -> Unit)?> = actionOrNullIfExecuting(
+        scope = scope,
+    ) {
+        autoTTSSetting.update(
+            newValue = !autoTTS,
+        )
+    }
+
+    data class PreviousWordSpeaker(
+        val word: WordToLearn,
+        val speak: StateFlow<(() -> Unit)?>,
+        val close: () -> Unit,
+    )
+
+    val previousWordSpeaker: StateFlow<PreviousWordSpeaker?> = skeleton
+        .previousWord
+        .mapWithScope(scope) { previousWordScope, previousWordOrNull ->
+            previousWordOrNull?.let { previousWord ->
+                PreviousWordSpeaker(
+                    word = previousWord,
+                    speak = actionOrNullIfExecuting(
+                        scope = previousWordScope,
+                    ) {
+                        dependencies.tts.speek(previousWord.word)
+                    },
+                    close = { skeleton.previousWord.value = null },
+                )
+            }
+        }
+
+    init {
+        if (autoTTS) {
+            previousWordSpeaker
+                .value
+                ?.speak
+                ?.value
+                ?.invoke()
+        }
     }
 
     val wordToLearn: WordToLearn
@@ -84,6 +146,7 @@ class QuestionModel(
                         onEnteredCorrect = { onAnswer(Answer.Incorrect) },
                         onTypo = ::onCorrect,
                         wordToLearn = skeleton.wordToLearn,
+                        autoTTS = autoTTS,
                     )
                 )
             }

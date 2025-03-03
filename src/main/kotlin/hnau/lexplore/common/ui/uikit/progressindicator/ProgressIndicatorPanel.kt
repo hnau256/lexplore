@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import hnau.lexplore.common.ui.uikit.Space
+import hnau.lexplore.common.ui.uikit.Separator
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 
 @Composable
@@ -35,7 +35,7 @@ fun ProgressIndicatorPanel(
         size = ProgressIndicatorSize.large,
     )
     content?.let { contentNotNull ->
-        Space()
+        Separator()
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colorScheme.onBackground,
             LocalTextStyle provides MaterialTheme.typography.headlineMedium,

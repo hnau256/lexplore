@@ -47,7 +47,11 @@ class ExerciseModel(
     @Serializable
     data class Skeleton(
         @Serializable(MutableStateFlowSerializer::class)
-        val state: MutableStateFlow<State> = MutableStateFlow(State.Initial),
+        val state: MutableStateFlow<State> = MutableStateFlow(
+            State.Prepare(
+                previousWord = null,
+            )
+        ),
 
         @Serializable(MutableStateFlowSerializer::class)
         val displayConfirmGoBack: MutableStateFlow<Boolean> = MutableStateFlow(false),
@@ -59,13 +63,9 @@ class ExerciseModel(
     sealed interface State {
 
         @Serializable
-        @SerialName("initial")
-        data object Initial : State
-
-        @Serializable
-        @SerialName("word_to_exclude")
-        data class WordToExclude(
-            val wordToExclude: WordToLearn,
+        @SerialName("prepare")
+        data class Prepare(
+            val previousWord: WordToLearn?,
         ) : State
 
         @Serializable
@@ -124,12 +124,9 @@ class ExerciseModel(
                 .state
                 .collectLatest { state ->
                     when (state) {
-                        State.Initial -> switchToNewQuestion(
-                            wordToLearnToExclude = null,
-                        )
 
-                        is State.WordToExclude -> switchToNewQuestion(
-                            wordToLearnToExclude = state.wordToExclude,
+                        is State.Prepare -> switchToNewQuestion(
+                            previousWord = state.previousWord,
                         )
 
                         is State.Question -> Unit
@@ -139,16 +136,17 @@ class ExerciseModel(
     }
 
     private suspend fun switchToNewQuestion(
-        wordToLearnToExclude: WordToLearn?,
+        previousWord: WordToLearn?,
     ) {
         inProgressRegistry.executeRegistered {
             val engine = engine.await()
             val newWordToLearn = engine.findNextWordToLearn(
-                wordToLearnToExclude = wordToLearnToExclude,
+                wordToLearnToExclude = previousWord,
             )
             skeleton.state.value = State.Question(
                 question = QuestionModel.Skeleton(
                     wordToLearn = newWordToLearn,
+                    previousWord = MutableStateFlow(previousWord),
                 )
             )
         }
@@ -163,8 +161,8 @@ class ExerciseModel(
             word = wordToLearn,
             answer = answer,
         )
-        skeleton.state.value = State.WordToExclude(
-            wordToExclude = wordToLearn,
+        skeleton.state.value = State.Prepare(
+            previousWord = wordToLearn,
         )
     }
 
@@ -173,7 +171,7 @@ class ExerciseModel(
         .mapNotNull { state ->
             when (state) {
                 is State.Question -> state.question
-                State.Initial, is State.WordToExclude -> null
+                is State.Prepare -> null
             }
         }
         .map { questionSkeleton ->
@@ -192,7 +190,7 @@ class ExerciseModel(
                             .let { localState ->
                                 when (localState) {
                                     is State.Question -> localState.question.wordToLearn
-                                    State.Initial, is State.WordToExclude -> null
+                                    is State.Prepare -> null
                                 }
                             }
                         val wordToLearn = questionSkeleton.wordToLearn

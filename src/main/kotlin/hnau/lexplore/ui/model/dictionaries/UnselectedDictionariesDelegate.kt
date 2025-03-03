@@ -22,13 +22,12 @@ class UnselectedDictionariesDelegate(
     internal val overwritten: MutableStateFlow<Set<DictionaryName>?>,
 ) {
 
-    private val setting: Setting<Set<DictionaryName>> =
-        settings["unselected_dictionaries"]
-            .map(
-                Mapper.stringSplit('|') +
-                        Mapper(::DictionaryName, DictionaryName::name).toListMapper() +
-                        Mapper(List<DictionaryName>::toSet, Set<DictionaryName>::toList),
-            )
+    private val setting: Setting<Set<DictionaryName>> = settings["unselected_dictionaries"]
+        .map(
+            Mapper.stringSplit('|') +
+                    Mapper(::DictionaryName, DictionaryName::name).toListMapper() +
+                    Mapper(List<DictionaryName>::toSet, Set<DictionaryName>::toList),
+        )
 
     val unselectedNames: StateFlow<Set<DictionaryName>> = overwritten
         .flatMapState(

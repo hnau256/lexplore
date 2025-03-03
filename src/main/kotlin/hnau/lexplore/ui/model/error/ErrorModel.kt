@@ -19,6 +19,7 @@ class ErrorModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
+    private val autoTTS: Boolean,
     val onTypo: (sureness: Sureness) -> Unit,
     private val onEnteredCorrect: () -> Unit,
 ) : GoBackHandlerProvider {

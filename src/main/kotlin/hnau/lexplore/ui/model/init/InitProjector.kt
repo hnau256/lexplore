@@ -20,12 +20,12 @@ import hnau.lexplore.common.kotlin.Loadable
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.color.buildColors
 import hnau.lexplore.common.ui.color.material.MaterialHue
-import hnau.lexplore.common.ui.uikit.Content
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonDelegate
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonWidthProvider
 import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
 import hnau.lexplore.common.ui.uikit.bubble.Content
 import hnau.lexplore.common.ui.uikit.bubble.SharedBubblesHolder
+import hnau.lexplore.common.ui.uikit.state.LoadableContent
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.ui.model.mainstack.MainStackProjector
 import hnau.shuffler.annotations.Shuffle
@@ -103,7 +103,7 @@ class InitProjector(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground,
                     LocalDensity provides Density(LocalDensity.current.density * 1.1f),
                 ) {
-                    mainSackProjector.Content { mainStackProjector ->
+                    mainSackProjector.LoadableContent { mainStackProjector ->
                         mainStackProjector.Content()
                     }
                     backButtonDelegate.Content()

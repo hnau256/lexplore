@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.Dp
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 
 @Composable
-fun Space(
+fun Separator(
     size: Dp = Dimens.separation,
 ) = Spacer(
     modifier = Modifier.size(size),
