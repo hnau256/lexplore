@@ -52,7 +52,6 @@ class QuestionProjector(
     @Shuffle
     interface Dependencies {
 
-
         fun error(): ErrorProjector.Dependencies
 
         fun input(): InputProjector.Dependencies
@@ -108,7 +107,7 @@ class QuestionProjector(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = model.title + " (" + model.question.info?.forgettingFactor?.factor?.let {
+                    text = model.title + " (" + model.info?.forgettingFactor?.factor?.let {
                         round(
                             it * 10
                         ) / 10
@@ -127,7 +126,7 @@ class QuestionProjector(
                             shape = RoundedCornerShape(100)
                         )
                 ) {
-                    val knowLevel = model.question.info.knowLevel.level
+                    val knowLevel = model.info.knowLevel.level
                     if (knowLevel > 0) {
                         Box(
                             modifier = Modifier

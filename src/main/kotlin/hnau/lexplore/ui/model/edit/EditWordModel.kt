@@ -8,7 +8,7 @@ import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.dto.ForgettingFactor
-import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ class EditWordModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val word: Word,
+    private val wordToLearn: WordToLearn,
     private val onReady: () -> Unit,
 ) : GoBackHandlerProvider {
 
@@ -65,7 +65,7 @@ class EditWordModel(
         scope.launch {
             savingInProgressRegistry.executeRegistered {
                 dependencies.knowledgeRepository.update(
-                    key = word.toLearn,
+                    key = wordToLearn,
                     newForgettingFactor = newForgettingFactor,
                 )
             }

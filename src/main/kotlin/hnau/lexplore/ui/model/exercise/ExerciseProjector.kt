@@ -1,6 +1,7 @@
 package hnau.lexplore.ui.model.exercise
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -11,9 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import hnau.lexplore.R
+import hnau.lexplore.common.kotlin.Loadable
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
+import hnau.lexplore.common.ui.uikit.progressindicator.ProgressIndicatorPanel
 import hnau.lexplore.common.ui.utils.getTransitionSpecForHorizontalSlide
-import hnau.lexplore.ui.model.page.PageProjector
+import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.ui.model.question.QuestionProjector
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -28,33 +32,46 @@ class ExerciseProjector(
     @Shuffle
     interface Dependencies {
 
-        fun page(): PageProjector.Dependencies
+        fun question(): QuestionProjector.Dependencies
     }
 
-    private val page: StateFlow<PageProjector> = model
+    private val question: StateFlow<Loadable<Pair<WordToLearn, QuestionProjector>>> = model
         .question
-        .mapWithScope(scope) { questionScope, model ->
-            PageProjector(
-                scope = questionScope,
-                model = model,
-                dependencies = dependencies.page(),
-            )
+        .mapWithScope(scope) { questionScope, questionModelOrLoading ->
+            questionModelOrLoading.map { questionModel ->
+                val wordToLearn = questionModel.wordToLearn
+                val projector = QuestionProjector(
+                    scope = questionScope,
+                    model = questionModel,
+                    dependencies = dependencies.question(),
+                )
+                wordToLearn to projector
+            }
         }
 
     @Composable
     fun Content() {
-        val currentPage: PageProjector by page.collectAsState()
+        val currentPage by question.collectAsState()
         AnimatedContent(
             modifier = Modifier
                 .fillMaxSize(),
             targetState = currentPage,
             label = "CurrentQuestion",
             transitionSpec = getTransitionSpecForHorizontalSlide(
-                duration = 400.milliseconds,
-                slideCoefficientProvider = { 0.2f },
+                duration = 300.milliseconds,
+                slideCoefficientProvider = { 0.3f },
+            ),
+            contentKey = { it.orNull()?.first?.word },
+        ) { localQuestionOrLoading ->
+            localQuestionOrLoading.fold(
+                ifLoading = { },
+                ifReady = { (_, question) -> question.Content() }
             )
-        ) { localPage ->
-            localPage.Content()
+        }
+        AnimatedVisibility(
+            visible = model.isInProgress.collectAsState().value,
+        ) {
+            ProgressIndicatorPanel()
         }
         ConfirmGoBackDialog()
     }

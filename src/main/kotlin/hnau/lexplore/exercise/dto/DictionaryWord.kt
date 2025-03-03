@@ -3,8 +3,8 @@ package hnau.lexplore.exercise.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Word(
-    val weight: Float,
+data class DictionaryWord(
+    val weight: WordWeight,
     val toLearn: WordToLearn,
     val translation: Translation,
 )

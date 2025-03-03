@@ -6,9 +6,12 @@ import hnau.lexplore.common.kotlin.getOrInit
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
-import hnau.lexplore.exercise.Question
+import hnau.lexplore.data.knowledge.KnowledgeRepository
+import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
+import hnau.lexplore.exercise.dto.WordInfo
+import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.error.ErrorModel
 import hnau.lexplore.ui.model.input.InputModel
 import hnau.lexplore.utils.normalized
@@ -23,12 +26,12 @@ class QuestionModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    val question: Question,
-    private val switchToNextQuestion: () -> Unit,
+    private val onAnswer: suspend (Answer) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
     data class Skeleton(
+        val wordToLearn: WordToLearn,
         @Serializable(MutableStateFlowSerializer::class)
         val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
         var input: InputModel.Skeleton? = null,
@@ -40,12 +43,23 @@ class QuestionModel(
         fun input(): InputModel.Dependencies
 
         fun error(): ErrorModel.Dependencies
+
+        val exerciseWords: ExerciseWords
+
+        val repository: KnowledgeRepository
     }
 
-    private val onAnswerInProgressRegistry = InProgressRegistry()
+    val wordToLearn: WordToLearn
+        get() = skeleton.wordToLearn
+
+    val info: WordInfo? = dependencies
+        .repository[wordToLearn]
+        .value
+
+    private val answeringInProgressRegistry = InProgressRegistry()
 
     val isAnswering: StateFlow<Boolean>
-        get() = onAnswerInProgressRegistry.isProgress
+        get() = answeringInProgressRegistry.isProgress
 
     val state: StateFlow<QuestionStateModel> = skeleton
         .error
@@ -69,29 +83,18 @@ class QuestionModel(
                         dependencies = dependencies.error(),
                         onEnteredCorrect = { onAnswer(Answer.Incorrect) },
                         onTypo = ::onCorrect,
-                        wordToLearn = question.word.toLearn,
+                        wordToLearn = skeleton.wordToLearn,
                     )
                 )
             }
         }
-
-    fun onAnswer(
-        answer: Answer,
-    ) {
-        scope.launch {
-            onAnswerInProgressRegistry.executeRegistered {
-                question.answer(answer)
-                switchToNextQuestion()
-            }
-        }
-    }
 
     private fun onInput(
         input: String,
         sureness: Sureness,
     ) {
         when (input.normalized) {
-            question.word.toLearn.word.normalized -> onCorrect(
+            skeleton.wordToLearn.word.normalized -> onCorrect(
                 sureness = sureness,
             )
 
@@ -99,6 +102,16 @@ class QuestionModel(
                 incorrectInput = input,
                 selectedSureness = sureness,
             )
+        }
+    }
+
+    fun onAnswer(
+        answer: Answer,
+    ) {
+        scope.launch {
+            answeringInProgressRegistry.executeRegistered {
+                onAnswer.invoke(answer)
+            }
         }
     }
 
@@ -111,5 +124,8 @@ class QuestionModel(
     }
 
     val title: String
-        get() = question.word.translation.translation
+        get() = skeleton
+            .wordToLearn
+            .let(dependencies.exerciseWords::get)
+            .translation
 }

@@ -1,22 +1,22 @@
 package hnau.lexplore.exercise.dto.dictionary
 
 import android.content.Context
-import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.dictionary.provider.DictionariesProvider
 import kotlinx.serialization.Serializable
 
 @ConsistentCopyVisibility
 @Serializable
 data class Dictionary private constructor(
-    val words: List<Word>,
+    val dictionaryWords: List<DictionaryWord>,
 ) {
 
     companion object {
 
         fun create(
-            words: List<Word>,
+            dictionaryWords: List<DictionaryWord>,
         ): Dictionary = Dictionary(
-            words = words.sortedByDescending(Word::weight)
+            dictionaryWords = dictionaryWords.sortedByDescending(DictionaryWord::weight)
         )
 
         suspend fun loadList(

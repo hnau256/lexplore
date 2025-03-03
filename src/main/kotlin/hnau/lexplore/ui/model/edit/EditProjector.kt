@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
-import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.forgettingFactor
 import hnau.shuffler.annotations.Shuffle
@@ -37,8 +37,8 @@ class EditProjector(
         fun word(): EditWordProjector.Dependencies
     }
 
-    private val editWordProjector: StateFlow<Pair<WordToLearn, EditWordProjector>?> = model
-        .editWordModel
+    private val editWordToLearnProjector: StateFlow<Pair<WordToLearn, EditWordProjector>?> = model
+        .editWordToLearnModel
         .mapWithScope(scope) { editWordScope, wordWithModelOrNull ->
             wordWithModelOrNull?.let { (wordToLearn, model) ->
                 val projector = EditWordProjector(
@@ -60,7 +60,7 @@ class EditProjector(
                 )
             }
         ) { contentPadding ->
-            val edit: Pair<WordToLearn, EditWordProjector>? by editWordProjector.collectAsState()
+            val edit: Pair<WordToLearn, EditWordProjector>? by editWordToLearnProjector.collectAsState()
             LazyColumn(
                 state = model.scrollState,
                 contentPadding = contentPadding,
@@ -81,7 +81,7 @@ class EditProjector(
 
     @Composable
     private fun WordContent(
-        word: Word,
+        word: DictionaryWord,
         edit: Pair<WordToLearn, EditWordProjector>?,
     ) {
         val toLearn = word.toLearn
@@ -102,7 +102,7 @@ class EditProjector(
                 null -> ListItem(
                     modifier = Modifier
                         .clickable { model.updateSelectedWord(toLearn) },
-                    headlineContent = { Text(word.toLearn.word) },
+                    headlineContent = { Text(toLearn.word) },
                     supportingContent = { Text(word.translation.translation) },
                     trailingContent = {
                         Text(

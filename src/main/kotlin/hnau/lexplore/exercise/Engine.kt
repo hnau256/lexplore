@@ -1,100 +1,74 @@
 package hnau.lexplore.exercise
 
-import arrow.core.NonEmptyList
-import arrow.core.nonEmptyListOf
-import arrow.core.toNonEmptyListOrNull
 import hnau.lexplore.common.kotlin.sumOf
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.ForgettingFactor
+import hnau.lexplore.exercise.dto.KnowLevel
 import hnau.lexplore.exercise.dto.Sureness
-import hnau.lexplore.exercise.dto.Word
-import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.pow
 import kotlin.random.Random
 
 class Engine(
-    private val words: List<Word>,
+    private val wordsToLearn: List<WordToLearn>,
     private val knowledgeRepository: KnowledgeRepository,
 ) {
 
-    suspend fun generateNewQuestion(
-        wordToExclude: WordToLearn?,
-    ): Question = withContext(Dispatchers.Default) {
-        val wordsToChooseFrom = collectWordsToChoose(
-            wordToExclude = wordToExclude,
-        )
-        val word = wordsToChooseFrom.chooseRandom { (_, info) ->
-            info.weight
+    suspend fun findNextWordToLearn(
+        wordToLearnToExclude: WordToLearn?,
+    ): WordToLearn = withContext(Dispatchers.Default) {
+        val (word) = collectWordsToChoose(
+            wordToLearnToExclude = wordToLearnToExclude,
+        ).chooseRandom { (_, info) ->
+            info.chooseWeight
         }
-        Question(
-            word = word.first,
-            info = word.second,
-            answer = { answer ->
-                val newForgettingFactor = answer.calcNewForgettingFactor(
-                    current = word.second.forgettingFactor,
-                )
-                knowledgeRepository.update(
-                    key = word.first.toLearn,
-                    newForgettingFactor = newForgettingFactor,
-                )
-            }
+        word
+    }
+
+    suspend fun answer(
+        word: WordToLearn,
+        answer: Answer,
+    ) {
+        val info = knowledgeRepository[word].value
+        val newForgettingFactor = answer.calcNewForgettingFactor(
+            current = info.forgettingFactor,
+        )
+        knowledgeRepository.update(
+            key = word,
+            newForgettingFactor = newForgettingFactor,
         )
     }
+
+    private val KnowLevel.chooseWeight: Float
+        get() = (1f - level).pow(LearningConstants.weightPow)
 
     private fun collectWordsToChoose(
-        wordToExclude: WordToLearn?,
-    ): NonEmptyList<Pair<Word, WordInfo?>> {
-
-        fun collectAnsweredWordInfos(
-            filterByKnowLevel: Boolean,
-        ): NonEmptyList<Pair<Word, WordInfo>>? = words
-            .asSequence()
-            .filter { it.toLearn != wordToExclude }
-            .mapNotNull { word ->
-                val wordInfo = knowledgeRepository
-                    .get(word.toLearn)
-                    .value
-                    ?: return@mapNotNull null
-                word to wordInfo
+        wordToLearnToExclude: WordToLearn?,
+    ): List<Pair<WordToLearn, KnowLevel>> = wordsToLearn
+        .fold(
+            initial = false to emptyList<Pair<WordToLearn, KnowLevel>>(),
+        ) { (collectedUnknown, alreadyCollected), word ->
+            if (word == wordToLearnToExclude) {
+                return@fold collectedUnknown to alreadyCollected
             }
-            .filter { (_, info) ->
-                !filterByKnowLevel ||
-                        info.knowLevel <= LearningConstants.maxKnowLevelToAsk
+            val info = knowledgeRepository[word].value
+            val result = word to info.knowLevel
+            val answeredCorrectOnce =
+                info.forgettingFactor > LearningConstants.initialForgettingFactor
+            when (answeredCorrectOnce) {
+                false -> true to when (collectedUnknown) {
+                    true -> alreadyCollected
+                    false -> alreadyCollected + result
+                }
+
+                true -> collectedUnknown to (alreadyCollected + result)
             }
-            .toList()
-            .toNonEmptyListOrNull()
-
-        val answeredWordsWithLowKnowLevel = collectAnsweredWordInfos(
-            filterByKnowLevel = true,
-        )
-        if (answeredWordsWithLowKnowLevel != null) {
-            return answeredWordsWithLowKnowLevel
         }
-
-        val newWord = words
-            .asSequence()
-            .filter { it.toLearn != wordToExclude }
-            .firstOrNull { word ->
-                val info = knowledgeRepository.get(word.toLearn).value
-                info == null
-            }
-        if (newWord != null) {
-            return nonEmptyListOf(newWord to null)
-        }
-
-        val answeredWords = collectAnsweredWordInfos(
-            filterByKnowLevel = false,
-        )
-        if (answeredWords != null) {
-            return answeredWords
-        }
-
-        error("Unable find word to learn")
-    }
+        .second
 
     private fun Answer.calcNewForgettingFactor(
         current: ForgettingFactor,
@@ -117,7 +91,7 @@ class Engine(
             Sureness.Height -> 2f
         }
 
-    private inline fun <T> NonEmptyList<T>.chooseRandom(
+    private inline fun <T> List<T>.chooseRandom(
         weight: (T) -> Float,
     ): T {
         val withWeights = map { item ->

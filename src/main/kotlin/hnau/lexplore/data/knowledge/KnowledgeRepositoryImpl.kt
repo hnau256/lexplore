@@ -23,7 +23,7 @@ class KnowledgeRepositoryImpl private constructor(
             .mapValues { (_, value) -> MutableStateFlow<WordInfo?>(value) }
             .toMutableMap()
 
-    override fun get(
+    override operator fun get(
         key: WordToLearn,
     ): StateFlow<WordInfo?> = synchronized(infos) {
         infos.getOrPut(key) {

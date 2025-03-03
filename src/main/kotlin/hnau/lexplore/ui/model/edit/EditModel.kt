@@ -6,7 +6,7 @@ import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
-import hnau.lexplore.exercise.dto.Word
+import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
@@ -30,7 +30,7 @@ class EditModel(
         @Serializable(LazyListStateSerializer::class)
         val scrollState: LazyListState = LazyListState(),
         @Serializable(MutableStateFlowSerializer::class)
-        val selectedWord: MutableStateFlow<Pair<WordToLearn, EditWordModel.Skeleton>?> =
+        val selectedWordToLearn: MutableStateFlow<Pair<WordToLearn, EditWordModel.Skeleton>?> =
             MutableStateFlow(null),
     )
 
@@ -51,40 +51,35 @@ class EditModel(
     }
 
     fun getWordInfo(
-        word: WordToLearn,
+        wordToLearn: WordToLearn,
     ): StateFlow<WordInfo?> = dependencies
         .knowledgeRepository
-        .get(word)
+        .get(wordToLearn)
 
     fun updateSelectedWord(
-        word: WordToLearn,
+        wordToLearn: WordToLearn,
     ) {
-        val forgettingFactor = getWordInfo(word).value.forgettingFactor
-        skeleton.selectedWord.value = word to EditWordModel.Skeleton(
+        val forgettingFactor = getWordInfo(wordToLearn).value.forgettingFactor
+        skeleton.selectedWordToLearn.value = wordToLearn to EditWordModel.Skeleton(
             initialValue = forgettingFactor,
         )
     }
 
-    val words: List<Word> = dependencies
+    val words: List<DictionaryWord> = dependencies
         .dictionaries[skeleton.name]
-        .words
+        .dictionaryWords
 
-    val editWordModel: StateFlow<Pair<WordToLearn, EditWordModel>?> = run {
-        val wordsByToLearn: Map<WordToLearn, Word> = words.associateBy(Word::toLearn)
-
-        skeleton
-            .selectedWord
-            .mapWithScope(scope) { selectionScope, wordWithSkeleton ->
-                val (wordToLearn, editWordSkeleton) = wordWithSkeleton ?: return@mapWithScope null
-                val word = wordsByToLearn.getValue(wordToLearn)
-                val model = EditWordModel(
-                    scope = selectionScope,
-                    word = word,
-                    skeleton = editWordSkeleton,
-                    dependencies = dependencies.word(),
-                    onReady = { skeleton.selectedWord.value = null },
-                )
-                wordToLearn to model
-            }
-    }
+    val editWordToLearnModel: StateFlow<Pair<WordToLearn, EditWordModel>?> = skeleton
+        .selectedWordToLearn
+        .mapWithScope(scope) { selectionScope, wordWithSkeleton ->
+            val (wordToLearn, editWordSkeleton) = wordWithSkeleton ?: return@mapWithScope null
+            val model = EditWordModel(
+                scope = selectionScope,
+                wordToLearn = wordToLearn,
+                skeleton = editWordSkeleton,
+                dependencies = dependencies.word(),
+                onReady = { skeleton.selectedWordToLearn.value = null },
+            )
+            wordToLearn to model
+        }
 }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface KnowledgeRepository {
 
-    fun get(
+    operator fun get(
         key: WordToLearn,
     ): StateFlow<WordInfo?>
 

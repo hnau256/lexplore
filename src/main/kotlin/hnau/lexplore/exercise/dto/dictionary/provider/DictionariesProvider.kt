@@ -2,9 +2,10 @@ package hnau.lexplore.exercise.dto.dictionary.provider
 
 import android.content.Context
 import hnau.lexplore.R
+import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.Translation
-import hnau.lexplore.exercise.dto.Word
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.exercise.dto.WordWeight
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
@@ -32,9 +33,9 @@ object DictionariesProvider {
                 .associate { dictionaryJson ->
                     val name = DictionaryName(dictionaryJson.name)
                     val dictionary = Dictionary.create(
-                        words = dictionaryJson.words.map { word ->
-                            Word(
-                                weight = word.weight,
+                        dictionaryWords = dictionaryJson.words.map { word ->
+                            DictionaryWord(
+                                weight = WordWeight(word.weight),
                                 toLearn = WordToLearn(word.word),
                                 translation = Translation(word.translation),
                             )
@@ -45,6 +46,4 @@ object DictionariesProvider {
                 .let(::Dictionaries)
         }
     }
-
-    private const val dictionariesPath = "data/dictionaries/"
 }
