@@ -22,7 +22,7 @@ object LearningConstants {
 
     val initialForgettingFactor = ForgettingFactor(1f)
 
-    const val weightPow: Float = 4f
+    const val weightPow: Float = 6f
 
     val minForgettingFactor: ForgettingFactor = ForgettingFactor(1f)
 }
