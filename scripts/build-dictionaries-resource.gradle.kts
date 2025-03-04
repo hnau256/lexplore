@@ -2,6 +2,7 @@ import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
 import java.io.File
 import java.text.Normalizer
+import kotlin.text.lowercase
 
 tasks.register<BuildDictionariesResourceTask>("buildDictionariesResource") {
     sourceDir = file("data")
@@ -32,6 +33,7 @@ open class BuildDictionariesResourceTask : DefaultTask() {
         )
 
         val dictionariesDir = File(sourceDir, "dictionaries")
+        val collectedWords: MutableSet<String> = mutableSetOf()
         val dictionaries = dictionariesDir
             .list()
             .orEmpty()
@@ -46,7 +48,15 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                         if (parts.size != 2 && parts.size != 3) {
                             error("Expected <word>|<translation>{|<count>}, got $line")
                         }
-                        val word = parts[0].trim().let(::Word)
+                        val wordString = parts[0].trim()
+
+                        val collectedWord = wordString.lowercase()
+                        if (collectedWord in collectedWords) {
+                            error("Found $collectedWord twice")
+                        }
+                        collectedWords += collectedWord
+
+                        val word = wordString.let(::Word)
                         val translation = parts[1].trim()
                         val weight = parts
                             .getOrNull(2)
