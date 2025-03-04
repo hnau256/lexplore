@@ -12,6 +12,7 @@ import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 class ErrorModel(
@@ -19,7 +20,7 @@ class ErrorModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
-    private val autoTTS: Boolean,
+    private val autoTTS: StateFlow<Boolean>,
     val onTypo: (sureness: Sureness) -> Unit,
     private val onEnteredCorrect: () -> Unit,
 ) : GoBackHandlerProvider {

@@ -3,6 +3,7 @@ package hnau.lexplore.ui.model.question
 import arrow.core.getOrElse
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
 import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
+import hnau.lexplore.common.kotlin.coroutines.mapStateLite
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.getOrInit
 import hnau.lexplore.common.kotlin.mapper.Mapper
@@ -68,14 +69,14 @@ class QuestionModel(
         .settings["auto_tts"]
         .map(Mapper.stringToBoolean)
 
-    val autoTTS: Boolean
-        get() = autoTTSSetting.value.getOrElse { true }
+    val autoTTS: StateFlow<Boolean>
+        get() = autoTTSSetting.state.mapStateLite { it.getOrElse { true } }
 
     val switchAutoTTS: StateFlow<(() -> Unit)?> = actionOrNullIfExecuting(
         scope = scope,
     ) {
         autoTTSSetting.update(
-            newValue = !autoTTS,
+            newValue = !autoTTS.value,
         )
     }
 
@@ -102,7 +103,7 @@ class QuestionModel(
         }
 
     init {
-        if (autoTTS) {
+        if (autoTTS.value) {
             previousWordSpeaker
                 .value
                 ?.speak

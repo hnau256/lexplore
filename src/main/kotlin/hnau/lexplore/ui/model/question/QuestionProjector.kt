@@ -98,7 +98,8 @@ class QuestionProjector(
                     onClick = model.switchAutoTTS.collectAsState().value,
                     content = {
                         Icon {
-                            when (model.autoTTS) {
+                            val autoTTS by model.autoTTS.collectAsState()
+                            when (autoTTS) {
                                 true -> VolumeUp
                                 false -> VolumeOff
                             }
