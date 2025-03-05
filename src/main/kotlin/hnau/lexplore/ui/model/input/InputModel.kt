@@ -14,7 +14,7 @@ class InputModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    val onReady: (input: String, sureness: Sureness) -> Unit,
+    private val onReady: (input: String, sureness: Sureness) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
@@ -22,6 +22,8 @@ class InputModel(
         @Serializable(MutableStateFlowSerializer::class)
         val input: MutableStateFlow<@Serializable(TextFieldValueSerializer::class) TextFieldValue> =
             MutableStateFlow(TextFieldValue()),
+        @Serializable(MutableStateFlowSerializer::class)
+        val selectedSureness: MutableStateFlow<Sureness> = MutableStateFlow(Sureness.default),
     )
 
     val input: MutableStateFlow<TextFieldValue>
@@ -29,4 +31,16 @@ class InputModel(
 
     @Shuffle
     interface Dependencies
+
+    val selectedSureness: MutableStateFlow<Sureness>
+        get() = skeleton.selectedSureness
+
+    fun onReady(
+        input: String,
+    ) {
+        onReady(
+            input,
+            skeleton.selectedSureness.value,
+        )
+    }
 }

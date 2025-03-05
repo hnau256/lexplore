@@ -1,5 +1,8 @@
 package hnau.lexplore.exercise.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Sureness {
     Low,
     Medium,
@@ -7,6 +10,6 @@ enum class Sureness {
 
     companion object {
 
-        val primary: Sureness = Medium
+        val default: Sureness = Medium
     }
 }

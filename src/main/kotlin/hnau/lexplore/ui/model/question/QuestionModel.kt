@@ -15,7 +15,6 @@ import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.data.settings.AppSettings
 import hnau.lexplore.data.settings.Setting
 import hnau.lexplore.data.settings.map
-import hnau.lexplore.data.settings.value
 import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
