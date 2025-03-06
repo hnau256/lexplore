@@ -12,7 +12,7 @@ class MenuModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val onAnswer: (Answer) -> Unit,
+    val onAnswer: (Answer) -> Unit,
     val selectedSureness: MutableStateFlow<Sureness>,
 ) : GoBackHandlerProvider {
 

@@ -73,9 +73,8 @@ class QuestionProjector(
         fun menu(): MenuProjector.Dependencies
     }
 
-    private val state: StateFlow<QuestionStateProjector> = model
-        .state
-        .mapWithScope(scope) { stateScope, state ->
+    private val state: StateFlow<QuestionStateProjector> =
+        model.state.mapWithScope(scope) { stateScope, state ->
             when (state) {
                 is QuestionStateModel.Error -> QuestionStateProjector.Error(
                     ErrorProjector(
@@ -95,9 +94,8 @@ class QuestionProjector(
             }
         }
 
-    private val menu: StateFlow<MenuProjector?> = model
-        .menu
-        .mapWithScope(scope) { menuScope, menuOrNull ->
+    private val menu: StateFlow<MenuProjector?> =
+        model.menu.mapWithScope(scope) { menuScope, menuOrNull ->
             menuOrNull?.let { menu ->
                 MenuProjector(
                     scope = menuScope,
@@ -109,32 +107,22 @@ class QuestionProjector(
 
     @Composable
     fun Content() {
-        ScreenContent(
-            dependencies = remember(dependencies) { dependencies.screenContent() },
+        ScreenContent(dependencies = remember(dependencies) { dependencies.screenContent() },
             topAppBarContent = {
                 Spacer(modifier = Modifier.weight(1f))
-                Action(
-                    onClick = model.switchAutoTTS.collectAsState().value,
-                    content = {
-                        Icon {
-                            val autoTTS by model.autoTTS.collectAsState()
-                            when (autoTTS) {
-                                true -> VolumeUp
-                                false -> VolumeOff
-                            }
+                Action(onClick = model.switchAutoTTS.collectAsState().value, content = {
+                    Icon {
+                        val autoTTS by model.autoTTS.collectAsState()
+                        when (autoTTS) {
+                            true -> VolumeUp
+                            false -> VolumeOff
                         }
                     }
-                )
-                Action(
-                    onClick = { model.onAnswer(Answer.AlmostKnown) },
-                    content = { Icon { School } }
-                )
-                Action(
-                    onClick = { model.onAnswer(Answer.Useless) },
-                    content = { Icon { Delete } }
-                )
-            }
-        ) { contentPadding ->
+                })
+                Action(onClick = { model.onAnswer(Answer.AlmostKnown) },
+                    content = { Icon { School } })
+                Action(onClick = { model.onAnswer(Answer.Useless) }, content = { Icon { Delete } })
+            }) { contentPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -179,13 +167,19 @@ class QuestionProjector(
                 }
                 Separator()
                 menu.NullableStateContent(
+                    modifier = Modifier.fillMaxWidth(),
                     transitionSpec = TransitionSpec.vertical(),
                 ) { menuProjector ->
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = Dimens.separation)
+                            .horizontalDisplayPadding(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
                     ) {
                         menuProjector.Content()
-                        Separator()
                     }
                 }
                 LinearProgressIndicator(
@@ -222,57 +216,55 @@ class QuestionProjector(
 
     @Composable
     private fun PreviousWordSpeaker() {
-        model
-            .previousWordSpeaker
-            .NullableStateContent(
-                transitionSpec = TransitionSpec.vertical(),
-            ) { previousWordSpeaker ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
+        model.previousWordSpeaker.NullableStateContent(
+            transitionSpec = TransitionSpec.vertical(),
+        ) { previousWordSpeaker ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                Card(
+                    shape = RoundedCornerShape(
+                        topStartPercent = 0,
+                        bottomStartPercent = 0,
+                        topEndPercent = 100,
+                        bottomEndPercent = 100,
+                    ),
+                    modifier = Modifier
+                        .padding(
+                            bottom = Dimens.separation,
+                        )
+                        .padding(
+                            end = Dimens.separation,
+                        ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
                 ) {
-                    Card(
-                        shape = RoundedCornerShape(
-                            topStartPercent = 0,
-                            bottomStartPercent = 0,
-                            topEndPercent = 100,
-                            bottomEndPercent = 100,
-                        ),
-                        modifier = Modifier
-                            .padding(
-                                bottom = Dimens.separation,
-                            )
-                            .padding(
-                                end = Dimens.separation,
-                            ),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Separator(Dimens.smallSeparation)
+                        Icon { ChevronLeft }
+                        Text(
+                            text = previousWordSpeaker.word.word,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        val speakOrNull: (() -> Unit)? by previousWordSpeaker.speak.collectAsState()
+                        IconButton(
+                            onClick = { speakOrNull?.invoke() },
+                            enabled = speakOrNull != null,
                         ) {
-                            Separator(Dimens.smallSeparation)
-                            Icon { ChevronLeft }
-                            Text(
-                                text = previousWordSpeaker.word.word,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            val speakOrNull: (() -> Unit)? by previousWordSpeaker.speak.collectAsState()
-                            IconButton(
-                                onClick = { speakOrNull?.invoke() },
-                                enabled = speakOrNull != null,
-                            ) {
-                                Icon { VolumeUp }
-                            }
-                            IconButton(
-                                onClick = previousWordSpeaker.close,
-                            ) {
-                                Icon { Close }
-                            }
+                            Icon { VolumeUp }
+                        }
+                        IconButton(
+                            onClick = previousWordSpeaker.close,
+                        ) {
+                            Icon { Close }
                         }
                     }
                 }
             }
+        }
     }
 }

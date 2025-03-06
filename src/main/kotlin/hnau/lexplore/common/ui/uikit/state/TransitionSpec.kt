@@ -56,8 +56,8 @@ object TransitionSpec {
         enter togetherWith exit
     }
 
-    private val EnterDurationMillis = 220
-    private val ExitDurationMillis = 90
+    private const val EnterDurationMillis = 220
+    private const val ExitDurationMillis = 90
 
     private val enterFloatAnimationSpec = tween<Float>(
         durationMillis = EnterDurationMillis,

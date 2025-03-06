@@ -17,4 +17,6 @@
     <string name="sureness_low">Low</string>
     <string name="sureness_medium">Medium</string>
     <string name="sureness_high">High</string>
+    <string name="question_menu_mark_as_known">Mark as known</string>
+    <string name="question_menu_exclude">Exclude</string>
 </resources>
