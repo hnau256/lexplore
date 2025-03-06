@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model.error
+package hnau.lexplore.ui.model.exercise.question.error
 
 import androidx.compose.ui.text.input.TextFieldValue
 import hnau.lexplore.common.kotlin.coroutines.onSet

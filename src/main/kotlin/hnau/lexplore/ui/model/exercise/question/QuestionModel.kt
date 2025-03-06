@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model.question
+package hnau.lexplore.ui.model.exercise.question
 
 import arrow.core.getOrElse
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
@@ -6,6 +6,7 @@ import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
 import hnau.lexplore.common.kotlin.coroutines.mapStateLite
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.getOrInit
+import hnau.lexplore.common.kotlin.ifTrue
 import hnau.lexplore.common.kotlin.mapper.Mapper
 import hnau.lexplore.common.kotlin.mapper.stringToBoolean
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
@@ -20,14 +21,16 @@ import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.ui.model.error.ErrorModel
-import hnau.lexplore.ui.model.input.InputModel
+import hnau.lexplore.ui.model.exercise.question.error.ErrorModel
+import hnau.lexplore.ui.model.exercise.question.input.InputModel
+import hnau.lexplore.ui.model.exercise.question.menu.MenuModel
 import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -45,7 +48,12 @@ class QuestionModel(
         val previousWord: MutableStateFlow<WordToLearn?>,
         @Serializable(MutableStateFlowSerializer::class)
         val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
+        @Serializable(MutableStateFlowSerializer::class)
+        val menuIsOpened: MutableStateFlow<Boolean> = MutableStateFlow(false),
+        @Serializable(MutableStateFlowSerializer::class)
+        val selectedSureness: MutableStateFlow<Sureness> = MutableStateFlow(Sureness.default),
         var input: InputModel.Skeleton? = null,
+        var menu: MenuModel.Skeleton? = null,
     )
 
     @Shuffle
@@ -55,6 +63,8 @@ class QuestionModel(
 
         fun error(): ErrorModel.Dependencies
 
+        fun menu(): MenuModel.Dependencies
+
         val exerciseWords: ExerciseWords
 
         val repository: KnowledgeRepository
@@ -63,6 +73,9 @@ class QuestionModel(
 
         val tts: TTS
     }
+
+    val menuIsOpened: MutableStateFlow<Boolean>
+        get() = skeleton.menuIsOpened
 
     private val autoTTSSetting: Setting<Boolean> = dependencies
         .settings["auto_tts"]
@@ -152,10 +165,30 @@ class QuestionModel(
             }
         }
 
+    val menu: StateFlow<MenuModel?> = skeleton
+        .menuIsOpened
+        .mapWithScope(scope) {menuScope, isOpened ->
+            isOpened.ifTrue {
+                MenuModel(
+                    scope = menuScope,
+                    dependencies = dependencies.menu(),
+                    skeleton = skeleton::menu
+                        .toAccessor()
+                        .getOrInit { MenuModel.Skeleton() },
+                    selectedSureness = skeleton.selectedSureness,
+                    onAnswer = ::onAnswer,
+                )
+            }
+        }
+
+    fun switchMenuIsOpened() {
+        menuIsOpened.update { !it }
+    }
+
     private fun onInput(
         input: String,
-        sureness: Sureness,
     ) {
+        val sureness = skeleton.selectedSureness.value
         when (input.normalized) {
             skeleton.wordToLearn.word.normalized -> onCorrect(
                 sureness = sureness,

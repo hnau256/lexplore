@@ -10,6 +10,8 @@ sealed interface MainStackElementProjector {
     @Composable
     fun Content()
 
+    val key: Any?
+
     data class Dictionaries(
         private val dictionaries: DictionariesProjector,
     ) : MainStackElementProjector {
@@ -18,6 +20,9 @@ sealed interface MainStackElementProjector {
         override fun Content() {
             dictionaries.Content()
         }
+
+        override val key: Any
+            get() = 0
     }
 
     data class Edit(
@@ -28,6 +33,9 @@ sealed interface MainStackElementProjector {
         override fun Content() {
             edit.Content()
         }
+
+        override val key: Any
+            get() = 1
     }
 
     data class Exercise(
@@ -38,5 +46,8 @@ sealed interface MainStackElementProjector {
         override fun Content() {
             exercise.Content()
         }
+
+        override val key: Any
+            get() = 2
     }
 }

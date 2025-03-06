@@ -8,17 +8,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.StateFlow
 
-data class StackProjectorTail<P>(
+data class StackProjectorTail<K, P>(
     val projector: P,
     val isNew: Boolean?,
+    val key: K,
 )
 
 @PublishedApi
 internal data class TailInfo<K, P>(
     val cancel: () -> Unit,
-    val key: K,
     val stackKeys: Set<K>,
-    val tail: StackProjectorTail<P>,
+    val tail: StackProjectorTail<K, P>,
 )
 
 @Suppress("FunctionName")
@@ -27,7 +27,7 @@ fun <M, K, P> StackProjectorTail(
     modelsStack: StateFlow<NonEmptyStack<M>>,
     extractKey: (M) -> K,
     createProjector: (CoroutineScope, M) -> P,
-): StateFlow<StackProjectorTail<P>> {
+): StateFlow<StackProjectorTail<K, P>> {
 
     fun NonEmptyStack<M>.keys(): Set<K> = all.map(extractKey).toSet()
 
@@ -42,9 +42,9 @@ fun <M, K, P> StackProjectorTail(
             tail = StackProjectorTail(
                 projector = createProjector(projectorScope, model),
                 isNew = isNew,
+                key = extractKey(model),
             ),
             stackKeys = keys,
-            key = extractKey(model),
         )
     }
 
@@ -62,7 +62,7 @@ fun <M, K, P> StackProjectorTail(
                 val model = newStack.tail
                 val key = extractKey(model)
                 val keys = newStack.keys()
-                if (previousInfo.key == key) {
+                if (previousInfo.tail.key == key) {
                     return@runningFoldState previousInfo.copy(
                         stackKeys = keys,
                     )

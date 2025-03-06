@@ -13,4 +13,8 @@
     <string name="dictionaries_all">All</string>
     <string name="dictionaries_none">None</string>
     <string name="edit_incorrect_number">Incorrect number format</string>
+    <string name="sureness_title">Sureness</string>
+    <string name="sureness_low">Low</string>
+    <string name="sureness_medium">Medium</string>
+    <string name="sureness_high">High</string>
 </resources>

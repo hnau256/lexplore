@@ -1,8 +1,8 @@
-package hnau.lexplore.ui.model.question
+package hnau.lexplore.ui.model.exercise.question
 
 import androidx.compose.runtime.Composable
-import hnau.lexplore.ui.model.error.ErrorProjector
-import hnau.lexplore.ui.model.input.InputProjector
+import hnau.lexplore.ui.model.exercise.question.error.ErrorProjector
+import hnau.lexplore.ui.model.exercise.question.input.InputProjector
 
 sealed interface QuestionStateProjector {
 

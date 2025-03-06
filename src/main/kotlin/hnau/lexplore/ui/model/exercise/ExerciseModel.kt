@@ -18,7 +18,7 @@ import hnau.lexplore.exercise.dto.Translation
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
-import hnau.lexplore.ui.model.question.QuestionModel
+import hnau.lexplore.ui.model.exercise.question.QuestionModel
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred

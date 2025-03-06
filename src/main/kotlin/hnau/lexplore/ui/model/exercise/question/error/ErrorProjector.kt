@@ -1,4 +1,4 @@
-package hnau.lexplore.ui.model.error
+package hnau.lexplore.ui.model.exercise.question.error
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

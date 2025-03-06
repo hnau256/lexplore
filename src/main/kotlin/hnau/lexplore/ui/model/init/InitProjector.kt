@@ -26,6 +26,7 @@ import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
 import hnau.lexplore.common.ui.uikit.bubble.Content
 import hnau.lexplore.common.ui.uikit.bubble.SharedBubblesHolder
 import hnau.lexplore.common.ui.uikit.state.LoadableContent
+import hnau.lexplore.common.ui.uikit.state.TransitionSpec
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.ui.model.mainstack.MainStackProjector
 import hnau.shuffler.annotations.Shuffle
@@ -101,9 +102,11 @@ class InitProjector(
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-                    LocalDensity provides Density(LocalDensity.current.density * 1.1f),
+                    //LocalDensity provides Density(LocalDensity.current.density * 1.1f),
                 ) {
-                    mainSackProjector.LoadableContent { mainStackProjector ->
+                    mainSackProjector.LoadableContent(
+                        transitionSpec = TransitionSpec.both(),
+                    ) { mainStackProjector ->
                         mainStackProjector.Content()
                     }
                     backButtonDelegate.Content()

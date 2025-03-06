@@ -10,17 +10,31 @@ import kotlinx.serialization.Serializable
 
 sealed interface MainStackElementModel : GoBackHandlerProvider {
 
+    val key: Any?
+
     data class Dictionaries(
         val dictionaries: DictionariesModel,
-    ) : MainStackElementModel, GoBackHandlerProvider by dictionaries
+    ) : MainStackElementModel, GoBackHandlerProvider by dictionaries {
+
+        override val key: Any
+            get() = 0
+    }
 
     data class Exercise(
         val exercise: ExerciseModel,
-    ) : MainStackElementModel, GoBackHandlerProvider by exercise
+    ) : MainStackElementModel, GoBackHandlerProvider by exercise {
+
+        override val key: Any
+            get() = 1
+    }
 
     data class Edit(
         val edit: EditModel,
-    ) : MainStackElementModel, GoBackHandlerProvider by edit
+    ) : MainStackElementModel, GoBackHandlerProvider by edit {
+
+        override val key: Any
+            get() = 2
+    }
 
     @Serializable
     sealed interface Skeleton {

@@ -1,7 +1,5 @@
 package hnau.lexplore.ui.model.exercise
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -15,9 +13,12 @@ import hnau.lexplore.R
 import hnau.lexplore.common.kotlin.Loadable
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.progressindicator.ProgressIndicatorPanel
+import hnau.lexplore.common.ui.uikit.state.BooleanStateContent
+import hnau.lexplore.common.ui.uikit.state.LoadableContent
+import hnau.lexplore.common.ui.uikit.state.TransitionSpec
 import hnau.lexplore.common.ui.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.ui.model.question.QuestionProjector
+import hnau.lexplore.ui.model.exercise.question.QuestionProjector
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -51,28 +52,25 @@ class ExerciseProjector(
 
     @Composable
     fun Content() {
-        val currentPage by question.collectAsState()
-        AnimatedContent(
-            modifier = Modifier
-                .fillMaxSize(),
-            targetState = currentPage,
-            label = "CurrentQuestion",
-            transitionSpec = getTransitionSpecForHorizontalSlide(
-                duration = 300.milliseconds,
-                slideCoefficientProvider = { 0.3f },
-            ),
-            contentKey = { it.orNull()?.first?.word },
-        ) { localQuestionOrLoading ->
-            localQuestionOrLoading.fold(
-                ifLoading = { },
-                ifReady = { (_, question) -> question.Content() }
-            )
-        }
-        AnimatedVisibility(
-            visible = model.isInProgress.collectAsState().value,
-        ) {
-            ProgressIndicatorPanel()
-        }
+        question
+            .LoadableContent(
+                modifier = Modifier
+                    .fillMaxSize(),
+                transitionSpec = getTransitionSpecForHorizontalSlide(
+                    duration = 300.milliseconds,
+                    slideCoefficientProvider = { 0.3f },
+                ),
+                loadingContent = {},
+            ) { (_, question) ->
+                question.Content()
+            }
+        model
+            .isInProgress
+            .BooleanStateContent(
+                transitionSpec = TransitionSpec.crossfade(),
+            ) {
+                ProgressIndicatorPanel()
+            }
         ConfirmGoBackDialog()
     }
 

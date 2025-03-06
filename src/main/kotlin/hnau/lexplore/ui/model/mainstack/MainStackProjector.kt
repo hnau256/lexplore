@@ -26,16 +26,10 @@ class MainStackProjector(
         fun edit(): EditProjector.Dependencies
     }
 
-    private val tail: StateFlow<StackProjectorTail<MainStackElementProjector>> = StackProjectorTail(
+    private val tail: StateFlow<StackProjectorTail<Any?, MainStackElementProjector>> = StackProjectorTail(
         scope = scope,
         modelsStack = model.stack,
-        extractKey = { model ->
-            when (model) {
-                is MainStackElementModel.Dictionaries -> 0
-                is MainStackElementModel.Edit -> 1
-                is MainStackElementModel.Exercise -> 2
-            }
-        },
+        extractKey = { model -> model.key },
         createProjector = { scope, model ->
             when (model) {
                 is MainStackElementModel.Dictionaries -> MainStackElementProjector.Dictionaries(

@@ -27,13 +27,15 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = true
+        create("composeTest") {
+            signingConfig = signingConfigs["debug"]
+            isDebuggable = false
+            /*isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
-            )
+            )*/
         }
     }
     compileOptions {

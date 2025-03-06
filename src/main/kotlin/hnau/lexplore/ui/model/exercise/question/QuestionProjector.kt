@@ -1,7 +1,7 @@
-package hnau.lexplore.ui.model.question
+package hnau.lexplore.ui.model.exercise.question
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
@@ -32,19 +33,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.common.ui.uikit.Separator
 import hnau.lexplore.common.ui.uikit.state.NullableStateContent
+import hnau.lexplore.common.ui.uikit.state.StateContent
+import hnau.lexplore.common.ui.uikit.state.TransitionSpec
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.verticalDisplayPadding
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.knowLevel
-import hnau.lexplore.ui.model.error.ErrorProjector
-import hnau.lexplore.ui.model.input.InputProjector
+import hnau.lexplore.ui.model.exercise.question.error.ErrorProjector
+import hnau.lexplore.ui.model.exercise.question.input.InputProjector
+import hnau.lexplore.ui.model.exercise.question.menu.MenuProjector
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -64,6 +69,8 @@ class QuestionProjector(
         fun input(): InputProjector.Dependencies
 
         fun screenContent(): ScreenContentDependencies
+
+        fun menu(): MenuProjector.Dependencies
     }
 
     private val state: StateFlow<QuestionStateProjector> = model
@@ -84,6 +91,18 @@ class QuestionProjector(
                         dependencies = dependencies.input(),
                         model = state.input,
                     )
+                )
+            }
+        }
+
+    private val menu: StateFlow<MenuProjector?> = model
+        .menu
+        .mapWithScope(scope) { menuScope, menuOrNull ->
+            menuOrNull?.let { menu ->
+                MenuProjector(
+                    scope = menuScope,
+                    dependencies = dependencies.menu(),
+                    model = menu,
                 )
             }
         }
@@ -122,20 +141,53 @@ class QuestionProjector(
                     .padding(contentPadding)
                     .verticalDisplayPadding()
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(Dimens.separation),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 PreviousWordSpeaker()
-                Text(
-                    text = model.title + " (" + model.info?.forgettingFactor?.factor?.let {
-                        round(
-                            it * 10
-                        ) / 10
-                    } + ")",
-                    style = MaterialTheme.typography.headlineMedium,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = Dimens.smallSeparation,
+                        alignment = Alignment.CenterHorizontally,
+                    ),
                     modifier = Modifier
+                        .fillMaxWidth()
                         .horizontalDisplayPadding(),
-                )
+                ) {
+                    Text(
+                        text = model.title + " (" + model.info?.forgettingFactor?.factor?.let {
+                            round(
+                                it * 10
+                            ) / 10
+                        } + ")",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    IconButton(
+                        onClick = model::switchMenuIsOpened,
+                    ) {
+                        Icon(
+                            modifier = Modifier.rotate(
+                                degrees = animateFloatAsState(
+                                    when (menu.collectAsState().value) {
+                                        null -> 0f
+                                        else -> 90f
+                                    }
+                                ).value,
+                            )
+                        ) { MoreVert }
+                    }
+                }
+                Separator()
+                menu.NullableStateContent(
+                    transitionSpec = TransitionSpec.vertical(),
+                ) { menuProjector ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        menuProjector.Content()
+                        Separator()
+                    }
+                }
                 LinearProgressIndicator(
                     modifier = Modifier
                         .padding(horizontal = Dimens.separation)
@@ -147,15 +199,15 @@ class QuestionProjector(
                 Spacer(
                     modifier = Modifier.weight(1f),
                 )
-                AnimatedContent(
-                    targetState = state.collectAsState().value,
-                    label = "InputOrError",
+                state.StateContent(
                     contentKey = { localState ->
                         when (localState) {
                             is QuestionStateProjector.Input -> 0
                             is QuestionStateProjector.Error -> 1
                         }
-                    }
+                    },
+                    label = "InputOrError",
+                    transitionSpec = TransitionSpec.vertical(),
                 ) { localState ->
                     localState.Content()
                 }
@@ -172,7 +224,9 @@ class QuestionProjector(
     private fun PreviousWordSpeaker() {
         model
             .previousWordSpeaker
-            .NullableStateContent { previousWordSpeaker ->
+            .NullableStateContent(
+                transitionSpec = TransitionSpec.vertical(),
+            ) { previousWordSpeaker ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start,

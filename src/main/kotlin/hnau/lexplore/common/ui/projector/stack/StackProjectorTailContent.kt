@@ -5,19 +5,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import hnau.lexplore.common.ui.utils.getTransitionSpecForHorizontalSlide
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun <P> StateFlow<StackProjectorTail<P>>.Content(
+fun <K, P> StateFlow<StackProjectorTail<K, P>>.Content(
     content: @Composable (projector: P) -> Unit,
 ) {
-    val currentTail: StackProjectorTail<P> by collectAsState()
+    val currentTail: StackProjectorTail<K, P> by collectAsState()
     AnimatedContent(
         modifier = Modifier.fillMaxSize(),
         targetState = currentTail,
+        contentKey = { tail -> tail.key },
         transitionSpec = getTransitionSpecForHorizontalSlide(
             duration = AnimationDuration,
         ) {
@@ -27,6 +29,7 @@ fun <P> StateFlow<StackProjectorTail<P>>.Content(
                 null -> 0
             }
         },
+        contentAlignment = Alignment.Center,
     ) { (projector, _) ->
         content(projector)
     }
