@@ -7,6 +7,7 @@ import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.ui.model.exercise.AutoTTS
 import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
@@ -20,7 +21,6 @@ class ErrorModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
-    private val autoTTS: StateFlow<Boolean>,
     val onTypo: (sureness: Sureness) -> Unit,
     private val onEnteredCorrect: () -> Unit,
 ) : GoBackHandlerProvider {
@@ -29,6 +29,8 @@ class ErrorModel(
     interface Dependencies {
 
         val tts: TTS
+
+        val autoTTS: AutoTTS
     }
 
     @Deprecated("Play with model. Do not use TTS direct")

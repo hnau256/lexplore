@@ -21,6 +21,7 @@ import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
+import hnau.lexplore.ui.model.exercise.AutoTTS
 import hnau.lexplore.ui.model.exercise.question.error.ErrorModel
 import hnau.lexplore.ui.model.exercise.question.input.InputModel
 import hnau.lexplore.ui.model.exercise.question.menu.MenuModel
@@ -69,28 +70,13 @@ class QuestionModel(
 
         val repository: KnowledgeRepository
 
-        val settings: AppSettings
-
         val tts: TTS
+
+        val autoTTS: AutoTTS
     }
 
     val menuIsOpened: MutableStateFlow<Boolean>
         get() = skeleton.menuIsOpened
-
-    private val autoTTSSetting: Setting<Boolean> = dependencies
-        .settings["auto_tts"]
-        .map(Mapper.stringToBoolean)
-
-    val autoTTS: StateFlow<Boolean>
-        get() = autoTTSSetting.state.mapStateLite { it.getOrElse { true } }
-
-    val switchAutoTTS: StateFlow<(() -> Unit)?> = actionOrNullIfExecuting(
-        scope = scope,
-    ) {
-        autoTTSSetting.update(
-            newValue = !autoTTS.value,
-        )
-    }
 
     data class PreviousWordSpeaker(
         val word: WordToLearn,
@@ -113,9 +99,8 @@ class QuestionModel(
                 )
             }
         }
-
     init {
-        if (autoTTS.value) {
+        if (dependencies.autoTTS.active.value) {
             previousWordSpeaker
                 .value
                 ?.speak
@@ -123,6 +108,7 @@ class QuestionModel(
                 ?.invoke()
         }
     }
+
 
     val wordToLearn: WordToLearn
         get() = skeleton.wordToLearn
@@ -159,7 +145,6 @@ class QuestionModel(
                         onEnteredCorrect = { onAnswer(Answer.Incorrect) },
                         onTypo = ::onCorrect,
                         wordToLearn = skeleton.wordToLearn,
-                        autoTTS = autoTTS,
                     )
                 )
             }

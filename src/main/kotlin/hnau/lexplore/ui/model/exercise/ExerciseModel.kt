@@ -1,15 +1,23 @@
 package hnau.lexplore.ui.model.exercise
 
+import arrow.core.getOrElse
 import hnau.lexplore.common.kotlin.Loadable
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
+import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
 import hnau.lexplore.common.kotlin.coroutines.flatMapState
 import hnau.lexplore.common.kotlin.coroutines.mapState
+import hnau.lexplore.common.kotlin.coroutines.mapStateLite
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.coroutines.scopedInState
 import hnau.lexplore.common.kotlin.ifNull
+import hnau.lexplore.common.kotlin.mapper.Mapper
+import hnau.lexplore.common.kotlin.mapper.stringToBoolean
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.data.knowledge.KnowledgeRepository
+import hnau.lexplore.data.settings.AppSettings
+import hnau.lexplore.data.settings.Setting
+import hnau.lexplore.data.settings.map
 import hnau.lexplore.exercise.Engine
 import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
@@ -83,8 +91,29 @@ class ExerciseModel(
         val dictionaries: Dictionaries
 
         fun question(
+            autoTTS: AutoTTS,
             exerciseWords: ExerciseWords,
         ): QuestionModel.Dependencies
+
+        val settings: AppSettings
+    }
+
+    private val autoTTSSetting: Setting<Boolean> = dependencies
+        .settings["auto_tts"]
+        .map(Mapper.stringToBoolean)
+
+    val autoTTS: AutoTTS
+        get() = autoTTSSetting
+            .state
+            .mapStateLite { it.getOrElse { true } }
+            .let(::AutoTTS)
+
+    val switchAutoTTS: StateFlow<(() -> Unit)?> = actionOrNullIfExecuting(
+        scope = scope,
+    ) {
+        autoTTSSetting.update(
+            newValue = !autoTTS.active.value,
+        )
     }
 
     private val exerciseWordsMap: Deferred<Map<WordToLearn, Translation>> = scope.async {
@@ -181,6 +210,7 @@ class ExerciseModel(
                     scope = stateScope,
                     dependencies = dependencies.question(
                         exerciseWords = exerciseWords,
+                        autoTTS = autoTTS,
                     ),
                     skeleton = questionSkeleton,
                     onAnswer = { answer ->
