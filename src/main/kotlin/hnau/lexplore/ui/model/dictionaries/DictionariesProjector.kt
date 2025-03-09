@@ -140,12 +140,13 @@ class DictionariesProjector(
             contentPadding = contentPadding + PaddingValues(bottom = 96.dp),
         ) {
             items(
-                items = model.allDictionaryNames,
-                key = DictionaryName::name,
-            ) { name ->
+                items = model.items,
+                key = { it.dictionaryName.name },
+            ) { item ->
+                val name = item.dictionaryName
                 val selected = name !in currentUnselectedDictionaries
-                Dictionary(
-                    name = name,
+                ItemContent(
+                    item = item,
                     selected = selected,
                     setIsSelected = remember(name, update) {
                         { newSelected ->
@@ -163,13 +164,24 @@ class DictionariesProjector(
     }
 
     @Composable
-    private fun Dictionary(
-        name: DictionaryName,
+    private fun ItemContent(
+        item: DictionariesModel.Item,
         selected: Boolean,
         setIsSelected: (Boolean) -> Unit,
     ) {
+        val name = item.dictionaryName
         ListItem(
             headlineContent = { Text(name.name) },
+            supportingContent = {
+                Text(
+                    stringResource(
+                        R.string.dictionary_subtitle,
+                        item.knownWordsCount,
+                        (item.totalWordsCount - item.knownWordsCount),
+                        item.totalWordsCount,
+                    )
+                )
+            },
             leadingContent = {
                 Switch(
                     checked = selected,

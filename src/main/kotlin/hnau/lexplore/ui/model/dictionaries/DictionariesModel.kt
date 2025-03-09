@@ -6,9 +6,12 @@ import hnau.lexplore.common.kotlin.coroutines.mapState
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
+import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.data.settings.AppSettings
+import hnau.lexplore.exercise.LearningConstants
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
+import hnau.lexplore.exercise.dto.forgettingFactor
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +43,8 @@ class DictionariesModel(
         val appSettings: AppSettings
 
         val dictionaries: Dictionaries
+
+        val knowledgeRepository: KnowledgeRepository
     }
 
     val scrollState: LazyListState
@@ -87,10 +92,32 @@ class DictionariesModel(
             }
         }
 
-    val allDictionaryNames: List<DictionaryName> = dependencies
+    data class Item(
+        val dictionaryName: DictionaryName,
+        val totalWordsCount: Int,
+        val knownWordsCount: Int,
+    )
+
+    private val dictionaryNames: List<DictionaryName> = dependencies
         .dictionaries
         .names
 
+    val items: List<Item> = dictionaryNames.map { dictionaryName ->
+        val words = dependencies
+            .dictionaries[dictionaryName]
+            .dictionaryWords
+        Item(
+            dictionaryName = dictionaryName,
+            totalWordsCount = words.size,
+            knownWordsCount = words.count { word ->
+                dependencies
+                    .knowledgeRepository[word.toLearn]
+                    .value
+                    .forgettingFactor > LearningConstants.initialForgettingFactor
+            }
+        )
+    }
+
     val allDictionaryNamesSet: Set<DictionaryName> =
-        allDictionaryNames.toSet()
+        dictionaryNames.toSet()
 }

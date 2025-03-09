@@ -11,6 +11,7 @@
     <string name="dictionaries_title">Dictionaries</string>
     <string name="dictionaries_start">Start</string>
     <string name="dictionaries_all">All</string>
+    <string name="dictionary_subtitle">%s (known) + %s (unknown) = %s</string>
     <string name="dictionaries_none">None</string>
     <string name="edit_incorrect_number">Incorrect number format</string>
     <string name="sureness_title">Sureness</string>
