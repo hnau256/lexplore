@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.lerp
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 
 @Immutable
@@ -24,34 +25,45 @@ class HnauShape(
         layoutDirection: LayoutDirection,
         density: Density,
     ): Outline {
-        val maxRadius = with(density) { Dimens.cornerRadius.toPx() }
 
-        val leftTopRadius = CornerRadius(
+        val radius: (Float) -> CornerRadius = { cornerFraction ->
+            CornerRadius(
+                with(density) {
+                    lerp(
+                        start = Dimens.cornerRadiusMin.toPx(),
+                        stop = Dimens.cornerRadius.toPx(),
+                        fraction = cornerFraction,
+                    )
+                }
+            )
+        }
+
+        val leftTopRadius = radius(
             when (layoutDirection) {
                 LayoutDirection.Ltr -> startTopRadiusFraction
                 LayoutDirection.Rtl -> endTopRadiusFraction
-            } * maxRadius,
+            },
         )
 
-        val rightTopRadius = CornerRadius(
+        val rightTopRadius = radius(
             when (layoutDirection) {
                 LayoutDirection.Ltr -> endTopRadiusFraction
                 LayoutDirection.Rtl -> startTopRadiusFraction
-            } * maxRadius,
+            },
         )
 
-        val leftBottomRadius = CornerRadius(
+        val leftBottomRadius = radius(
             when (layoutDirection) {
                 LayoutDirection.Ltr -> startBottomRadiusFraction
                 LayoutDirection.Rtl -> endBottomRadiusFraction
-            } * maxRadius,
+            },
         )
 
-        val rightBottomRadius = CornerRadius(
+        val rightBottomRadius = radius(
             when (layoutDirection) {
                 LayoutDirection.Ltr -> endBottomRadiusFraction
                 LayoutDirection.Rtl -> startBottomRadiusFraction
-            } * maxRadius,
+            },
         )
 
         return Outline.Rounded(
