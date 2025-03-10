@@ -7,6 +7,10 @@ interface TableScope {
 
     val orientation: TableOrientation
 
+    fun Modifier.weight(
+        weight: Float,
+    ): Modifier
+
     @Composable
     fun Cell(
         content: @Composable (TableCorners) -> Unit,

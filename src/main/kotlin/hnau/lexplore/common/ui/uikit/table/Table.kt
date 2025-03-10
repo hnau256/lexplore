@@ -1,11 +1,9 @@
 package hnau.lexplore.common.ui.uikit.table
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import hnau.lexplore.common.ui.uikit.utils.Dimens
+import hnau.lexplore.common.ui.uikit.table.layout.LayoutWeightElement
+import hnau.lexplore.common.ui.uikit.table.layout.TableLayout
 
 @Composable
 fun Table(
@@ -21,6 +19,14 @@ fun Table(
         override val orientation: TableOrientation
             get() = orientation
 
+        override fun Modifier.weight(
+            weight: Float,
+        ): Modifier = then(
+            LayoutWeightElement(
+                weight = weight,
+            )
+        )
+
         @Composable
         override fun Cell(
             content: @Composable (TableCorners) -> Unit,
@@ -31,7 +37,10 @@ fun Table(
 
     tableScope.content()
 
-    val cellsContent = @Composable {
+    TableLayout(
+        orientation = orientation,
+        modifier = modifier,
+    ) {
         cells.forEachIndexed { i, cell ->
             cell(
                 corners.close(
@@ -41,18 +50,5 @@ fun Table(
                 )
             )
         }
-    }
-
-    val arrangement = Arrangement.spacedBy(Dimens.chipsSeparation)
-    when (orientation) {
-        TableOrientation.Vertical -> Column(
-            modifier = modifier,
-            verticalArrangement = arrangement,
-        ) { cellsContent() }
-
-        TableOrientation.Horizontal -> Row(
-            modifier = modifier,
-            horizontalArrangement = arrangement,
-        ) { cellsContent() }
     }
 }
