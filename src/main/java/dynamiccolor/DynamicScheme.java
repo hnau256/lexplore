@@ -16,10 +16,11 @@
 
 package dynamiccolor;
 
+import java.util.Optional;
+
 import hct.Hct;
 import palettes.TonalPalette;
 import utils.MathUtils;
-import java.util.Optional;
 
 /**
  * Provides important settings for creating colors dynamically, and 6 color palettes. Requires: 1. A

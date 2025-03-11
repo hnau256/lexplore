@@ -16,9 +16,10 @@
 
 package palettes;
 
-import hct.Hct;
 import java.util.HashMap;
 import java.util.Map;
+
+import hct.Hct;
 
 /**
  * A convenience class for retrieving colors that are constant in hue and chroma, but vary in tone.

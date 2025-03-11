@@ -1,21 +1,14 @@
 package hnau.lexplore.ui.model.exercise.question
 
-import arrow.core.getOrElse
 import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
 import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
-import hnau.lexplore.common.kotlin.coroutines.mapStateLite
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.getOrInit
 import hnau.lexplore.common.kotlin.ifTrue
-import hnau.lexplore.common.kotlin.mapper.Mapper
-import hnau.lexplore.common.kotlin.mapper.stringToBoolean
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.data.knowledge.KnowledgeRepository
-import hnau.lexplore.data.settings.AppSettings
-import hnau.lexplore.data.settings.Setting
-import hnau.lexplore.data.settings.map
 import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness

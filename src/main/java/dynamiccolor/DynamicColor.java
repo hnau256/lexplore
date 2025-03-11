@@ -21,13 +21,15 @@ import static java.lang.Math.min;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Function;
+
 import contrast.Contrast;
 import hct.Hct;
 import palettes.TonalPalette;
 import utils.MathUtils;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.function.Function;
 
 /**
  * A color that adjusts itself based on UI state, represented by DynamicScheme.

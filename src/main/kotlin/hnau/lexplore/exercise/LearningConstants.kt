@@ -1,7 +1,6 @@
 package hnau.lexplore.exercise
 
 import hnau.lexplore.exercise.dto.ForgettingFactor
-import hnau.lexplore.exercise.dto.KnowLevel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -16,7 +15,7 @@ object LearningConstants {
 
     val almostKnownForgettingFactor: ForgettingFactor = ForgettingFactor(500f)
 
-    const val correctForgettingFactorFactor: Float = 1.75f
+    const val correctForgettingFactorFactor: Float = 1.7f
 
     const val incorrectForgettingFactorFactor: Float = 0.5f
 

@@ -18,8 +18,6 @@
 
 package scheme;
 
-import org.slf4j.helpers.CheckReturnValue;
-
 import palettes.CorePalette;
 
 /**

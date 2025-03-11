@@ -26,7 +26,6 @@ import hnau.lexplore.common.ui.uikit.shape.start
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.collectAsMutableState
-import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
 import hnau.shuffler.annotations.Shuffle

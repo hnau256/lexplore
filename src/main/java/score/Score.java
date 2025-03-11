@@ -16,13 +16,14 @@
 
 package score;
 
-import hct.Hct;
-import utils.MathUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import hct.Hct;
+import utils.MathUtils;
 
 /**
  * Given a large set of colors, remove colors that are unsuitable for a UI theme, and rank the rest
