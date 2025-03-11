@@ -60,31 +60,31 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                         val translation = parts[1].trim()
                         val weight = parts
                             .getOrNull(2)
-                            ?.toFloat()
+                            ?.toInt()
                             ?: word.calcCount(counts)
 
                         Triple(word.build(), translation, weight)
                     }
                     .toList()
-                    .sortedByDescending(Triple<String, String, Float>::third)
+                    .sortedByDescending(Triple<String, String, Int>::third)
                 dictionaryName to words
             }
 
 
         File(outputDir, "dictionaries.json").writeText(
             text = dictionaries.joinToString(
-                prefix = "[",
-                postfix = "]",
-                separator = ",",
+                prefix = "[\n",
+                postfix = "\n]",
+                separator = ",\n",
             ) { (name, words) ->
                 val wordsJson: String = words.joinToString(
-                    prefix = "[",
-                    postfix = "]",
-                    separator = ",",
+                    prefix = "[\n",
+                    postfix = "\n    ]",
+                    separator = ",\n",
                 ) { (word, translation, weight) ->
-                    "{\"word\":\"$word\",\"translation\":\"$translation\",\"weight\":$weight}"
+                    "      {\n        \"word\": \"$word\",\n        \"translation\": \"$translation\",\n        \"weight\": $weight\n      }"
                 }
-                "{\"name\":\"$name\",\"words\":$wordsJson}"
+                "  {\n    \"name\": \"$name\",\n    \"words\": $wordsJson\n  }"
             }
         )
 
@@ -153,18 +153,11 @@ open class BuildDictionariesResourceTask : DefaultTask() {
 
         fun calcCount(
             counts: Counts,
-        ): Float = parts
+        ): Int = parts
             .filter(Part::significant)
             .map { it.value.lowercase() }
-            .map { counts[it].toFloat() }
-            .sorted()
-            .let { partsCounts ->
-                val count = partsCounts.size
-                when (count % 2) {
-                    0 -> (partsCounts[count / 2 - 1] + partsCounts[count / 2]) / 2
-                    else -> partsCounts[count / 2]
-                }
-            }
+            .map { counts[it].toInt() }
+            .min()
     }
 
 
