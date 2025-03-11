@@ -2,11 +2,8 @@ package hnau.lexplore.ui.model.init
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
@@ -25,11 +22,12 @@ import hnau.lexplore.common.ui.color.material.MaterialHue
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonDelegate
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonWidthProvider
 import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
+import hnau.lexplore.common.ui.uikit.bubble.Content
 import hnau.lexplore.common.ui.uikit.bubble.SharedBubblesHolder
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
-import hnau.lexplore.common.ui.uikit.table.Table
-import hnau.lexplore.common.ui.uikit.table.TableOrientation
+import hnau.lexplore.common.ui.uikit.state.LoadableContent
+import hnau.lexplore.common.ui.uikit.state.TransitionSpec
 import hnau.lexplore.common.ui.uikit.table.TableScope
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.ui.model.mainstack.MainStackProjector
@@ -108,35 +106,13 @@ class InitProjector(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground,
                     //LocalDensity provides Density(LocalDensity.current.density * 1.1f),
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {  }
-                    Table(
-                        orientation = TableOrientation.Vertical,
-                    ) {
-                        Table {
-                            cell("1.1")
-                            cell("1.2")
-                            cell("1.3")
-                        }
-                        Table {
-                            cell("2.1")
-                            cell("2.2")
-                            cell("2.3")
-                        }
-                        Table {
-                            cell("3.1")
-                            cell("3.2")
-                            cell("3.3")
-                        }
+                    mainSackProjector.LoadableContent(
+                        transitionSpec = TransitionSpec.both(),
+                    ) { mainStackProjector ->
+                        mainStackProjector.Content()
                     }
-                    /*                    mainSackProjector.LoadableContent(
-                                            transitionSpec = TransitionSpec.both(),
-                                        ) { mainStackProjector ->
-                                            mainStackProjector.Content()
-                                        }
-                                        backButtonDelegate.Content()
-                                        bubblesHolder.Content()*/
+                    backButtonDelegate.Content()
+                    bubblesHolder.Content()
                 }
             }
         }

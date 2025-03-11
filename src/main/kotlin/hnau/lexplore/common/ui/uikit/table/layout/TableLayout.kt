@@ -3,6 +3,7 @@ package hnau.lexplore.common.ui.uikit.table.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import hnau.lexplore.common.kotlin.ifNull
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import kotlin.math.max
@@ -71,7 +72,7 @@ fun TableLayout(
                 }
             } ?: 0
             measurable.measure(
-                Constraints(
+                Constraints.fixed(
                     orientation = orientation,
                     along = alongs[index] + weightAlong, //TODO calc last as difference
                     across = across,

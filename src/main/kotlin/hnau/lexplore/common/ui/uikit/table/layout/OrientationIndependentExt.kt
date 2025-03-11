@@ -103,7 +103,7 @@ fun Constraints.constrainAcross(
     value = value,
 )
 
-fun Constraints(
+fun Constraints.Companion.fixed(
     orientation: TableOrientation,
     along: Int,
     across: Int,
