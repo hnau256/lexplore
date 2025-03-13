@@ -11,8 +11,7 @@ interface TableScope {
         weight: Float,
     ): Modifier
 
-    @Composable
-    fun Cell(
+    fun cell(
         content: @Composable (TableCorners) -> Unit,
     )
 }

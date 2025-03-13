@@ -1,6 +1,7 @@
 package hnau.lexplore.common.ui.uikit.table.layout
 
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
@@ -89,37 +90,55 @@ fun Constraints.reduceAlong(
 
 fun Constraints.constrainAlong(
     orientation: TableOrientation,
-    value: Int,
+    along: Int,
 ): Int = orientation.fold(
-    ifVertical = { constrainHeight(value) },
-    ifHorizontal = { constrainWidth(value) },
+    ifVertical = { constrainHeight(along) },
+    ifHorizontal = { constrainWidth(along) },
 )
 
 fun Constraints.constrainAcross(
     orientation: TableOrientation,
-    value: Int,
+    across: Int,
 ): Int = constrainAlong(
     orientation = orientation.opposite,
-    value = value,
+    along = across,
+)
+
+fun Constraints.Companion.create(
+    orientation: TableOrientation,
+    minAlong: Int,
+    maxAlong: Int,
+    minAcross: Int,
+    maxAcross: Int,
+): Constraints = orientation.fold(
+    ifVertical = {
+        Constraints(
+            minWidth = minAcross,
+            maxWidth = maxAcross,
+            minHeight = minAlong,
+            maxHeight = maxAlong,
+        )
+    },
+    ifHorizontal = {
+        Constraints(
+            minWidth = minAlong,
+            maxWidth = maxAlong,
+            minHeight = minAcross,
+            maxHeight = maxAcross,
+        )
+    }
 )
 
 fun Constraints.Companion.fixed(
     orientation: TableOrientation,
     along: Int,
     across: Int,
-): Constraints = orientation.fold(
-    ifVertical = {
-        Constraints.fixed(
-            width = across,
-            height = along,
-        )
-    },
-    ifHorizontal = {
-        Constraints.fixed(
-            width = along,
-            height = across,
-        )
-    }
+): Constraints = create(
+    orientation = orientation,
+    minAlong = along,
+    maxAlong = along,
+    minAcross = across,
+    maxAcross = across,
 )
 
 fun Placeable.placeRelative(
@@ -145,3 +164,27 @@ fun Placeable.placeRelative(
         )
     }
 }
+
+fun IntrinsicMeasurable.maxAlong(
+    orientation: TableOrientation,
+    across: Int,
+): Int = orientation.fold(
+    ifVertical = {
+        maxIntrinsicHeight(
+            width = across,
+        )
+    },
+    ifHorizontal = {
+        maxIntrinsicWidth(
+            height = across,
+        )
+    },
+)
+
+fun IntrinsicMeasurable.maxAcross(
+    orientation: TableOrientation,
+    along: Int,
+): Int = maxAlong(
+    orientation = orientation.opposite,
+    across = along,
+)

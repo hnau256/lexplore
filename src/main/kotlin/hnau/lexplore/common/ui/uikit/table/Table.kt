@@ -2,8 +2,10 @@ package hnau.lexplore.common.ui.uikit.table
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import hnau.lexplore.common.ui.uikit.table.layout.LayoutWeightElement
 import hnau.lexplore.common.ui.uikit.table.layout.TableLayout
+import hnau.lexplore.common.ui.uikit.utils.Dimens
 
 @Composable
 fun Table(
@@ -27,8 +29,7 @@ fun Table(
             )
         )
 
-        @Composable
-        override fun Cell(
+        override fun cell(
             content: @Composable (TableCorners) -> Unit,
         ) {
             cells += content
@@ -40,6 +41,7 @@ fun Table(
     TableLayout(
         orientation = orientation,
         modifier = modifier,
+        separationPx = with(LocalDensity.current) { Dimens.chipsSeparation.roundToPx() },
     ) {
         cells.forEachIndexed { i, cell ->
             cell(

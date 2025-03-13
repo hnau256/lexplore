@@ -14,6 +14,6 @@ object Dimens {
     val fabSize = 56.dp
     val fabSeparationVertical = separation + fabSize + separation
     val fabExtendedSeparationVertical = separation + 48.dp + separation
-    val cornerRadius = 12.dp
-    val cornerRadiusMin = 4.dp
+    val cornerRadius = 16.dp
+    val cornerRadiusMin = 6.dp
 }

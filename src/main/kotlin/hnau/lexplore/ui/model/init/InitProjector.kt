@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -24,11 +23,8 @@ import hnau.lexplore.common.ui.uikit.backbutton.BackButtonWidthProvider
 import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
 import hnau.lexplore.common.ui.uikit.bubble.Content
 import hnau.lexplore.common.ui.uikit.bubble.SharedBubblesHolder
-import hnau.lexplore.common.ui.uikit.chip.Chip
-import hnau.lexplore.common.ui.uikit.chip.ChipStyle
 import hnau.lexplore.common.ui.uikit.state.LoadableContent
 import hnau.lexplore.common.ui.uikit.state.TransitionSpec
-import hnau.lexplore.common.ui.uikit.table.TableScope
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.ui.model.mainstack.MainStackProjector
 import hnau.shuffler.annotations.Shuffle
@@ -116,12 +112,5 @@ class InitProjector(
                 }
             }
         }
-    }
-
-    @Composable
-    fun TableScope.cell(
-        text: String,
-    ) {
-        Cell { Chip(shape = it.toShape(), style = ChipStyle.button) { Text(text) } }
     }
 }
