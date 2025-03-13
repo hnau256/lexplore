@@ -216,7 +216,7 @@ private class TableMeasurePolicyWithoutIntrinsicSizes(
                             info = info,
                             alongSum = alongSum,
                             maxAlongOrNull = maxAlong,
-                            fillMaxParent = i == measurables.lastIndex,
+                            fillMaxParent = false,
                         )
                         alongSum += placeable.along(
                             orientation = info.orientation,
