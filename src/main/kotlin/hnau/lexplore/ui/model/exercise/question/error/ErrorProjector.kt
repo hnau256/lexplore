@@ -4,8 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,10 +29,9 @@ import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
 import hnau.lexplore.common.ui.uikit.progressindicator.chipInProgressLeadingContent
-import hnau.lexplore.common.ui.uikit.shape.HnauShape
-import hnau.lexplore.common.ui.uikit.shape.end
-import hnau.lexplore.common.ui.uikit.shape.inRow
-import hnau.lexplore.common.ui.uikit.shape.start
+import hnau.lexplore.common.ui.uikit.table.Table
+import hnau.lexplore.common.ui.uikit.table.TableOrientation
+import hnau.lexplore.common.ui.uikit.table.cellBox
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
@@ -52,63 +53,93 @@ class ErrorProjector(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalDisplayPadding(),
-            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
+            verticalArrangement = Arrangement.spacedBy(Dimens.separation)
         ) {
-            Text(
-                text = stringResource(R.string.question_incorrect) + ":  " + model.incorrectInput,
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Dimens.chipsSeparation),
-                verticalAlignment = Alignment.CenterVertically,
+            Table(
+                orientation = TableOrientation.Horizontal,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Chip(
-                    content = { Text(text = stringResource(R.string.question_typo)) },
-                    activeColor = MaterialTheme.colorScheme.error,
-                    style = ChipStyle.button,
-                    onClick = { model.onTypo(model.selectedSureness) },
-                    shape = HnauShape.inRow.start,
-                )
-                SpeakButton(
-                    shape = HnauShape.inRow.end,
-                )
+                cellBox(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(Dimens.separation),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.error,
+                        ) { Clear }
+                        Text(
+                            text = model.incorrectInput,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+                cell { corners ->
+                    val speakOrNull by model.correctWorkSpeaker.collectAsState()
+                    Chip(
+                        style = ChipStyle.button,
+                        leading = chipInProgressLeadingContent(
+                            inProgress = speakOrNull == null,
+                        ),
+                        onClick = speakOrNull,
+                        content = { Icon { RecordVoiceOver } },
+                        shape = corners.toShape(),
+                    )
+                }
+                cell { corners ->
+                    Chip(
+                        style = ChipStyle.button,
+                        onClick = { model.onTypo(model.selectedSureness) },
+                        content = { Text(text = stringResource(R.string.question_typo)) },
+                        shape = corners.toShape(),
+                    )
+                }
             }
-            Text(
-                text = model.wordToLearn.word,
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            val focusRequester = remember { FocusRequester() }
-            TextInput(
-                value = model.input,
-                shape = HnauShape(),
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.None
-                ),
-                keyboardActions = KeyboardActions {},
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-            )
-            LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+            Table(
+                orientation = TableOrientation.Vertical,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                cellBox(
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(Dimens.separation),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.primary,
+                        ) { Done }
+                        Text(
+                            text = model.wordToLearn.word,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+                cell { corners ->
+                    val focusRequester = remember { FocusRequester() }
+                    TextInput(
+                        value = model.input,
+                        shape = corners.toShape(),
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.None
+                        ),
+                        keyboardActions = KeyboardActions {},
+                        maxLines = 1,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                    )
+                    LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+                }
+            }
         }
-    }
-
-    @Composable
-    private fun SpeakButton(
-        shape: Shape = HnauShape(),
-    ) {
-        val speakOrNull by model.correctWorkSpeaker.collectAsState()
-        Chip(
-            style = ChipStyle.chipSelected,
-            leading = chipInProgressLeadingContent(
-                inProgress = speakOrNull == null,
-            ),
-            onClick = speakOrNull,
-            content = { Icon { RecordVoiceOver } },
-            shape = shape,
-        )
     }
 }

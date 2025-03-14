@@ -1,10 +1,7 @@
 package hnau.lexplore.ui.model.exercise.question.input
 
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Done
@@ -20,10 +17,6 @@ import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipSize
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
-import hnau.lexplore.common.ui.uikit.shape.HnauShape
-import hnau.lexplore.common.ui.uikit.shape.end
-import hnau.lexplore.common.ui.uikit.shape.inRow
-import hnau.lexplore.common.ui.uikit.shape.start
 import hnau.lexplore.common.ui.uikit.table.Table
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import hnau.lexplore.common.ui.utils.Icon

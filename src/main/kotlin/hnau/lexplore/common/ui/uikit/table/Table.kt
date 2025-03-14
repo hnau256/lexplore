@@ -1,9 +1,9 @@
 package hnau.lexplore.common.ui.uikit.table
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import hnau.lexplore.common.ui.uikit.table.layout.LayoutWeightElement
 import hnau.lexplore.common.ui.uikit.table.layout.TableLayout
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 
@@ -12,32 +12,15 @@ fun Table(
     orientation: TableOrientation,
     modifier: Modifier = Modifier,
     corners: TableCorners = TableCorners.opened,
-    content: @Composable TableScope.() -> Unit,
+    content: TableScope.() -> Unit,
 ) {
-    val cells: MutableList<@Composable (TableCorners) -> Unit> = mutableListOf()
-
-    val tableScope = object : TableScope {
-
-        override val orientation: TableOrientation
-            get() = orientation
-
-        override fun Modifier.weight(
-            weight: Float,
-        ): Modifier = then(
-            LayoutWeightElement(
-                weight = weight,
-            )
+    val cells: List<@Composable (TableCorners) -> Unit> = remember(orientation, content) {
+        val scope = TableScopeImpl(
+            orientation = orientation,
         )
-
-        override fun cell(
-            content: @Composable (TableCorners) -> Unit,
-        ) {
-            cells += content
-        }
+        scope.content()
+        scope.cells
     }
-
-    tableScope.content()
-
     TableLayout(
         orientation = orientation,
         modifier = modifier,

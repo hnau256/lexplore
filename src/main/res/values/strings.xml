@@ -6,7 +6,6 @@
     <string name="exercise_cancel_text">Do you want to exit exercise?</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
-    <string name="question_incorrect">Incorrect</string>
     <string name="question_typo">Typo</string>
     <string name="dictionaries_title">Dictionaries</string>
     <string name="dictionaries_start">Start</string>
