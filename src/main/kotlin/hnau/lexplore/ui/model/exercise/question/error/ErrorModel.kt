@@ -1,6 +1,7 @@
 package hnau.lexplore.ui.model.exercise.question.error
 
 import androidx.compose.ui.text.input.TextFieldValue
+import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
 import hnau.lexplore.common.kotlin.coroutines.onSet
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
@@ -13,10 +14,11 @@ import hnau.lexplore.utils.normalized
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 class ErrorModel(
-    private val scope: CoroutineScope,
+    scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
@@ -31,10 +33,6 @@ class ErrorModel(
 
         val autoTTS: AutoTTS
     }
-
-    @Deprecated("Play with model. Do not use TTS direct")
-    val tts: TTS
-        get() = dependencies.tts
 
     @Serializable
     data class Skeleton(
@@ -58,4 +56,16 @@ class ErrorModel(
                 onEnteredCorrect()
             }
         }
+
+    val correctWorkSpeaker: StateFlow<(() -> Unit)?> = actionOrNullIfExecuting(
+        scope = scope,
+    ) {
+        dependencies.tts.speek(wordToLearn.word)
+    }
+
+    init {
+        if (dependencies.autoTTS.active.value) {
+            correctWorkSpeaker.value?.invoke()
+        }
+    }
 }

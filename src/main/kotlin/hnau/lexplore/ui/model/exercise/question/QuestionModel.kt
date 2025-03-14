@@ -92,6 +92,7 @@ class QuestionModel(
                 )
             }
         }
+
     init {
         if (dependencies.autoTTS.active.value) {
             previousWordSpeaker
