@@ -1,8 +1,12 @@
 package hnau.lexplore.ui.model.dictionaries
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,8 +15,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -27,10 +29,15 @@ import androidx.compose.ui.unit.dp
 import hnau.lexplore.R
 import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
+import hnau.lexplore.common.ui.uikit.chip.Chip
+import hnau.lexplore.common.ui.uikit.chip.ChipStyle
 import hnau.lexplore.common.ui.uikit.progressindicator.ProgressIndicatorPanel
+import hnau.lexplore.common.ui.uikit.table.Table
+import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import hnau.lexplore.common.ui.uikit.topappbar.TopAppBarScope
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
+import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.plus
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.shuffler.annotations.Shuffle
@@ -137,7 +144,11 @@ class DictionariesProjector(
             .collectAsState()
         LazyColumn(
             state = model.scrollState,
-            contentPadding = contentPadding + PaddingValues(bottom = 96.dp),
+            contentPadding = contentPadding + PaddingValues(
+                bottom = 96.dp,
+                top = Dimens.separation,
+            ),
+            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         ) {
             items(
                 items = model.items,
@@ -170,31 +181,56 @@ class DictionariesProjector(
         setIsSelected: (Boolean) -> Unit,
     ) {
         val name = item.dictionaryName
-        ListItem(
-            headlineContent = { Text(name.name) },
-            supportingContent = {
-                Text(
-                    stringResource(
-                        R.string.dictionary_subtitle,
-                        item.knownWordsCount,
-                        (item.totalWordsCount - item.knownWordsCount),
-                        item.totalWordsCount,
-                    )
-                )
-            },
-            leadingContent = {
-                Switch(
-                    checked = selected,
-                    onCheckedChange = setIsSelected,
-                )
-            },
-            trailingContent = {
-                IconButton(
-                    onClick = { model.edit(name) }
+        Table(
+            modifier = Modifier.horizontalDisplayPadding(),
+            orientation = TableOrientation.Horizontal,
+        ) {
+            cell { corners ->
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            shape = corners.toShape(),
+                        )
+                        .padding(Dimens.separation),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.separation),
                 ) {
-                    Icon { Edit }
+                    Switch(
+                        checked = selected,
+                        onCheckedChange = setIsSelected,
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+                    ) {
+                        Text(
+                            text = name.name,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.dictionary_subtitle,
+                                item.knownWordsCount,
+                                (item.totalWordsCount - item.knownWordsCount),
+                                item.totalWordsCount,
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
-        )
+            cell { corners ->
+                Chip(
+                    shape = corners.toShape(),
+                    style = ChipStyle.chip,
+                    onClick = { model.edit(name) },
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(Dimens.smallSeparation),
+                    ) { Edit }
+                }
+            }
+        }
     }
 }
