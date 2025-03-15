@@ -171,6 +171,7 @@ class QuestionProjector(
                 progress = { model.info.knowLevel.level },
                 drawStopIndicator = {},
             )
+            Separator()
             Spacer(
                 modifier = Modifier.weight(1f),
             )

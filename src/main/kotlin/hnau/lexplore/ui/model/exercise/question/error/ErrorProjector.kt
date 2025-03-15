@@ -32,6 +32,7 @@ import hnau.lexplore.common.ui.uikit.progressindicator.chipInProgressLeadingCont
 import hnau.lexplore.common.ui.uikit.table.Table
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import hnau.lexplore.common.ui.uikit.table.cellBox
+import hnau.lexplore.common.ui.uikit.table.subtable
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
@@ -79,18 +80,6 @@ class ErrorProjector(
                     }
                 }
                 cell { corners ->
-                    val speakOrNull by model.correctWorkSpeaker.collectAsState()
-                    Chip(
-                        style = ChipStyle.button,
-                        leading = chipInProgressLeadingContent(
-                            inProgress = speakOrNull == null,
-                        ),
-                        onClick = speakOrNull,
-                        content = { Icon { RecordVoiceOver } },
-                        shape = corners.toShape(),
-                    )
-                }
-                cell { corners ->
                     Chip(
                         style = ChipStyle.button,
                         onClick = { model.onTypo(model.selectedSureness) },
@@ -103,21 +92,36 @@ class ErrorProjector(
                 orientation = TableOrientation.Vertical,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                cellBox(
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(Dimens.separation),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+                subtable {
+                    cellBox(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Icon(
-                            tint = MaterialTheme.colorScheme.primary,
-                        ) { Done }
-                        Text(
-                            text = model.wordToLearn.word,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                        Row(
+                            modifier = Modifier.padding(Dimens.separation),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+                        ) {
+                            Icon(
+                                tint = MaterialTheme.colorScheme.primary,
+                            ) { Done }
+                            Text(
+                                text = model.wordToLearn.word,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                    cell { corners ->
+                        val speakOrNull by model.correctWorkSpeaker.collectAsState()
+                        Chip(
+                            style = ChipStyle.button,
+                            leading = chipInProgressLeadingContent(
+                                inProgress = speakOrNull == null,
+                            ),
+                            onClick = speakOrNull,
+                            content = { Icon { RecordVoiceOver } },
+                            shape = corners.toShape(),
                         )
                     }
                 }
