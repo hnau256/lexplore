@@ -1,5 +1,5 @@
 plugins {
-    val kotlinVersion = "2.1.0"
+    val kotlinVersion = "2.1.10"
     id("androidx.room") version "2.6.1"
     id("com.android.application") version "8.9.0"
     id("org.jetbrains.kotlin.plugin.compose") version kotlinVersion
