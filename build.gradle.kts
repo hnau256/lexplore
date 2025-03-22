@@ -62,6 +62,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
 
     val composeUi = "1.7.8"
     implementation("androidx.compose.ui:ui:$composeUi")

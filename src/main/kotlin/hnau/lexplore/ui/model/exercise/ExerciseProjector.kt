@@ -123,13 +123,13 @@ class ExerciseProjector(
             confirmButton = {
                 TextButton(
                     onClick = model::confirmGoBack,
-                    content = { Text(stringResource(R.string.confirm)) },
+                    content = { Text(stringResource(R.string.yes)) },
                 )
             },
             dismissButton = {
                 TextButton(
                     onClick = model::cancelGoBack,
-                    content = { Text(stringResource(R.string.cancel)) },
+                    content = { Text(stringResource(R.string.no)) },
                 )
             },
             onDismissRequest = model::cancelGoBack

@@ -1,22 +1,27 @@
 <resources>
     <string name="app_name">LEXplore</string>
-    <string name="exercises_title">Exercises</string>
-    <string name="exercises_preparing">Preparing exercise</string>
-    <string name="exercise_cancel_title">Exercise cancellation</string>
-    <string name="exercise_cancel_text">Do you want to exit exercise?</string>
-    <string name="confirm">Confirm</string>
-    <string name="cancel">Cancel</string>
-    <string name="question_typo">Typo</string>
-    <string name="dictionaries_title">Dictionaries</string>
-    <string name="dictionaries_start">Start</string>
-    <string name="dictionaries_all">All</string>
-    <string name="dictionary_subtitle">%s (known) + %s (unknown) = %s</string>
-    <string name="dictionaries_none">None</string>
-    <string name="edit_incorrect_number">Incorrect number format</string>
-    <string name="sureness_title">Sureness</string>
-    <string name="sureness_low">Low</string>
-    <string name="sureness_medium">Medium</string>
-    <string name="sureness_high">High</string>
-    <string name="question_menu_mark_as_known">Mark as known</string>
-    <string name="question_menu_exclude">Exclude</string>
+    <string name="exercise_cancel_title">Завершение упражнение</string>
+    <string name="exercise_cancel_text">Вы хотите завершить упражнение?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="question_typo">Опечатка</string>
+    <string name="dictionaries_title">Словари</string>
+    <string name="dictionaries_start">Начать</string>
+    <string name="dictionaries_all">Все</string>
+    <string name="dictionary_subtitle">%s (знаю) + %s (не знаю) = %s</string>
+    <string name="dictionaries_none">Ни одного</string>
+    <string name="edit_incorrect_number">Неверный формат числа</string>
+    <string name="sureness_title">Уверенность</string>
+    <string name="sureness_low">Низкая</string>
+    <string name="sureness_medium">Средняя</string>
+    <string name="sureness_high">Высокая</string>
+    <string name="question_menu_mark_as_known">Уже знаю</string>
+    <string name="question_menu_exclude">Не спрашивать</string>
+    <string name="question_info_forgetting_factor">Знаю</string>
+    <string name="question_info_knowledge_level">Помню</string>
+    <string name="question_info_last_ask">Пауза</string>
+    <string name="question_info_last_ask_days">д</string>
+    <string name="question_info_last_ask_hours">ч</string>
+    <string name="question_info_last_ask_minutes">м</string>
+    <string name="question_info_last_ask_seconds">с</string>
 </resources>

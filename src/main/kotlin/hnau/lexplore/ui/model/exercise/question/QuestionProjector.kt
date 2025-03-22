@@ -31,16 +31,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
+import hnau.lexplore.R
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.common.ui.uikit.Separator
 import hnau.lexplore.common.ui.uikit.state.NullableStateContent
 import hnau.lexplore.common.ui.uikit.state.StateContent
 import hnau.lexplore.common.ui.uikit.state.TransitionSpec
+import hnau.lexplore.common.ui.uikit.table.Table
+import hnau.lexplore.common.ui.uikit.table.TableOrientation
+import hnau.lexplore.common.ui.uikit.table.cellBox
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.verticalDisplayPadding
+import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.knowLevel
 import hnau.lexplore.ui.model.exercise.question.error.ErrorProjector
 import hnau.lexplore.ui.model.exercise.question.input.InputProjector
@@ -48,7 +54,6 @@ import hnau.lexplore.ui.model.exercise.question.menu.MenuProjector
 import hnau.shuffler.annotations.Shuffle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.math.round
 
 class QuestionProjector(
     scope: CoroutineScope,
@@ -107,9 +112,9 @@ class QuestionProjector(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(contentPadding)
-                .verticalDisplayPadding()
-                .verticalScroll(rememberScrollState()),
+                .verticalDisplayPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             PreviousWordSpeaker()
@@ -124,11 +129,7 @@ class QuestionProjector(
                     .horizontalDisplayPadding(),
             ) {
                 Text(
-                    text = model.title + " (" + model.info?.forgettingFactor?.factor?.let {
-                        round(
-                            it * 10
-                        ) / 10
-                    } + ")",
+                    text = model.title,
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 IconButton(
@@ -163,13 +164,10 @@ class QuestionProjector(
                     menuProjector.Content()
                 }
             }
-            LinearProgressIndicator(
+            model.info?.Content(
                 modifier = Modifier
-                    .padding(horizontal = Dimens.separation)
                     .fillMaxWidth()
-                    .height(Dimens.smallSeparation),
-                progress = { model.info.knowLevel.level },
-                drawStopIndicator = {},
+                    .horizontalDisplayPadding(),
             )
             Separator()
             Spacer(
