@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -67,7 +68,7 @@ class InputProjector(
                     size = ChipSize.large,
                     shape = corners.toShape(),
                     style = ChipStyle.button,
-                    onClick = { model.onReady(model.input.value.text) },
+                    onClick = model.done.collectAsState().value,
                 )
             }
         }
