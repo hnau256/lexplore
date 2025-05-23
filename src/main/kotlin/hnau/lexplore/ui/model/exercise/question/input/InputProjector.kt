@@ -18,6 +18,7 @@ import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipSize
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
+import hnau.lexplore.common.ui.uikit.chip.ChipStyle.Companion.builder
 import hnau.lexplore.common.ui.uikit.table.Table
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import hnau.lexplore.common.ui.utils.Icon
@@ -61,14 +62,18 @@ class InputProjector(
                 LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
             }
             cell { corners ->
+                val done = model.done.collectAsState().value
                 Chip(
                     modifier = Modifier
                         .fillMaxHeight(),
                     content = { Icon { Done } },
                     size = ChipSize.large,
                     shape = corners.toShape(),
-                    style = ChipStyle.button,
-                    onClick = model.done.collectAsState().value,
+                    style = when (done) {
+                        null -> ChipStyle.chip
+                        else -> ChipStyle.button
+                    },
+                    onClick = done,
                 )
             }
         }
