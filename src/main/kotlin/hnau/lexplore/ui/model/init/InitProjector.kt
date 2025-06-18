@@ -27,7 +27,7 @@ import hnau.lexplore.common.ui.uikit.state.LoadableContent
 import hnau.lexplore.common.ui.uikit.state.TransitionSpec
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.ui.model.mainstack.MainStackProjector
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
@@ -37,7 +37,7 @@ class InitProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val context: Context

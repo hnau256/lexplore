@@ -40,7 +40,7 @@ import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.plus
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class DictionariesProjector(
@@ -49,7 +49,7 @@ class DictionariesProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         fun screenContent(): ScreenContentDependencies

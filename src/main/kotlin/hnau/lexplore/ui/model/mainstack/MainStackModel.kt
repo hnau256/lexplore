@@ -13,7 +13,7 @@ import hnau.lexplore.common.model.stack.tryDropLast
 import hnau.lexplore.ui.model.dictionaries.DictionariesModel
 import hnau.lexplore.ui.model.edit.EditModel
 import hnau.lexplore.ui.model.exercise.ExerciseModel
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +32,7 @@ class MainStackModel(
             MutableStateFlow(NonEmptyStack(MainStackElementModel.Skeleton.Dictionaries())),
     )
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         fun dictionaries(): DictionariesModel.Dependencies

@@ -12,7 +12,7 @@ import hnau.lexplore.exercise.LearningConstants
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.exercise.dto.forgettingFactor
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +37,7 @@ class DictionariesModel(
             MutableStateFlow(null),
     )
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val appSettings: AppSettings

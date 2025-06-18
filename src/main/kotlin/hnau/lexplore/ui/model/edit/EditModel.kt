@@ -12,7 +12,7 @@ import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.exercise.dto.forgettingFactor
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +40,7 @@ class EditModel(
     val scrollState: LazyListState
         get() = skeleton.scrollState
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val knowledgeRepository: KnowledgeRepository

@@ -1,7 +1,7 @@
 package hnau.lexplore.ui.model.template
 
 import androidx.compose.runtime.Composable
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class TemplateProjector(
@@ -10,7 +10,7 @@ class TemplateProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies
 
     @Composable

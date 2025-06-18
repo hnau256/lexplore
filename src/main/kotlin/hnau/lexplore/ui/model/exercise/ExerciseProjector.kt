@@ -26,7 +26,7 @@ import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.getTransitionSpecForHorizontalSlide
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.exercise.question.QuestionProjector
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration.Companion.milliseconds
@@ -37,7 +37,7 @@ class ExerciseProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         fun question(): QuestionProjector.Dependencies

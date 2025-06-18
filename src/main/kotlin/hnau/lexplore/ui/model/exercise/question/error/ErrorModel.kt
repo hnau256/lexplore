@@ -11,7 +11,7 @@ import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.exercise.AutoTTS
 import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +26,7 @@ class ErrorModel(
     private val onEnteredCorrect: () -> Unit,
 ) : GoBackHandlerProvider {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val tts: TTS

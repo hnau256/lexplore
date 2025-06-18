@@ -27,7 +27,7 @@ import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.ui.model.exercise.question.QuestionModel
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ class ExerciseModel(
         ) : State
     }
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val knowledgeRepository: KnowledgeRepository

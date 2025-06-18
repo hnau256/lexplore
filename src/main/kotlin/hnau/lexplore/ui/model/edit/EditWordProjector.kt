@@ -18,7 +18,7 @@ import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.bubble.Bubble
 import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
 import hnau.lexplore.common.ui.uikit.utils.Dimens
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class EditWordProjector(
@@ -27,7 +27,7 @@ class EditWordProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         val bubblesShower: BubblesShower

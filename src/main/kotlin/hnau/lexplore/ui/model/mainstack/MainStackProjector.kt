@@ -6,7 +6,7 @@ import hnau.lexplore.common.ui.projector.stack.StackProjectorTail
 import hnau.lexplore.ui.model.dictionaries.DictionariesProjector
 import hnau.lexplore.ui.model.edit.EditProjector
 import hnau.lexplore.ui.model.exercise.ExerciseProjector
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,7 +16,7 @@ class MainStackProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         fun exercise(): ExerciseProjector.Dependencies

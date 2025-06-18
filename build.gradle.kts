@@ -71,13 +71,13 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:$composeUi")
     implementation("androidx.compose.material:material-icons-extended:$composeUi")
 
-    val shuffler = "1.0.8"
-    implementation("hnau.shuffler:annotations:$shuffler")
-    ksp("hnau.shuffler:processor:$shuffler")
-
     val room = "2.6.1"
     implementation("androidx.room:room-runtime:$room")
     implementation("androidx.room:room-ktx:$room")
     ksp("androidx.room:room-compiler:$room")
+
+    val pipe = "1.0.5"
+    implementation("com.github.hnau256.common-gen-pipe:annotations:$pipe")
+    ksp("com.github.hnau256.common-gen-pipe:processor:$pipe")
 
 }

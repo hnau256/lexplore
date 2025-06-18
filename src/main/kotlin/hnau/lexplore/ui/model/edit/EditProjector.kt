@@ -19,7 +19,7 @@ import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.forgettingFactor
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
@@ -29,7 +29,7 @@ class EditProjector(
     private val dependencies: Dependencies,
 ) {
 
-    @Shuffle
+    @Pipe
     interface Dependencies {
 
         fun screenContent(): ScreenContentDependencies

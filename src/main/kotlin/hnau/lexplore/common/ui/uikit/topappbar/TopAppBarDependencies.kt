@@ -1,9 +1,9 @@
 package hnau.lexplore.common.ui.uikit.topappbar
 
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonWidthProvider
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 
-@Shuffle
+@Pipe
 interface TopAppBarDependencies {
 
     val backButtonWidthProvider: BackButtonWidthProvider

@@ -15,9 +15,9 @@ import hnau.lexplore.common.ui.uikit.topappbar.TopAppBarDependencies
 import hnau.lexplore.common.ui.uikit.topappbar.TopAppBarScope
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.uikit.utils.appInsets
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 
-@Shuffle
+@Pipe
 interface ScreenContentDependencies {
 
     fun topAppBar(): TopAppBarDependencies

@@ -3,7 +3,7 @@ package hnau.lexplore.ui.model.exercise.question.menu
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
-import hnau.shuffler.annotations.Shuffle
+import hnau.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
@@ -19,6 +19,6 @@ class MenuModel(
     @Serializable
     /*data*/ class Skeleton
 
-    @Shuffle
+    @Pipe
     interface Dependencies
 }
