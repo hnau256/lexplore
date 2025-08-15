@@ -1,3 +1,6 @@
+import java.util.Properties
+import kotlin.apply
+
 plugins {
     val kotlinVersion = "2.1.20"
     id("androidx.room") version "2.7.2"
@@ -5,6 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
     id("com.google.devtools.ksp") version "2.1.20-1.0.31"
+    id("com.google.gms.google-services") version "4.4.3"
     kotlin("android") version kotlinVersion
 }
 
@@ -24,18 +28,48 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        val versionPropsFile = file("version.properties")
+        val versionProps = Properties().apply {
+            load(versionPropsFile.inputStream())
+        }
+        val localVersionCode = (versionProps["versionCode"] as String).toInt()
+        versionName = versionProps["versionName"] as String + "." + localVersionCode
+        versionCode = localVersionCode
+
+        tasks.named("preBuild") {
+            doFirst {
+                versionProps.setProperty("versionCode", (localVersionCode + 1).toString())
+                versionProps.store(versionPropsFile.outputStream(), null)
+            }
+        }
+    }
+
+    signingConfigs {
+        create("qa") {
+            storeFile = file("keystores/qa.keystore")
+            storePassword = "password"
+            keyAlias = "qa"
+            keyPassword = "password"
+        }
     }
 
     buildTypes {
-        create("composeTest") {
-            signingConfig = signingConfigs["debug"]
-            isDebuggable = false
-            /*isMinifyEnabled = true
+        getByName("debug") {
+            applicationIdSuffix =".debug"
+        }
+        getByName("release") {
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )*/
+            isMinifyEnabled = true
+            isDebuggable = false
+            proguardFile("proguard-rules.pro")
+            //signingConfig = signingConfigs.getByName("release")
+        }
+        create("qa") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("qa")
+            applicationIdSuffix =".qa"
         }
     }
     compileOptions {
@@ -63,6 +97,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
 
     val composeUi = "1.8.3"
     implementation("androidx.compose.ui:ui:$composeUi")

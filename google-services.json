@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1071007144713",
+    "project_id": "lexplore-hnau",
+    "storage_bucket": "lexplore-hnau.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071007144713:android:d629feed65f9f4a08511d8",
+        "android_client_info": {
+          "package_name": "hnau.lexplore.qa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaLyIBrn_gGEhLmh3Rv6YG0Y_pR7NMQsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
