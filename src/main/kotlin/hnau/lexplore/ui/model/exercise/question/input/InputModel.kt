@@ -5,7 +5,7 @@ import hnau.lexplore.common.kotlin.coroutines.mapState
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

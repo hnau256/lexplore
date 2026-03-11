@@ -20,7 +20,7 @@ import hnau.lexplore.ui.model.exercise.question.input.InputModel
 import hnau.lexplore.ui.model.exercise.question.menu.MenuModel
 import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

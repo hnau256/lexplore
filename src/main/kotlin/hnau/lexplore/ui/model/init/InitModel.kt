@@ -16,7 +16,7 @@ import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.Dictionary
 import hnau.lexplore.ui.model.mainstack.MainStackModel
 import hnau.lexplore.utils.TTS
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

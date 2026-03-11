@@ -3,7 +3,7 @@ package hnau.lexplore.exercise
 import hnau.lexplore.exercise.dto.KnowLevel
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.forgettingFactor
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.pow

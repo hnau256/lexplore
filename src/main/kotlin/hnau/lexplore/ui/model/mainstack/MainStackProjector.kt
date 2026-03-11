@@ -6,7 +6,7 @@ import hnau.lexplore.common.ui.projector.stack.StackProjectorTail
 import hnau.lexplore.ui.model.dictionaries.DictionariesProjector
 import hnau.lexplore.ui.model.edit.EditProjector
 import hnau.lexplore.ui.model.exercise.ExerciseProjector
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 

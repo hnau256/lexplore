@@ -1,6 +1,5 @@
 package hnau.lexplore.common.kotlin.coroutines
 
-import arrow.core.partially1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,5 +35,7 @@ fun actionOrNullIfExecuting(
     scope = scope,
     action = { action() },
 ).mapState(scope) { operationOrNull ->
-    operationOrNull?.partially1(Unit)
+    operationOrNull?.let { operation ->
+        { operation(Unit) }
+    }
 }

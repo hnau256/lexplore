@@ -1,7 +1,7 @@
 package hnau.lexplore.ui.model.template
 
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 

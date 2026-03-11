@@ -9,7 +9,7 @@ import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

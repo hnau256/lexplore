@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordToLearn
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 
 @Entity(

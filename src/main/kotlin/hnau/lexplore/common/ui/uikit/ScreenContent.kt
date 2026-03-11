@@ -15,7 +15,7 @@ import hnau.lexplore.common.ui.uikit.topappbar.TopAppBarDependencies
 import hnau.lexplore.common.ui.uikit.topappbar.TopAppBarScope
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.uikit.utils.appInsets
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 
 @Pipe
 interface ScreenContentDependencies {

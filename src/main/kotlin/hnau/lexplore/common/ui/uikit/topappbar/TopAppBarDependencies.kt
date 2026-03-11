@@ -1,7 +1,7 @@
 package hnau.lexplore.common.ui.uikit.topappbar
 
 import hnau.lexplore.common.ui.uikit.backbutton.BackButtonWidthProvider
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 
 @Pipe
 interface TopAppBarDependencies {

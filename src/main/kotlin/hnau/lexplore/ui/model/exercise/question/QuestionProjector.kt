@@ -51,7 +51,7 @@ import hnau.lexplore.exercise.knowLevel
 import hnau.lexplore.ui.model.exercise.question.error.ErrorProjector
 import hnau.lexplore.ui.model.exercise.question.input.InputProjector
 import hnau.lexplore.ui.model.exercise.question.menu.MenuProjector
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 

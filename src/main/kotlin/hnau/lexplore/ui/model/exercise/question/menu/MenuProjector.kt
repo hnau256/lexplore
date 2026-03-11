@@ -39,7 +39,7 @@ import hnau.lexplore.common.ui.utils.collectAsMutableState
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.Sureness
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope

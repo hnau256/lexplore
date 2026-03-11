@@ -12,7 +12,7 @@ import hnau.lexplore.exercise.LearningConstants
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.exercise.dto.forgettingFactor
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

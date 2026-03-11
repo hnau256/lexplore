@@ -1,7 +1,7 @@
 package hnau.lexplore.ui.model.template
 
 import androidx.compose.runtime.Composable
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class TemplateProjector(

@@ -23,7 +23,7 @@ import hnau.lexplore.common.ui.uikit.table.Table
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class InputProjector(

@@ -1,6 +1,6 @@
 package hnau.lexplore.exercise.dto
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class WordInfo(
     val forgettingFactor: ForgettingFactor,

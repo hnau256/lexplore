@@ -3,7 +3,7 @@ package hnau.lexplore.data.knowledge.db
 import androidx.room.TypeConverter
 import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordToLearn
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class KnowledgeDatabaseTypeConverters {
 

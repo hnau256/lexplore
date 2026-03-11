@@ -27,7 +27,7 @@ import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
 import hnau.lexplore.ui.model.exercise.question.QuestionModel
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

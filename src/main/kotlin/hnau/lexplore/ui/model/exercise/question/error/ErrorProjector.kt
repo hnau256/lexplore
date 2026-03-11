@@ -36,7 +36,7 @@ import hnau.lexplore.common.ui.uikit.table.subtable
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class ErrorProjector(

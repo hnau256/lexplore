@@ -40,7 +40,7 @@ import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.plus
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class DictionariesProjector(

@@ -18,7 +18,7 @@ import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.bubble.Bubble
 import hnau.lexplore.common.ui.uikit.bubble.BubblesShower
 import hnau.lexplore.common.ui.uikit.utils.Dimens
-import hnau.pipe.annotations.Pipe
+import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
 class EditWordProjector(

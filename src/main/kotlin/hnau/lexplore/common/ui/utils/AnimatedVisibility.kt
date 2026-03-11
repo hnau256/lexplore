@@ -54,7 +54,7 @@ fun <T, L> AnimatedVisibility(
 ) {
     val localOrNone = value.toLocal()
     androidx.compose.animation.AnimatedVisibility(
-        visible = localOrNone.isDefined(),
+        visible = localOrNone.isSome(),
         modifier = modifier,
         enter = transitions.enter,
         exit = transitions.exit,
