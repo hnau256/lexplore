@@ -37,6 +37,7 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                                 word to count
                             },
                         ).associate { it },
+                errors = errors,
             )
 
         val dictionariesDir = File(sourceDir, "dictionaries")
@@ -68,18 +69,25 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                                     }
                                     collectedWords += collectedWord
 
-                                    val word = wordString.let(::Word)
+                                    val word = wordString.let { Word(it, errors) }
+                                    if (word.parts.isEmpty()) {
+                                        return@readLines null
+                                    }
                                     val translation = parts[1].trim()
-                                    val weight =
+                                    val weight: Int? =
                                         parts
                                             .getOrNull(2)
                                             ?.toInt()
                                             ?: word.calcCount(counts)
 
+                                    if (weight == null) {
+                                        return@readLines null
+                                    }
+
                                     Triple(word.build(), translation, weight)
                                 },
-                            ).toList()
-                            .sortedByDescending(Triple<String, String, Int>::third)
+                            ).filterNotNull()
+                            .sortedByDescending { it.third }
                     dictionaryName to words
                 }
 
@@ -117,13 +125,13 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                     withoutNonSpacingMarks(word) to count
                 }.associate { it }
 
-        operator fun get(word: String): Int {
+        operator fun get(word: String): Int? {
             val letters = word.filter { it.isLetter() }
             return raw[letters]
                 ?: simplified[withoutNonSpacingMarks(letters)]
                 ?: run {
                     errors?.add("Unknown count of word $word")
-                    0
+                    null
                 }
         }
 
@@ -135,7 +143,7 @@ open class BuildDictionariesResourceTask : DefaultTask() {
 
     private data class Word(
         val parts: List<Part>,
-        val errors: MutableList<String>? = null,
+        private val errors: MutableList<String>? = null,
     ) {
         data class Part(
             val value: String,
@@ -175,12 +183,12 @@ open class BuildDictionariesResourceTask : DefaultTask() {
                 transform = Part::value,
             )
 
-        fun calcCount(counts: Counts): Int =
+        fun calcCount(counts: Counts): Int? =
             parts
                 .filter(Part::significant)
                 .map { it.value.lowercase() }
-                .map { counts[it].toInt() }
-                .min()
+                .mapNotNull { counts[it] }
+                .minOrNull()
     }
 
     private val dictionaryExtensionSuffix = ".txt"
