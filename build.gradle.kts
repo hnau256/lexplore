@@ -117,7 +117,7 @@ dependencies {
     val arrow = "2.2.2"
     implementation("io.arrow-kt:arrow-core:$arrow")
 
-    val hnau = "1.4.3"
+    val hnau = "1.5.0"
     implementation ("org.hnau.commons:kotlin:${hnau}")
     implementation("org.hnau.commons:gen-pipe-annotations:$hnau")
     ksp("org.hnau.commons:gen-pipe-processor:$hnau")
