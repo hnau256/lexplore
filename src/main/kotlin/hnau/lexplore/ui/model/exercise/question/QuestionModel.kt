@@ -11,7 +11,6 @@ import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.ExerciseWords
 import hnau.lexplore.exercise.dto.Answer
-import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.exercise.AutoTTS
@@ -44,8 +43,6 @@ class QuestionModel(
         val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
         @Serializable(MutableStateFlowSerializer::class)
         val menuIsOpened: MutableStateFlow<Boolean> = MutableStateFlow(false),
-        @Serializable(MutableStateFlowSerializer::class)
-        val selectedSureness: MutableStateFlow<Sureness> = MutableStateFlow(Sureness.default),
         var input: InputModel.Skeleton? = null,
         var menu: MenuModel.Skeleton? = null,
     )
@@ -154,7 +151,6 @@ class QuestionModel(
                     skeleton = skeleton::menu
                         .toAccessor()
                         .getOrInit { MenuModel.Skeleton() },
-                    selectedSureness = skeleton.selectedSureness,
                     onAnswer = ::onAnswer,
                 )
             }
@@ -167,15 +163,11 @@ class QuestionModel(
     private fun onInput(
         input: String,
     ) {
-        val sureness = skeleton.selectedSureness.value
         when (input.normalized) {
-            skeleton.wordToLearn.word.normalized -> onCorrect(
-                sureness = sureness,
-            )
+            skeleton.wordToLearn.word.normalized -> onCorrect()
 
             else -> skeleton.error.value = ErrorModel.Skeleton(
                 incorrectInput = input,
-                selectedSureness = sureness,
             )
         }
     }
@@ -190,12 +182,8 @@ class QuestionModel(
         }
     }
 
-    private fun onCorrect(
-        sureness: Sureness,
-    ) {
-        onAnswer(
-            Answer.Correct(sureness)
-        )
+    private fun onCorrect() {
+        onAnswer(Answer.Correct)
     }
 
     val title: String

@@ -5,7 +5,6 @@ import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.KnowLevel
-import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlinx.coroutines.Dispatchers
@@ -48,48 +47,49 @@ class Engine(
 
     private fun collectWordsToChoose(
         wordToLearnToExclude: WordToLearn?,
-    ): List<Pair<WordToLearn, KnowLevel>> = wordsToLearn
-        .fold(
-            initial = false to emptyList<Pair<WordToLearn, KnowLevel>>(),
-        ) { (collectedUnknown, alreadyCollected), word ->
-            if (word == wordToLearnToExclude) {
-                return@fold collectedUnknown to alreadyCollected
-            }
-            val info = knowledgeRepository[word].value
-            val result = word to info.knowLevel
-            val answeredCorrectOnce =
-                info.forgettingFactor > LearningConstants.initialForgettingFactor
-            when (answeredCorrectOnce) {
-                false -> true to when (collectedUnknown) {
-                    true -> alreadyCollected
-                    false -> alreadyCollected + result
-                }
-
-                true -> collectedUnknown to (alreadyCollected + result)
-            }
+    ): List<Pair<WordToLearn, KnowLevel>> {
+        val wordsWithInfo = wordsToLearn.map { word ->
+            word to knowledgeRepository[word].value
         }
-        .second
+        val wordsToChooseWithInfo = wordsWithInfo.filter { (word, _) ->
+            word != wordToLearnToExclude
+        }
+        val hasUnlearnedWord = wordsWithInfo.any { (_, info) ->
+            info != null && info.forgettingFactor <= LearningConstants.initialForgettingFactor
+        }
+        val newWordToAdd = if (hasUnlearnedWord) {
+            null
+        } else {
+            wordsToChooseWithInfo
+                .firstOrNull { (_, info) -> info == null }
+                ?.first
+        }
+
+        return wordsToChooseWithInfo
+            .mapNotNull { (word, info) ->
+                if (info == null && word != newWordToAdd) {
+                    return@mapNotNull null
+                }
+                word to info.knowLevel
+            }
+            .ifEmpty {
+                listOfNotNull(wordToLearnToExclude ?: wordsToLearn.firstOrNull())
+                    .map { word ->
+                        word to knowledgeRepository[word].value.knowLevel
+                    }
+            }
+    }
 
     private fun Answer.calcNewForgettingFactor(
         current: ForgettingFactor,
     ): ForgettingFactor = when (this) {
-        is Answer.Correct -> current *
-                LearningConstants.correctForgettingFactorFactor *
-                sureness.factor
-
+        Answer.Correct -> current * LearningConstants.correctForgettingFactorFactor
         Answer.Incorrect -> current * LearningConstants.incorrectForgettingFactorFactor
         Answer.AlmostKnown -> LearningConstants.almostKnownForgettingFactor
         Answer.Useless -> LearningConstants.uselessForgettingFactor
     }.coerceAtLeast(
         minimumValue = LearningConstants.minForgettingFactor,
     )
-
-    private val Sureness.factor: Float
-        get() = when (this) {
-            Sureness.Low -> 0.5f
-            Sureness.Medium -> 1f
-            Sureness.Height -> 2f
-        }
 
     private inline fun <T> List<T>.chooseRandom(
         weight: (T) -> Float,

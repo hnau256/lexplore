@@ -82,7 +82,7 @@ class ErrorProjector(
                 cell { corners ->
                     Chip(
                         style = ChipStyle.button,
-                        onClick = { model.onTypo(model.selectedSureness) },
+                        onClick = { model.onTypo() },
                         content = { Text(text = stringResource(R.string.question_typo)) },
                         shape = corners.toShape(),
                     )

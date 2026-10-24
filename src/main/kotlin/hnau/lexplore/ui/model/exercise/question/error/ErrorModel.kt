@@ -6,7 +6,6 @@ import hnau.lexplore.common.kotlin.coroutines.onSet
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
-import hnau.lexplore.exercise.dto.Sureness
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.exercise.AutoTTS
 import hnau.lexplore.utils.TTS
@@ -22,7 +21,7 @@ class ErrorModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
-    val onTypo: (sureness: Sureness) -> Unit,
+    val onTypo: () -> Unit,
     private val onEnteredCorrect: () -> Unit,
 ) : GoBackHandlerProvider {
 
@@ -37,7 +36,6 @@ class ErrorModel(
     @Serializable
     data class Skeleton(
         val incorrectInput: String,
-        val selectedSureness: Sureness,
         @Serializable(MutableStateFlowSerializer::class)
         val input: MutableStateFlow<@Serializable(TextFieldValueSerializer::class) TextFieldValue> =
             MutableStateFlow(TextFieldValue()),
@@ -45,9 +43,6 @@ class ErrorModel(
 
     val incorrectInput: String
         get() = skeleton.incorrectInput
-
-    val selectedSureness: Sureness
-        get() = skeleton.selectedSureness
 
     val input: MutableStateFlow<TextFieldValue> = skeleton
         .input
