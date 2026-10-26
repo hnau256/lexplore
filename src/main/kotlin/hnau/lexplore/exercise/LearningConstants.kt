@@ -21,7 +21,15 @@ object LearningConstants {
 
     val initialForgettingFactor = ForgettingFactor(1f)
 
-    const val weightPow: Float = 4f
+    const val priorityPow: Double = 2.0
+
+    const val newWordProbabilityK: Double = 0.05
+
+    const val newWordRetentionPow: Double = 4.0
+
+    const val softminTau: Double = 0.05
+
+    const val previousWordPenalty: Double = 0.1
 
     val minForgettingFactor: ForgettingFactor = ForgettingFactor(1f)
 }

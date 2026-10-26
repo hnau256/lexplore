@@ -4,13 +4,30 @@ import hnau.lexplore.exercise.dto.KnowLevel
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Instant
 import kotlin.math.exp
 import kotlin.math.ln
-import kotlin.math.pow
-import kotlin.time.Duration
 
 val WordInfo.durationFromLastAnswer: Duration
     get() = Clock.System.now() - lastAnswerTimestamp
+
+fun WordInfo.knowLevel(
+    now: Instant,
+): KnowLevel {
+    val timeFactor = (now - lastAnswerTimestamp) / LearningConstants.baseInterval
+    val result = exp(-timeFactor / forgettingFactor.factor.toDouble())
+    return KnowLevel(
+        level = result.toFloat(),
+    )
+}
+
+fun WordInfo.overdueRatio(
+    now: Instant,
+): Double {
+    val timeFactor = (now - lastAnswerTimestamp) / LearningConstants.baseInterval
+    return timeFactor / forgettingFactor.factor.toDouble()
+}
 
 val WordInfo?.knowLevel: KnowLevel
     get() {
@@ -19,17 +36,8 @@ val WordInfo?.knowLevel: KnowLevel
             forgettingFactor = forgettingFactor,
             lastAnswerTimestamp = now - LearningConstants.newWordFakeLastAnswerBefore
         )
-        val timeFactor = info.durationFromLastAnswer / LearningConstants.baseInterval
-        val result = exp(-timeFactor / info.forgettingFactor.factor)
-        return KnowLevel(
-            level = result.toFloat(),
-        )
+        return info.knowLevel(now)
     }
-
-val WordInfo?.weight: Float
-    get() = (1f / knowLevel.level - 1)
-        .coerceAtLeast(0f)
-        .pow(LearningConstants.weightPow)
 
 val WordInfo?.forgettingFactorFrom0To1: Float
     get() {
