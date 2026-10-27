@@ -50,7 +50,7 @@ internal data class FsrsParameters(
             lapseRetrievabilitySensitivity = 1.6483,
             hardPenalty = 0.6014,
             easyBonus = 1.8729,
-            learningStabilityIncrease = 1.875,
+            learningStabilityIncrease = 1.9,
             learningHardPenalty = 0.9,
             learningEasyBonus = 1.2,
             learningStabilityLimit = Stability.from(1.days),

@@ -122,4 +122,5 @@ dependencies {
     implementation("org.hnau.commons:gen-pipe-annotations:$hnau")
     ksp("org.hnau.commons:gen-pipe-processor:$hnau")
 
+    testImplementation("junit:junit:4.13.2")
 }
