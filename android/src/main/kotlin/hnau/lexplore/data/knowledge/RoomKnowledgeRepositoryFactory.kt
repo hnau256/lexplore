@@ -1,0 +1,51 @@
+package hnau.lexplore.data.knowledge
+
+import hnau.lexplore.common.WordToLearn
+import hnau.lexplore.common.knowledge.KnowledgeRepository
+import hnau.lexplore.common.knowledge.KnowledgeRepositoryImpl
+import hnau.lexplore.data.db.AppDatabase
+import hnau.lexplore.data.knowledge.db.KnowledgeLevelOfWord
+import hnau.lexplore.fsrs.dto.Difficulty
+import hnau.lexplore.fsrs.dto.Stability
+import hnau.lexplore.fsrs.dto.WordInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.days
+
+object RoomKnowledgeRepositoryFactory {
+
+    suspend fun create(
+        database: AppDatabase,
+    ): KnowledgeRepository {
+        val dao = database.knowledgeDao()
+
+        val initialList: List<KnowledgeLevelOfWord> =
+            withContext(Dispatchers.IO) { dao.getAll() }
+
+        val initial: Map<WordToLearn, WordInfo> = withContext(Dispatchers.Default) {
+            initialList.associate { knowledge ->
+                knowledge.question to WordInfo(
+                    stability = Stability(knowledge.stability.days),
+                    difficulty = Difficulty(knowledge.difficulty),
+                    lastAnswerTimestamp = knowledge.lastAnswerTimestamp,
+                )
+            }
+        }
+
+        return KnowledgeRepositoryImpl(
+            initial = initial,
+            persist = { question, info ->
+                withContext(Dispatchers.IO) {
+                    dao.insert(
+                        knowledge = KnowledgeLevelOfWord(
+                            question = question,
+                            lastAnswerTimestamp = info.lastAnswerTimestamp,
+                            stability = info.stability.days,
+                            difficulty = info.difficulty.value,
+                        )
+                    )
+                }
+            },
+        )
+    }
+}

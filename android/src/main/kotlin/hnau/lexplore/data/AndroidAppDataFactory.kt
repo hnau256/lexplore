@@ -4,7 +4,7 @@ import android.content.Context
 import hnau.lexplore.common.AppData
 import hnau.lexplore.common.AppDataFactory
 import hnau.lexplore.data.db.AppDatabase
-import hnau.lexplore.data.knowledge.KnowledgeRepositoryImpl
+import hnau.lexplore.data.knowledge.RoomKnowledgeRepositoryFactory
 import hnau.lexplore.data.settings.AppSettingsImpl
 
 class AndroidAppDataFactory(
@@ -14,7 +14,7 @@ class AndroidAppDataFactory(
     override suspend fun create(): AppData {
         val database = AppDatabase.create(context)
         return AppData(
-            knowledgeRepository = KnowledgeRepositoryImpl.create(database),
+            knowledgeRepository = RoomKnowledgeRepositoryFactory.create(database),
             appSettings = AppSettingsImpl.create(database),
         )
     }

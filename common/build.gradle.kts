@@ -9,6 +9,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(project(":fsrs"))
+                implementation(hnau.kotlinx.atomicfu)
                 implementation(hnau.kotlinx.serialization.json)
             }
         }
