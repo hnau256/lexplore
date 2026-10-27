@@ -17,6 +17,7 @@ import hnau.lexplore.projector.exercise.question.input.InputProjector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import org.hnau.commons.app.projector.fractal.SButton
+import org.hnau.commons.app.projector.fractal.SLine
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.SText
 import org.hnau.commons.app.projector.fractal.size.SizeType
@@ -72,32 +73,35 @@ class QuestionProjector(
     @Composable
     fun Content() {
         val localization = dependencies.localization
-        SLazyTable(
+        SLine(
             orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxSize(),
         ) {
-            item {
-                PreviousWordSpeaker()
-            }
-            item {
-                STableHeader {
-                    SText(
-                        text = model.title,
-                        type = SizeType.Large,
-                    )
-                }
-            }
-            model.info?.let { info ->
+            SLazyTable(
+                orientation = Orientation.Vertical,
+                modifier = Modifier.weight(1f),
+            ) {
                 item {
-                    WordInfoContent(
-                        info = info,
-                        localization = localization,
-                    )
+                    PreviousWordSpeaker()
+                }
+                item {
+                    STableHeader {
+                        SText(
+                            text = model.title,
+                            type = SizeType.Large,
+                        )
+                    }
+                }
+                model.info?.let { info ->
+                    item {
+                        WordInfoContent(
+                            info = info,
+                            localization = localization,
+                        )
+                    }
                 }
             }
-            item {
-                state.collectAsState().value.Content()
-            }
+            state.collectAsState().value.Content()
         }
     }
 

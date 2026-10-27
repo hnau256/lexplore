@@ -19,10 +19,8 @@ import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.SScreen
 import org.hnau.commons.app.projector.fractal.SText
 import org.hnau.commons.app.projector.fractal.size.SizeType
-import org.hnau.commons.app.projector.fractal.table.STableHeader
 import org.hnau.commons.app.projector.fractal.table.lazy.SLazyTable
 import org.hnau.commons.app.projector.fractal.table.lazy.cells
-import org.hnau.commons.app.projector.fractal.table.lazy.item
 import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
@@ -48,6 +46,23 @@ class DictionariesProjector(
         val localization = dependencies.localization
         val unselectedNames by model.unselectedNames.collectAsState()
         val start by model.start.collectAsState()
+        val startAction = if (unselectedNames.size < model.allDictionaryNamesSet.size) {
+            start
+        } else {
+            null
+        }
+        val selectAllAction: (() -> Unit)? = if (unselectedNames.isEmpty()) {
+            null
+        } else {
+            { model.update { emptySet() } }
+        }
+        val selectNoneAction: (() -> Unit)? = if (
+            unselectedNames.size == model.allDictionaryNamesSet.size
+        ) {
+            null
+        } else {
+            { model.update { model.allDictionaryNamesSet } }
+        }
 
         SScreen(
             contentPadding = contentPadding,
@@ -59,15 +74,11 @@ class DictionariesProjector(
             },
             actions = {
                 Action(
-                    actionOrElseOrDisabled = ActionOrElse.instant {
-                        model.update { model.allDictionaryNamesSet }
-                    },
+                    actionOrElseOrDisabled = ActionOrElse.instant(selectNoneAction),
                     titleOrIcon = TitleOrIcon.Title(localization.none),
                 )
                 Action(
-                    actionOrElseOrDisabled = ActionOrElse.instant {
-                        model.update { emptySet() }
-                    },
+                    actionOrElseOrDisabled = ActionOrElse.instant(selectAllAction),
                     titleOrIcon = TitleOrIcon.Title(localization.all),
                 )
             },
@@ -78,31 +89,28 @@ class DictionariesProjector(
                         orientation = Orientation.Vertical,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        item {
-                            STableHeader {
-                                SText(localization.dictionariesTitle)
-                            }
-                        }
                         cells(
                             items = model.items,
                             key = { item -> item.dictionaryName.name },
                         ) { item ->
                             val dictionaryName = item.dictionaryName
                             val isSelected = dictionaryName !in unselectedNames
-                            SPanel {
+                            SPanel(
+                                actionOrElseOrDisabled = ActionOrElse.instant {
+                                    model.update { current ->
+                                        if (isSelected) {
+                                            current + dictionaryName
+                                        } else {
+                                            current - dictionaryName
+                                        }
+                                    }
+                                },
+                                importanceToActivate = null,
+                            ) {
                                 SItem(
-                                    startAccessory = {
+                                    endAccessory = {
                                         SCheckBox(
                                             isChecked = isSelected,
-                                            onClick = {
-                                                model.update { current ->
-                                                    if (isSelected) {
-                                                        current + dictionaryName
-                                                    } else {
-                                                        current - dictionaryName
-                                                    }
-                                                }
-                                            },
                                         )
                                     },
                                     content = {
@@ -128,7 +136,7 @@ class DictionariesProjector(
                 },
                 actions = {
                     SButton(
-                        actionOrElseOrDisabled = start,
+                        actionOrElseOrDisabled = startAction,
                         titleOrIcon = TitleOrIcon.Both(
                             title = localization.start,
                             icon = Drawable.Vector(Icons.Default.RocketLaunch),

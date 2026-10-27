@@ -17,7 +17,6 @@ import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.model.exercise.question.InputModel
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
-import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.STextField
 import org.hnau.commons.app.projector.fractal.table.STable
@@ -47,48 +46,44 @@ class InputProjector(
         val input by model.input.collectAsState()
         val focusRequester = remember { FocusRequester() }
 
-        SElements(
+        STable(
+            orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            SPanel(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                STextField(
-                    value = input,
-                    onValueChanged = { newValue -> model.input.value = newValue },
-                    modifier = Modifier.focusRequester(focusRequester),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrectEnabled = false,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.None,
-                    ),
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                )
+            SCell {
+                SPanel(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    STextField(
+                        value = input,
+                        onValueChanged = { newValue -> model.input.value = newValue },
+                        modifier = Modifier.focusRequester(focusRequester),
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.None,
+                        ),
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                    )
+                }
             }
-            STable(
-                orientation = Orientation.Vertical,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Subtable {
-                    GradeCell(
-                        rating = FsrsRating.Again,
-                        enabled = true,
-                    )
-                    GradeCell(
-                        rating = FsrsRating.Hard,
-                        enabled = hasInput,
-                    )
-                }
-                Subtable {
-                    GradeCell(
-                        rating = FsrsRating.Good,
-                        enabled = hasInput,
-                    )
-                    GradeCell(
-                        rating = FsrsRating.Easy,
-                        enabled = hasInput,
-                    )
-                }
+            Subtable {
+                GradeCell(
+                    rating = FsrsRating.Again,
+                    enabled = true,
+                )
+                GradeCell(
+                    rating = FsrsRating.Hard,
+                    enabled = hasInput,
+                )
+                GradeCell(
+                    rating = FsrsRating.Good,
+                    enabled = hasInput,
+                )
+                GradeCell(
+                    rating = FsrsRating.Easy,
+                    enabled = hasInput,
+                )
             }
         }
 

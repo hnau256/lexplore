@@ -2,7 +2,10 @@ package hnau.lexplore.projector.exercise.question
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.difficultyFrom0To1
 import hnau.lexplore.fsrs.durationFromLastAnswer
@@ -65,21 +68,31 @@ fun WordInfoContent(
 
     STable(
         modifier = modifier.fillMaxWidth(),
-        orientation = Orientation.Vertical,
+        orientation = Orientation.Horizontal,
     ) {
-        rows.forEach { row ->
-            Subtable {
+        Subtable {
+            rows.forEach { row ->
                 SCell(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.height(rowHeight),
                 ) {
-                    SPanel {
+                    SPanel(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                         SText(row.title)
                     }
                 }
+            }
+        }
+        Subtable(
+            modifier = Modifier.weight(1f),
+        ) {
+            rows.forEach { row ->
                 SCell(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.height(rowHeight),
                 ) {
-                    SPanel {
+                    SPanel(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                         when (val value = row.value) {
                             is Row.Value.Fraction -> FContext(
                                 update = {
@@ -104,6 +117,8 @@ fun WordInfoContent(
         }
     }
 }
+
+private val rowHeight = 48.dp
 
 private data class Row(
     val title: String,

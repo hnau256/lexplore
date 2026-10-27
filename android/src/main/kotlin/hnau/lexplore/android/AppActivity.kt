@@ -6,9 +6,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import hnau.lexplore.app.LEXploreAppDependencies
 import hnau.lexplore.app.createAppProjector
@@ -62,9 +66,15 @@ class AppActivity : ComponentActivity() {
         )
         setContent {
             val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-            projector.Content(
-                contentPadding = systemBarsPadding,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
+            ) {
+                projector.Content(
+                    contentPadding = systemBarsPadding,
+                )
+            }
         }
     }
 

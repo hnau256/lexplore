@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import arrow.core.toNonEmptyListOrThrow
 import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.model.exercise.question.ErrorModel
 import hnau.lexplore.projector.Localization
@@ -22,20 +23,17 @@ import org.hnau.commons.app.projector.fractal.SButton
 import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.STextField
+import org.hnau.commons.app.projector.fractal.STabs
 import org.hnau.commons.app.projector.fractal.SText
 import org.hnau.commons.app.projector.fractal.context.FContext
 import org.hnau.commons.app.projector.fractal.size.SizeType
 import org.hnau.commons.app.projector.fractal.table.STable
-import org.hnau.commons.app.projector.fractal.table.STableScope
-import org.hnau.commons.app.projector.fractal.table.Subtable
 import org.hnau.commons.app.projector.fractal.utils.Mood
 import org.hnau.commons.app.projector.uikit.line.weight
 import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
-import org.hnau.commons.kotlin.coroutines.ActionOrElse
-import org.hnau.commons.kotlin.coroutines.instant
 
 class ErrorProjector(
     private val model: ErrorModel,
@@ -116,30 +114,17 @@ class ErrorProjector(
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
             }
-            STable(
-                orientation = Orientation.Vertical,
+            STabs(
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                Subtable {
-                    RatingCell(
-                        rating = FsrsRating.Again,
-                        selectedRating = selectedRating,
-                    )
-                    RatingCell(
-                        rating = FsrsRating.Hard,
-                        selectedRating = selectedRating,
-                    )
-                }
-                Subtable {
-                    RatingCell(
-                        rating = FsrsRating.Good,
-                        selectedRating = selectedRating,
-                    )
-                    RatingCell(
-                        rating = FsrsRating.Easy,
-                        selectedRating = selectedRating,
-                    )
-                }
+                items = FsrsRating.entries.toNonEmptyListOrThrow(),
+                getSelection = { selectedRating },
+                onSelectionChanged = model::selectRating,
+            ) { rating ->
+                SText(
+                    text = dependencies.localization.gradeLabel(rating),
+                    type = SizeType.Small,
+                    maxLines = 1,
+                )
             }
         }
 
@@ -148,22 +133,5 @@ class ErrorProjector(
         }
     }
 
-    @Composable
-    private fun STableScope.RatingCell(
-        rating: FsrsRating,
-        selectedRating: FsrsRating,
-    ) {
-        SCell(
-            modifier = Modifier.weight(1f),
-        ) {
-            SButton(
-                actionOrElseOrDisabled = ActionOrElse.instant { model.selectRating(rating) },
-                titleOrIcon = TitleOrIcon.Title(
-                    dependencies.localization.gradeLabel(rating),
-                ),
-                isSelected = rating == selectedRating,
-            )
-        }
-    }
 
 }
