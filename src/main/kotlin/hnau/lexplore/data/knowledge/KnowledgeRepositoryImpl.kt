@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.days
 
 class KnowledgeRepositoryImpl private constructor(
     initial: Map<WordToLearn, WordInfo>,
@@ -63,7 +64,7 @@ class KnowledgeRepositoryImpl private constructor(
             val initial: Map<WordToLearn, WordInfo> = withContext(Dispatchers.Default) {
                 initialList.associate { knowledge ->
                     knowledge.question to WordInfo(
-                        stability = Stability(knowledge.stability),
+                        stability = Stability(knowledge.stability.days),
                         difficulty = Difficulty(knowledge.difficulty),
                         lastAnswerTimestamp = knowledge.lastAnswerTimestamp,
                     )

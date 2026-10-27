@@ -1,11 +1,6 @@
 package hnau.lexplore.exercise
 
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-
 object LearningConstants {
-
-    val baseInterval: Duration = 1.minutes
 
     const val priorityPow: Double = 2.0
 

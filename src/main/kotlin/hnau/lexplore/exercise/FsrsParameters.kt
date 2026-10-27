@@ -1,8 +1,8 @@
 package hnau.lexplore.exercise
 
 import hnau.lexplore.exercise.dto.Difficulty
+import hnau.lexplore.exercise.dto.Retention
 import hnau.lexplore.exercise.dto.Stability
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 internal data class FsrsParameters(
@@ -10,6 +10,7 @@ internal data class FsrsParameters(
     val initialStabilityHard: Stability,
     val initialStabilityGood: Stability,
     val initialStabilityEasy: Stability,
+    val stabilityReferenceRetention: Retention,
     val initialDifficultyAgain: Difficulty,
     val initialDifficultySlope: Double,
     val difficultyDelta: Double,
@@ -23,20 +24,21 @@ internal data class FsrsParameters(
     val lapseRetrievabilitySensitivity: Double,
     val hardPenalty: Double,
     val easyBonus: Double,
-    val learningStabilityIncrease: Double,
-    val learningHardPenalty: Double,
-    val learningEasyBonus: Double,
-    val learningStabilityLimit: Stability,
     val curveDecay: Double,
 ) {
 
     companion object {
 
         val Default = FsrsParameters(
-            initialStabilityAgain = Stability.from(0.212.minutes),
-            initialStabilityHard = Stability.from(1.2931.minutes),
-            initialStabilityGood = Stability.from(2.3065.minutes),
-            initialStabilityEasy = Stability.from(8.2956.minutes),
+            // canonical FSRS-6: 0.212 days
+            initialStabilityAgain = Stability(0.212.minutes),
+            // canonical FSRS-6: 1.2931 days
+            initialStabilityHard = Stability(1.2931.minutes),
+            // canonical FSRS-6: 2.3065 days
+            initialStabilityGood = Stability(2.3065.minutes),
+            // canonical FSRS-6: 8.2956 days
+            initialStabilityEasy = Stability(8.2956.minutes),
+            stabilityReferenceRetention = Retention(0.9),
             initialDifficultyAgain = Difficulty(6.4133),
             initialDifficultySlope = 0.8334,
             difficultyDelta = 3.0194,
@@ -50,10 +52,6 @@ internal data class FsrsParameters(
             lapseRetrievabilitySensitivity = 1.6483,
             hardPenalty = 0.6014,
             easyBonus = 1.8729,
-            learningStabilityIncrease = 1.9,
-            learningHardPenalty = 0.9,
-            learningEasyBonus = 1.2,
-            learningStabilityLimit = Stability.from(1.days),
             curveDecay = 0.1542,
         )
     }

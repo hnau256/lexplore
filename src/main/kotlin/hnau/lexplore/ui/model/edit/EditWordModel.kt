@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.util.Locale
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 
 class EditWordModel(
     private val scope: CoroutineScope,
@@ -67,7 +68,9 @@ class EditWordModel(
             .text
             .replace(',', '.')
             .toDoubleOrNull()
-            ?.let { days -> Stability(days.coerceAtLeast(Fsrs.minStability.days)) }
+            ?.let { days ->
+                Stability(days.coerceAtLeast(Fsrs.minStability.days).days)
+            }
             ?: return false
         scope.launch {
             savingInProgressRegistry.executeRegistered {

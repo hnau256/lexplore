@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 class KnowledgeRepositoryUpdateTest {
@@ -16,7 +17,7 @@ class KnowledgeRepositoryUpdateTest {
     fun `update persists once and updates in-memory state`() = runBlocking {
         val word = WordToLearn("test")
         val info = WordInfo(
-            stability = Stability(1.0),
+            stability = Stability(1.days),
             difficulty = Difficulty(5.0),
             lastAnswerTimestamp = Instant.fromEpochMilliseconds(0),
         )
