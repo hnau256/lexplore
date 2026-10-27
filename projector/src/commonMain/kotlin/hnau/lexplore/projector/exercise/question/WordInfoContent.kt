@@ -1,22 +1,21 @@
 package hnau.lexplore.projector.exercise.question
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.dp
 import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.difficultyFrom0To1
 import hnau.lexplore.fsrs.durationFromLastAnswer
 import hnau.lexplore.fsrs.retrievability
 import hnau.lexplore.fsrs.stabilityFrom0To1
 import hnau.lexplore.projector.Localization
+import org.hnau.commons.app.projector.fractal.SItem
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.SProgress
 import org.hnau.commons.app.projector.fractal.SText
 import org.hnau.commons.app.projector.fractal.context.FContext
 import org.hnau.commons.app.projector.fractal.table.STable
+import org.hnau.commons.app.projector.fractal.table.STableScope
 import org.hnau.commons.app.projector.fractal.table.Subtable
 import org.hnau.commons.app.projector.fractal.utils.Mood
 import org.hnau.commons.app.projector.uikit.line.weight
@@ -29,29 +28,32 @@ fun WordInfoContent(
     localization: Localization,
     modifier: Modifier = Modifier,
 ) {
-    val rows = listOf(
-        Row(
+    val firstRow = listOf(
+        Cell(
             title = localization.infoKnowledgeLevel,
-            value = Row.Value.Fraction(
+            value = Cell.Value.Fraction(
                 fraction = info.retrievability(Clock.System.now()).value.toFloat(),
             ),
         ),
-        Row(
+        Cell(
             title = localization.infoForgettingFactor,
-            value = Row.Value.Fraction(
+            value = Cell.Value.Fraction(
                 fraction = info.stabilityFrom0To1,
             ),
         ),
-        Row(
+    )
+
+    val secondRow = listOf(
+        Cell(
             title = localization.infoDifficulty,
-            value = Row.Value.Fraction(
+            value = Cell.Value.Fraction(
                 fraction = info.difficultyFrom0To1,
                 isNegative = true,
             ),
         ),
-        Row(
+        Cell(
             title = localization.infoLastAsk,
-            value = Row.Value.Text(
+            value = Cell.Value.Text(
                 text = info.durationFromLastAnswer.let { duration ->
                     var seconds = duration.inWholeSeconds
                     var minutes = seconds / 60
@@ -68,59 +70,62 @@ fun WordInfoContent(
 
     STable(
         modifier = modifier.fillMaxWidth(),
-        orientation = Orientation.Horizontal,
+        orientation = Orientation.Vertical,
     ) {
         Subtable {
-            rows.forEach { row ->
-                SCell(
-                    modifier = Modifier.height(rowHeight),
-                ) {
-                    SPanel(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        SText(row.title)
-                    }
-                }
+            firstRow.forEach { cell ->
+                InfoCell(cell)
             }
         }
-        Subtable(
-            modifier = Modifier.weight(1f),
-        ) {
-            rows.forEach { row ->
-                SCell(
-                    modifier = Modifier.height(rowHeight),
-                ) {
-                    SPanel(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        when (val value = row.value) {
-                            is Row.Value.Fraction -> FContext(
-                                update = {
-                                    if (value.isNegative) {
-                                        copy(mood = Mood.Error)
-                                    } else {
-                                        this
-                                    }
-                                },
-                            ) {
-                                SProgress(
-                                    getFraction = { value.fraction },
-                                    onFractionChanged = null,
-                                )
-                            }
-
-                            is Row.Value.Text -> SText(value.text)
-                        }
-                    }
-                }
+        Subtable {
+            secondRow.forEach { cell ->
+                InfoCell(cell)
             }
         }
     }
 }
 
-private val rowHeight = 48.dp
+@Composable
+private fun STableScope.InfoCell(
+    cell: Cell,
+) {
+    SCell(
+        modifier = Modifier.weight(1f),
+    ) {
+        SPanel(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            SItem(
+                topAccessory = {
+                    SText(cell.title)
+                },
+                content = {
+                    when (val value = cell.value) {
+                        is Cell.Value.Fraction -> FContext(
+                            update = {
+                                if (value.isNegative) {
+                                    copy(mood = Mood.Error)
+                                } else {
+                                    this
+                                }
+                            },
+                        ) {
+                            SProgress(
+                                getFraction = { value.fraction },
+                                onFractionChanged = null,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
 
-private data class Row(
+                        is Cell.Value.Text -> SText(value.text)
+                    }
+                },
+            )
+        }
+    }
+}
+
+private data class Cell(
     val title: String,
     val value: Value,
 ) {

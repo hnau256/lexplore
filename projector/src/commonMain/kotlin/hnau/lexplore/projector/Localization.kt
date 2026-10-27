@@ -34,6 +34,7 @@ data class Localization(
             )
                 .dropWhile { (_, value) -> value <= 0 }
                 .take(2)
+                .ifEmpty { listOf(lastAskSeconds to seconds) }
                 .joinToString(
                     separator = " ",
                 ) { (suffix, value) -> value.toString() + suffix }
