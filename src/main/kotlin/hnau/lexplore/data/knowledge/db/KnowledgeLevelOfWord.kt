@@ -3,7 +3,6 @@ package hnau.lexplore.data.knowledge.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordToLearn
 import kotlin.time.Instant
 
@@ -20,8 +19,11 @@ data class KnowledgeLevelOfWord(
     @ColumnInfo(name = columnLastAnswerTimestamp)
     val lastAnswerTimestamp: Instant,
 
-    @ColumnInfo(name = columnLevel)
-    val level: ForgettingFactor,
+    @ColumnInfo(name = columnStability)
+    val stability: Double,
+
+    @ColumnInfo(name = columnDifficulty)
+    val difficulty: Double,
 ) {
 
     companion object {
@@ -30,7 +32,7 @@ data class KnowledgeLevelOfWord(
 
         const val columnQuestion = "question"
         const val columnLastAnswerTimestamp = "last_answer_timestamp"
-        const val columnLevel = "level"
+        const val columnStability = "stability"
+        const val columnDifficulty = "difficulty"
     }
 }
-

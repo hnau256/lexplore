@@ -1,7 +1,6 @@
 package hnau.lexplore.ui.model.exercise.question
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,27 +28,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.stringResource
-import hnau.lexplore.R
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.common.ui.uikit.Separator
 import hnau.lexplore.common.ui.uikit.state.NullableStateContent
 import hnau.lexplore.common.ui.uikit.state.StateContent
 import hnau.lexplore.common.ui.uikit.state.TransitionSpec
-import hnau.lexplore.common.ui.uikit.table.Table
-import hnau.lexplore.common.ui.uikit.table.TableOrientation
-import hnau.lexplore.common.ui.uikit.table.cellBox
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.common.ui.utils.verticalDisplayPadding
 import hnau.lexplore.exercise.dto.WordInfo
-import hnau.lexplore.exercise.knowLevel
 import hnau.lexplore.ui.model.exercise.question.error.ErrorProjector
 import hnau.lexplore.ui.model.exercise.question.input.InputProjector
-import hnau.lexplore.ui.model.exercise.question.menu.MenuProjector
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -69,8 +59,6 @@ class QuestionProjector(
         fun input(): InputProjector.Dependencies
 
         fun screenContent(): ScreenContentDependencies
-
-        fun menu(): MenuProjector.Dependencies
     }
 
     private val state: StateFlow<QuestionStateProjector> =
@@ -90,17 +78,6 @@ class QuestionProjector(
                         dependencies = dependencies.input(),
                         model = state.input,
                     )
-                )
-            }
-        }
-
-    private val menu: StateFlow<MenuProjector?> =
-        model.menu.mapWithScope(scope) { menuScope, menuOrNull ->
-            menuOrNull?.let { menu ->
-                MenuProjector(
-                    scope = menuScope,
-                    dependencies = dependencies.menu(),
-                    model = menu,
                 )
             }
         }
@@ -132,38 +109,8 @@ class QuestionProjector(
                     text = model.title,
                     style = MaterialTheme.typography.headlineMedium,
                 )
-                IconButton(
-                    onClick = model::switchMenuIsOpened,
-                ) {
-                    Icon(
-                        modifier = Modifier.rotate(
-                            degrees = animateFloatAsState(
-                                when (menu.collectAsState().value) {
-                                    null -> 0f
-                                    else -> 90f
-                                }
-                            ).value,
-                        )
-                    ) { MoreVert }
-                }
             }
             Separator()
-            menu.NullableStateContent(
-                modifier = Modifier.fillMaxWidth(),
-                transitionSpec = TransitionSpec.vertical(),
-            ) { menuProjector ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = Dimens.separation)
-                        .horizontalDisplayPadding(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    )
-                ) {
-                    menuProjector.Content()
-                }
-            }
             model.info?.Content(
                 modifier = Modifier
                     .fillMaxWidth()

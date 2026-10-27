@@ -1,25 +1,11 @@
 package hnau.lexplore.exercise
 
-import hnau.lexplore.exercise.dto.ForgettingFactor
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 object LearningConstants {
 
-    val newWordFakeLastAnswerBefore: Duration = 10.days
-
     val baseInterval: Duration = 1.minutes
-
-    val uselessForgettingFactor: ForgettingFactor = ForgettingFactor(10000000f)
-
-    val almostKnownForgettingFactor: ForgettingFactor = ForgettingFactor(500f)
-
-    const val correctForgettingFactorFactor: Float = 1.7f
-
-    const val incorrectForgettingFactorFactor: Float = 0.5f
-
-    val initialForgettingFactor = ForgettingFactor(1f)
 
     const val priorityPow: Double = 2.0
 
@@ -30,6 +16,4 @@ object LearningConstants {
     const val softminTau: Double = 0.05
 
     const val previousWordPenalty: Double = 0.1
-
-    val minForgettingFactor: ForgettingFactor = ForgettingFactor(1f)
 }

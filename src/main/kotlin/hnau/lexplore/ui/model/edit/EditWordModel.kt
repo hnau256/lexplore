@@ -7,13 +7,19 @@ import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
-import hnau.lexplore.exercise.dto.ForgettingFactor
+import hnau.lexplore.exercise.Fsrs
+import hnau.lexplore.exercise.dto.Difficulty
+import hnau.lexplore.exercise.dto.Stability
+import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldNullable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import java.util.Locale
+import kotlin.time.Clock
 
 class EditWordModel(
     private val scope: CoroutineScope,
@@ -30,13 +36,13 @@ class EditWordModel(
     ) {
 
         constructor(
-            initialValue: ForgettingFactor,
+            initialValue: Stability,
         ) : this(
             input = MutableStateFlow(
-                initialValue.factor.toString().let { factorString ->
+                String.format(Locale.US, "%.4f", initialValue.days).let { stabilityString ->
                     TextFieldValue(
-                        text = factorString,
-                        selection = TextRange(0, factorString.length),
+                        text = stabilityString,
+                        selection = TextRange(0, stabilityString.length),
                     )
                 }
             )
@@ -55,18 +61,38 @@ class EditWordModel(
     private val savingInProgressRegistry = InProgressRegistry()
 
     fun save(): Boolean {
-        val newForgettingFactor = skeleton
+        val newStability = skeleton
             .input
             .value
             .text
-            .toFloatOrNull()
-            ?.let(::ForgettingFactor)
+            .replace(',', '.')
+            .toDoubleOrNull()
+            ?.let { days -> Stability(days.coerceAtLeast(Fsrs.minStability.days)) }
             ?: return false
         scope.launch {
             savingInProgressRegistry.executeRegistered {
+                val now = Clock.System.now()
+                val newInfo = dependencies
+                    .knowledgeRepository[wordToLearn]
+                    .value
+                    .foldNullable(
+                        ifNull = {
+                            WordInfo(
+                                stability = newStability,
+                                difficulty = Difficulty(5.0),
+                                lastAnswerTimestamp = now,
+                            )
+                        },
+                        ifNotNull = { info ->
+                            info.copy(
+                                stability = newStability,
+                                lastAnswerTimestamp = now,
+                            )
+                        },
+                    )
                 dependencies.knowledgeRepository.update(
                     key = wordToLearn,
-                    newForgettingFactor = newForgettingFactor,
+                    info = newInfo,
                 )
             }
             onReady()

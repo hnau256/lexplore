@@ -6,12 +6,12 @@ import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
+import hnau.lexplore.exercise.Fsrs
 import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
-import hnau.lexplore.exercise.dto.forgettingFactor
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,9 +59,9 @@ class EditModel(
     fun updateSelectedWord(
         wordToLearn: WordToLearn,
     ) {
-        val forgettingFactor = getWordInfo(wordToLearn).value.forgettingFactor
+        val stability = getWordInfo(wordToLearn).value?.stability ?: Fsrs.minStability
         skeleton.selectedWordToLearn.value = wordToLearn to EditWordModel.Skeleton(
-            initialValue = forgettingFactor,
+            initialValue = stability,
         )
     }
 

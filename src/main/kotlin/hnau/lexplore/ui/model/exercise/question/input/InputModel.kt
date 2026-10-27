@@ -5,6 +5,7 @@ import hnau.lexplore.common.kotlin.coroutines.mapState
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
+import hnau.lexplore.exercise.dto.FsrsRating
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ class InputModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val onReady: (input: String) -> Unit,
+    private val onGradeSelected: (FsrsRating, String) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
@@ -28,11 +29,14 @@ class InputModel(
     val input: MutableStateFlow<TextFieldValue>
         get() = skeleton.input
 
-    val done: StateFlow<(() -> Unit)?> = input.mapState(scope) { textFieldValue ->
-        textFieldValue
-            .text
-            .takeIf(String::isNotEmpty)
-            ?.let { input -> { onReady(input) } }
+    val hasInput: StateFlow<Boolean> = input.mapState(scope) { textFieldValue ->
+        textFieldValue.text.trim().isNotEmpty()
+    }
+
+    fun onGrade(
+        rating: FsrsRating,
+    ) {
+        onGradeSelected(rating, input.value.text)
     }
 
     @Pipe

@@ -20,8 +20,8 @@ import hnau.lexplore.data.settings.Setting
 import hnau.lexplore.data.settings.map
 import hnau.lexplore.exercise.Engine
 import hnau.lexplore.exercise.ExerciseWords
-import hnau.lexplore.exercise.dto.Answer
 import hnau.lexplore.exercise.dto.DictionaryWord
+import hnau.lexplore.exercise.dto.FsrsRating
 import hnau.lexplore.exercise.dto.Translation
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
@@ -183,12 +183,12 @@ class ExerciseModel(
 
     private suspend fun answer(
         wordToLearn: WordToLearn,
-        answer: Answer,
+        rating: FsrsRating,
     ) {
         val engine = engine.await()
         engine.answer(
             word = wordToLearn,
-            answer = answer,
+            rating = rating,
         )
         skeleton.state.value = State.Prepare(
             previousWord = wordToLearn,
@@ -213,7 +213,7 @@ class ExerciseModel(
                         autoTTS = autoTTS,
                     ),
                     skeleton = questionSkeleton,
-                    onAnswer = { answer ->
+                    onAnswer = { rating ->
                         val currentQuestionWord: WordToLearn? = skeleton
                             .state
                             .value
@@ -227,7 +227,7 @@ class ExerciseModel(
                         if (wordToLearn == currentQuestionWord) {
                             answer(
                                 wordToLearn = wordToLearn,
-                                answer = answer,
+                                rating = rating,
                             )
                         }
                     }

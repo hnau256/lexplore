@@ -1,7 +1,6 @@
 package hnau.lexplore.data.knowledge
 
 import hnau.lexplore.data.db.AppDatabase
-import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +13,7 @@ interface KnowledgeRepository {
 
     suspend fun update(
         key: WordToLearn,
-        newForgettingFactor: ForgettingFactor,
+        info: WordInfo,
     )
 
     companion object {

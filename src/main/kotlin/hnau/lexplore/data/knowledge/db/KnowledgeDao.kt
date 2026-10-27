@@ -13,6 +13,6 @@ interface KnowledgeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(
-        level: KnowledgeLevelOfWord,
+        knowledge: KnowledgeLevelOfWord,
     )
 }

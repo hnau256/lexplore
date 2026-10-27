@@ -18,10 +18,11 @@ import hnau.lexplore.common.ui.uikit.ScreenContent
 import hnau.lexplore.common.ui.uikit.ScreenContentDependencies
 import hnau.lexplore.exercise.dto.DictionaryWord
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.exercise.dto.forgettingFactor
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldNullable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
+import java.util.Locale
 
 class EditProjector(
     scope: CoroutineScope,
@@ -88,8 +89,9 @@ class EditProjector(
         val wordInfoOrNull by model
             .getWordInfo(toLearn)
             .collectAsState()
-        val forgettingFactor = wordInfoOrNull
-            .forgettingFactor
+        val stabilityDays = wordInfoOrNull
+            ?.stability
+            ?.days
         AnimatedContent(
             targetState = edit
                 ?.takeIf { it.first == toLearn }
@@ -106,10 +108,10 @@ class EditProjector(
                     supportingContent = { Text(word.translation.translation) },
                     trailingContent = {
                         Text(
-                            text = forgettingFactor
-                                .factor
-                                .toInt()
-                                .toString(),
+                            text = stabilityDays.foldNullable(
+                                ifNull = { "—" },
+                                ifNotNull = { days -> String.format(Locale.US, "%.4f", days) },
+                            ),
                         )
                     }
                 )

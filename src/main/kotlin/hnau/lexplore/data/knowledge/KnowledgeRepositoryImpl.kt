@@ -2,7 +2,8 @@ package hnau.lexplore.data.knowledge
 
 import hnau.lexplore.data.db.AppDatabase
 import hnau.lexplore.data.knowledge.db.KnowledgeLevelOfWord
-import hnau.lexplore.exercise.dto.ForgettingFactor
+import hnau.lexplore.exercise.dto.Difficulty
+import hnau.lexplore.exercise.dto.Stability
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlin.time.Clock
 
 class KnowledgeRepositoryImpl private constructor(
     initial: Map<WordToLearn, WordInfo>,
@@ -35,20 +35,16 @@ class KnowledgeRepositoryImpl private constructor(
 
     override suspend fun update(
         key: WordToLearn,
-        newForgettingFactor: ForgettingFactor,
+        info: WordInfo,
     ) {
-        val wordInfo = WordInfo(
-            forgettingFactor = newForgettingFactor,
-            lastAnswerTimestamp = Clock.System.now(),
-        )
         updateMutex.withLock {
             synchronized(infos) {
                 infos[key] = when (val stateFlow = infos[key]) {
-                    null -> MutableStateFlow(wordInfo)
-                    else -> stateFlow.apply { value = wordInfo }
+                    null -> MutableStateFlow(info)
+                    else -> stateFlow.apply { value = info }
                 }
             }
-            update(key, wordInfo)
+            update(key, info)
         }
     }
 
@@ -63,10 +59,11 @@ class KnowledgeRepositoryImpl private constructor(
                 withContext(Dispatchers.IO) { dao.getAll() }
 
             val initial: Map<WordToLearn, WordInfo> = withContext(Dispatchers.Default) {
-                initialList.associate { questionInfoView ->
-                    questionInfoView.question to WordInfo(
-                        forgettingFactor = questionInfoView.level,
-                        lastAnswerTimestamp = questionInfoView.lastAnswerTimestamp,
+                initialList.associate { knowledge ->
+                    knowledge.question to WordInfo(
+                        stability = Stability(knowledge.stability),
+                        difficulty = Difficulty(knowledge.difficulty),
+                        lastAnswerTimestamp = knowledge.lastAnswerTimestamp,
                     )
                 }
             }
@@ -75,10 +72,11 @@ class KnowledgeRepositoryImpl private constructor(
                 initial = initial,
                 update = { question, info ->
                     dao.insert(
-                        level = KnowledgeLevelOfWord(
+                        knowledge = KnowledgeLevelOfWord(
                             question = question,
-                            level = info.forgettingFactor,
                             lastAnswerTimestamp = info.lastAnswerTimestamp,
+                            stability = info.stability.days,
+                            difficulty = info.difficulty.value,
                         )
                     )
                 }

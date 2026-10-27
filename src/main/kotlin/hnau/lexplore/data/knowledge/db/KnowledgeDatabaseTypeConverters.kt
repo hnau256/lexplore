@@ -1,7 +1,6 @@
 package hnau.lexplore.data.knowledge.db
 
 import androidx.room.TypeConverter
-import hnau.lexplore.exercise.dto.ForgettingFactor
 import hnau.lexplore.exercise.dto.WordToLearn
 import kotlin.time.Instant
 
@@ -17,18 +16,6 @@ class KnowledgeDatabaseTypeConverters {
         from: String,
     ): WordToLearn = WordToLearn(
         word = from,
-    )
-
-    @TypeConverter
-    fun serializeKnowledgeLevel(
-        from: ForgettingFactor,
-    ): Float = from.factor
-
-    @TypeConverter
-    fun deserializeKnowledgeLevel(
-        from: Float,
-    ): ForgettingFactor = ForgettingFactor(
-        factor = from,
     )
 
     @TypeConverter

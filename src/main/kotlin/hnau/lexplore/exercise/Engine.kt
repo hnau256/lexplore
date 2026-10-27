@@ -1,13 +1,14 @@
 package hnau.lexplore.exercise
 
 import hnau.lexplore.data.knowledge.KnowledgeRepository
-import hnau.lexplore.exercise.dto.Answer
-import hnau.lexplore.exercise.dto.ForgettingFactor
+import hnau.lexplore.exercise.dto.FsrsRating
+import hnau.lexplore.exercise.dto.Retrievability
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
-import hnau.lexplore.exercise.dto.forgettingFactor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.hnau.commons.kotlin.foldNullable
+import org.hnau.commons.kotlin.ifNull
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.pow
@@ -22,14 +23,13 @@ class Engine(
     private data class Candidate(
         val word: WordToLearn,
         val info: WordInfo,
-        val overdueRatio: Double,
+        val retention: Retrievability,
     ) {
 
-        val retention: Double
-            get() = exp(-overdueRatio)
-
         val weight: Double
-            get() = overdueRatio.pow(LearningConstants.priorityPow)
+            get() = (-ln(retention.value))
+                .coerceAtLeast(0.0)
+                .pow(LearningConstants.priorityPow)
     }
 
     suspend fun findNextWordToLearn(
@@ -42,15 +42,22 @@ class Engine(
 
     suspend fun answer(
         word: WordToLearn,
-        answer: Answer,
+        rating: FsrsRating,
     ) {
-        val info = knowledgeRepository[word].value
-        val newForgettingFactor = answer.calcNewForgettingFactor(
-            current = info.forgettingFactor,
+        val now = Clock.System.now()
+        val newInfo = knowledgeRepository[word].value.foldNullable(
+            ifNull = { Fsrs.initialState(rating = rating, now = now) },
+            ifNotNull = { info ->
+                Fsrs.review(
+                    info = info,
+                    rating = rating,
+                    now = now,
+                )
+            },
         )
         knowledgeRepository.update(
             key = word,
-            newForgettingFactor = newForgettingFactor,
+            info = newInfo,
         )
     }
 
@@ -66,7 +73,7 @@ class Engine(
                 Candidate(
                     word = word,
                     info = startedInfo,
-                    overdueRatio = startedInfo.overdueRatio(now),
+                    retention = startedInfo.retrievability(now),
                 )
             }
         }
@@ -75,24 +82,23 @@ class Engine(
             ?.first
 
         if (candidates.isEmpty()) {
-            return nextNewWord ?: error("There are no words to learn")
+            return nextNewWord.ifNull { error("There are no words to learn") }
         }
 
-        val hasUnlearnedWord = candidates.any { candidate ->
-            candidate.info.forgettingFactor <= LearningConstants.initialForgettingFactor
-        }
-
-        val newWordProbability = if (nextNewWord == null || hasUnlearnedWord) {
-            0.0
-        } else {
-            val retentionReference = softmin(
-                values = candidates.map { candidate -> candidate.retention },
-                tau = LearningConstants.softminTau,
-            )
-            val newWordProbabilityValue = LearningConstants.newWordProbabilityK *
-                retentionReference.pow(LearningConstants.newWordRetentionPow)
-            newWordProbabilityValue.coerceIn(0.0, 1.0)
-        }
+        val newWordProbability = nextNewWord.foldNullable(
+            ifNull = { 0.0 },
+            ifNotNull = {
+                val retentionReference = softmin(
+                    values = candidates.map { candidate -> candidate.retention.value },
+                    tau = LearningConstants.softminTau,
+                )
+                (
+                    LearningConstants.newWordProbabilityK *
+                        retentionReference.pow(LearningConstants.newWordRetentionPow)
+                    )
+                    .coerceIn(0.0, 1.0)
+            },
+        )
 
         if (nextNewWord != null && Random.nextDouble() < newWordProbability) {
             return nextNewWord
@@ -121,7 +127,7 @@ class Engine(
         val totalWeight = weightedWords.sumOf { (_, weight) -> weight }
         if (totalWeight <= 0.0) {
             return candidates
-                .minByOrNull { candidate -> candidate.info.forgettingFactor.factor }
+                .minByOrNull { candidate -> candidate.info.stability.days }
                 ?.word
                 ?: candidates.first().word
         }
@@ -146,15 +152,4 @@ class Engine(
         } / values.size
         return (min - tau * ln(meanExp)).coerceIn(0.0, 1.0)
     }
-
-    private fun Answer.calcNewForgettingFactor(
-        current: ForgettingFactor,
-    ): ForgettingFactor = when (this) {
-        Answer.Correct -> current * LearningConstants.correctForgettingFactorFactor
-        Answer.Incorrect -> current * LearningConstants.incorrectForgettingFactorFactor
-        Answer.AlmostKnown -> LearningConstants.almostKnownForgettingFactor
-        Answer.Useless -> LearningConstants.uselessForgettingFactor
-    }.coerceAtLeast(
-        minimumValue = LearningConstants.minForgettingFactor,
-    )
 }

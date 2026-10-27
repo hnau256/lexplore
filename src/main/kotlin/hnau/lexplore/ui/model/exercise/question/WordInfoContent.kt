@@ -21,10 +21,11 @@ import hnau.lexplore.common.ui.uikit.table.subtable
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.durationFromLastAnswer
-import hnau.lexplore.exercise.forgettingFactorFrom0To1
-import hnau.lexplore.exercise.knowLevel
+import hnau.lexplore.exercise.retrievability
+import hnau.lexplore.exercise.stabilityFrom0To1
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlin.time.Clock
 
 @Composable
 fun WordInfo.Content(
@@ -98,11 +99,13 @@ private fun WordInfo.generateRows(
 ): ImmutableList<Row> = persistentListOf(
     Row(
         title = context.getString(R.string.question_info_knowledge_level),
-        value = Row.Value.Fraction(knowLevel.level),
+        value = Row.Value.Fraction(
+            retrievability(Clock.System.now()).value.toFloat(),
+        ),
     ),
     Row(
         title = context.getString(R.string.question_info_forgetting_factor),
-        value = Row.Value.Fraction(forgettingFactorFrom0To1),
+        value = Row.Value.Fraction(stabilityFrom0To1),
     ),
     Row(
         title = context.getString(R.string.question_info_last_ask),

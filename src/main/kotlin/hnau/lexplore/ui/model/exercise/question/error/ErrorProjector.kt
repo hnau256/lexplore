@@ -1,5 +1,6 @@
 package hnau.lexplore.ui.model.exercise.question.error
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +26,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import hnau.lexplore.R
+import androidx.compose.ui.text.style.TextAlign
 import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
@@ -36,6 +38,8 @@ import hnau.lexplore.common.ui.uikit.table.subtable
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.common.ui.utils.Icon
 import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
+import hnau.lexplore.exercise.dto.FsrsRating
+import hnau.lexplore.ui.model.exercise.question.labelRes
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import kotlinx.coroutines.CoroutineScope
 
@@ -54,39 +58,21 @@ class ErrorProjector(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalDisplayPadding(),
-            verticalArrangement = Arrangement.spacedBy(Dimens.separation)
+            verticalArrangement = Arrangement.spacedBy(Dimens.separation),
         ) {
-            Table(
-                orientation = TableOrientation.Horizontal,
+            Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
             ) {
-                cellBox(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(Dimens.separation),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
-                    ) {
-                        Icon(
-                            tint = MaterialTheme.colorScheme.error,
-                        ) { Clear }
-                        Text(
-                            text = model.incorrectInput,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-                cell { corners ->
-                    Chip(
-                        style = ChipStyle.button,
-                        onClick = { model.onTypo() },
-                        content = { Text(text = stringResource(R.string.question_typo)) },
-                        shape = corners.toShape(),
-                    )
-                }
+                Icon(
+                    tint = MaterialTheme.colorScheme.error,
+                ) { Clear }
+                Text(
+                    text = model.incorrectInput,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
             Table(
                 orientation = TableOrientation.Vertical,
@@ -133,7 +119,7 @@ class ErrorProjector(
                         keyboardOptions = KeyboardOptions(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.None
+                            imeAction = ImeAction.None,
                         ),
                         keyboardActions = KeyboardActions {},
                         maxLines = 1,
@@ -142,6 +128,35 @@ class ErrorProjector(
                             .focusRequester(focusRequester),
                     )
                     LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+                }
+            }
+            RatingRadioRow()
+        }
+    }
+
+    @Composable
+    private fun RatingRadioRow() {
+        val selectedRating by model.selectedRating.collectAsState()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.smallSeparation),
+        ) {
+            FsrsRating.entries.forEach { rating ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { model.selectRating(rating) },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    RadioButton(
+                        selected = selectedRating == rating,
+                        onClick = { model.selectRating(rating) },
+                    )
+                    Text(
+                        text = stringResource(rating.labelRes),
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
         }

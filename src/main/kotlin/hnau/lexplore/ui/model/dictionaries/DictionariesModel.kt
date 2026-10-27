@@ -8,11 +8,11 @@ import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.LazyListStateSerializer
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.data.settings.AppSettings
-import hnau.lexplore.exercise.LearningConstants
+import hnau.lexplore.exercise.Fsrs
 import hnau.lexplore.exercise.dto.dictionary.Dictionaries
 import hnau.lexplore.exercise.dto.dictionary.DictionaryName
-import hnau.lexplore.exercise.dto.forgettingFactor
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldNullable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -113,7 +113,12 @@ class DictionariesModel(
                 dependencies
                     .knowledgeRepository[word.toLearn]
                     .value
-                    .forgettingFactor > LearningConstants.initialForgettingFactor
+                    .foldNullable(
+                        ifNull = { false },
+                        ifNotNull = { info ->
+                            info.stability > Fsrs.minStability
+                        },
+                    )
             }
         )
     }

@@ -45,7 +45,7 @@ class EditWordProjector(
             value = model.input,
             maxLines = 1,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions {

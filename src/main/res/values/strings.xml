@@ -4,15 +4,16 @@
     <string name="exercise_cancel_text">Вы хотите завершить упражнение?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="question_typo">Опечатка</string>
+    <string name="question_grade_again">Не знаю</string>
+    <string name="question_grade_hard">Сложно</string>
+    <string name="question_grade_good">Нормально</string>
+    <string name="question_grade_easy">Легко</string>
     <string name="dictionaries_title">Словари</string>
     <string name="dictionaries_start">Начать</string>
     <string name="dictionaries_all">Все</string>
     <string name="dictionary_subtitle">%s (знаю) + %s (не знаю) = %s</string>
     <string name="dictionaries_none">Ни одного</string>
     <string name="edit_incorrect_number">Неверный формат числа</string>
-    <string name="question_menu_mark_as_known">Уже знаю</string>
-    <string name="question_menu_exclude">Не спрашивать</string>
     <string name="question_info_forgetting_factor">Знаю</string>
     <string name="question_info_knowledge_level">Помню</string>
     <string name="question_info_last_ask">Пауза</string>

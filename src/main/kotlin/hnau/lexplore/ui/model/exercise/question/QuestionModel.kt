@@ -4,26 +4,27 @@ import hnau.lexplore.common.kotlin.coroutines.InProgressRegistry
 import hnau.lexplore.common.kotlin.coroutines.actionOrNullIfExecuting
 import hnau.lexplore.common.kotlin.coroutines.mapWithScope
 import hnau.lexplore.common.kotlin.getOrInit
-import hnau.lexplore.common.kotlin.ifTrue
 import hnau.lexplore.common.kotlin.serialization.MutableStateFlowSerializer
 import hnau.lexplore.common.kotlin.toAccessor
 import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.data.knowledge.KnowledgeRepository
 import hnau.lexplore.exercise.ExerciseWords
-import hnau.lexplore.exercise.dto.Answer
+import hnau.lexplore.exercise.defaultRating
+import hnau.lexplore.exercise.dto.FsrsRating
 import hnau.lexplore.exercise.dto.WordInfo
 import hnau.lexplore.exercise.dto.WordToLearn
 import hnau.lexplore.ui.model.exercise.AutoTTS
 import hnau.lexplore.ui.model.exercise.question.error.ErrorModel
 import hnau.lexplore.ui.model.exercise.question.input.InputModel
-import hnau.lexplore.ui.model.exercise.question.menu.MenuModel
 import hnau.lexplore.utils.TTS
 import hnau.lexplore.utils.normalized
+import hnau.lexplore.utils.recallScore
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldBoolean
+import org.hnau.commons.kotlin.foldNullable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -31,7 +32,7 @@ class QuestionModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val onAnswer: suspend (Answer) -> Unit,
+    private val onAnswer: suspend (FsrsRating) -> Unit,
 ) : GoBackHandlerProvider {
 
     @Serializable
@@ -41,10 +42,7 @@ class QuestionModel(
         val previousWord: MutableStateFlow<WordToLearn?>,
         @Serializable(MutableStateFlowSerializer::class)
         val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
-        @Serializable(MutableStateFlowSerializer::class)
-        val menuIsOpened: MutableStateFlow<Boolean> = MutableStateFlow(false),
         var input: InputModel.Skeleton? = null,
-        var menu: MenuModel.Skeleton? = null,
     )
 
     @Pipe
@@ -54,8 +52,6 @@ class QuestionModel(
 
         fun error(): ErrorModel.Dependencies
 
-        fun menu(): MenuModel.Dependencies
-
         val exerciseWords: ExerciseWords
 
         val repository: KnowledgeRepository
@@ -64,9 +60,6 @@ class QuestionModel(
 
         val autoTTS: AutoTTS
     }
-
-    val menuIsOpened: MutableStateFlow<Boolean>
-        get() = skeleton.menuIsOpened
 
     data class PreviousWordSpeaker(
         val word: WordToLearn,
@@ -100,7 +93,6 @@ class QuestionModel(
         }
     }
 
-
     val wordToLearn: WordToLearn
         get() = skeleton.wordToLearn
 
@@ -116,79 +108,67 @@ class QuestionModel(
     val state: StateFlow<QuestionStateModel> = skeleton
         .error
         .mapWithScope(scope) { stateScope, errorSkeleton ->
-            when (errorSkeleton) {
-                null -> QuestionStateModel.Input(
-                    InputModel(
-                        scope = stateScope,
-                        skeleton = skeleton::input
-                            .toAccessor()
-                            .getOrInit { InputModel.Skeleton() },
-                        dependencies = dependencies.input(),
-                        onReady = ::onInput,
+            errorSkeleton.foldNullable(
+                ifNull = {
+                    QuestionStateModel.Input(
+                        InputModel(
+                            scope = stateScope,
+                            skeleton = skeleton::input
+                                .toAccessor()
+                                .getOrInit { InputModel.Skeleton() },
+                            dependencies = dependencies.input(),
+                            onGradeSelected = ::onGrade,
+                        )
                     )
-                )
-
-                else -> QuestionStateModel.Error(
-                    ErrorModel(
-                        scope = stateScope,
-                        skeleton = errorSkeleton,
-                        dependencies = dependencies.error(),
-                        onEnteredCorrect = { onAnswer(Answer.Incorrect) },
-                        onTypo = ::onCorrect,
-                        wordToLearn = skeleton.wordToLearn,
+                },
+                ifNotNull = { error ->
+                    QuestionStateModel.Error(
+                        ErrorModel(
+                            scope = stateScope,
+                            skeleton = error,
+                            dependencies = dependencies.error(),
+                            wordToLearn = skeleton.wordToLearn,
+                            onAnswer = ::onAnswer,
+                        )
                     )
-                )
-            }
+                },
+            )
         }
 
-    val menu: StateFlow<MenuModel?> = skeleton
-        .menuIsOpened
-        .mapWithScope(scope) {menuScope, isOpened ->
-            isOpened.ifTrue {
-                MenuModel(
-                    scope = menuScope,
-                    dependencies = dependencies.menu(),
-                    skeleton = skeleton::menu
-                        .toAccessor()
-                        .getOrInit { MenuModel.Skeleton() },
-                    onAnswer = ::onAnswer,
-                )
-            }
-        }
-
-    fun switchMenuIsOpened() {
-        menuIsOpened.update { !it }
-    }
-
-    private fun onInput(
+    private fun onGrade(
+        rating: FsrsRating,
         input: String,
     ) {
-        when (input.normalized) {
-            skeleton.wordToLearn.word.normalized -> onCorrect()
-
-            else -> skeleton.error.value = ErrorModel.Skeleton(
-                incorrectInput = input,
-            )
+        when (rating) {
+            FsrsRating.Again -> onAnswer(rating)
+            else -> {
+                val target = wordToLearn.word
+                (input.normalized == target.normalized).foldBoolean(
+                    ifTrue = { onAnswer(rating) },
+                    ifFalse = {
+                        val score = input.recallScore(target)
+                        skeleton.error.value = ErrorModel.Skeleton(
+                            incorrectInput = input,
+                            defaultRating = defaultRating(score),
+                        )
+                    },
+                )
+            }
         }
     }
 
     fun onAnswer(
-        answer: Answer,
+        rating: FsrsRating,
     ) {
         scope.launch {
             answeringInProgressRegistry.executeRegistered {
-                onAnswer.invoke(answer)
+                onAnswer.invoke(rating)
             }
         }
     }
 
-    private fun onCorrect() {
-        onAnswer(Answer.Correct)
-    }
-
     val title: String
-        get() = skeleton
-            .wordToLearn
+        get() = wordToLearn
             .let(dependencies.exerciseWords::get)
             .translation
 }
