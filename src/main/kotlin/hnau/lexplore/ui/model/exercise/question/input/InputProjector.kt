@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,10 +17,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import hnau.lexplore.common.ui.uikit.TextInput
 import hnau.lexplore.common.ui.uikit.chip.Chip
-import hnau.lexplore.common.ui.uikit.chip.ChipSize
 import hnau.lexplore.common.ui.uikit.chip.ChipStyle
 import hnau.lexplore.common.ui.uikit.table.Table
 import hnau.lexplore.common.ui.uikit.table.TableOrientation
@@ -32,15 +29,6 @@ import hnau.lexplore.ui.model.exercise.question.labelRes
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.ifTrue
 import kotlinx.coroutines.CoroutineScope
-
-private val gradeChipSize = ChipSize(
-    height = 40.dp,
-    getTextStyle = { MaterialTheme.typography.bodyMedium },
-    contentEdgeSeparation = 4.dp,
-    contentSideContentSeparation = 0.dp,
-    sideContentEdgeSeparation = 0.dp,
-    sideContentSize = 0.dp,
-)
 
 class InputProjector(
     private val scope: CoroutineScope,
@@ -88,9 +76,9 @@ class InputProjector(
                             content = {
                                 Text(
                                     text = stringResource(rating.labelRes),
+                                    maxLines = 1,
                                 )
                             },
-                            size = gradeChipSize,
                             shape = corners.toShape(),
                             style = when {
                                 !enabled -> ChipStyle.chip
