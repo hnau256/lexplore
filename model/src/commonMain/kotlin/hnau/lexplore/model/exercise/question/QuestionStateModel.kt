@@ -1,15 +1,23 @@
 package hnau.lexplore.model.exercise.question
 
-import org.hnau.commons.gen.fold.annotations.Fold
+import org.hnau.commons.gen.sealup.annotations.SealUp
+import org.hnau.commons.gen.sealup.annotations.Variant
 
-@Fold
-sealed interface QuestionStateModel {
+@SealUp(
+    variants = [
+        Variant(
+            type = InputModel::class,
+            identifier = "input",
+        ),
+        Variant(
+            type = ErrorModel::class,
+            identifier = "error",
+        ),
+    ],
+    wrappedValuePropertyName = "model",
+    sealedInterfaceName = "QuestionStateModel",
+)
+interface QuestionStateModelElement {
 
-    data class Input(
-        val input: InputModel,
-    ) : QuestionStateModel
-
-    data class Error(
-        val error: ErrorModel,
-    ) : QuestionStateModel
+    companion object
 }

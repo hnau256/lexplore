@@ -3,29 +3,27 @@ package hnau.lexplore.projector.exercise.question
 import androidx.compose.runtime.Composable
 import hnau.lexplore.projector.exercise.question.error.ErrorProjector
 import hnau.lexplore.projector.exercise.question.input.InputProjector
+import org.hnau.commons.gen.sealup.annotations.SealUp
+import org.hnau.commons.gen.sealup.annotations.Variant
 
-sealed interface QuestionStateProjector {
+@SealUp(
+    variants = [
+        Variant(
+            type = InputProjector::class,
+            identifier = "input",
+        ),
+        Variant(
+            type = ErrorProjector::class,
+            identifier = "error",
+        ),
+    ],
+    wrappedValuePropertyName = "projector",
+    sealedInterfaceName = "QuestionStateProjector",
+)
+interface QuestionStateProjectorElement {
 
     @Composable
     fun Content()
 
-    data class Input(
-        private val input: InputProjector,
-    ) : QuestionStateProjector {
-
-        @Composable
-        override fun Content() {
-            input.Content()
-        }
-    }
-
-    data class Error(
-        private val error: ErrorProjector,
-    ) : QuestionStateProjector {
-
-        @Composable
-        override fun Content() {
-            error.Content()
-        }
-    }
+    companion object
 }

@@ -58,7 +58,7 @@ class QuestionProjector(
         .mapWithScope(scope) { _, state ->
             state.fold(
                 ifInput = { input ->
-                    QuestionStateProjector.Input(
+                    QuestionStateProjectorElement.input(
                         InputProjector(
                             model = input,
                             dependencies = dependencies.input(),
@@ -66,7 +66,7 @@ class QuestionProjector(
                     )
                 },
                 ifError = { error ->
-                    QuestionStateProjector.Error(
+                    QuestionStateProjectorElement.error(
                         ErrorProjector(
                             model = error,
                             dependencies = dependencies.error(),

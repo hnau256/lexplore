@@ -118,7 +118,7 @@ class QuestionModel(
         .mapWithScope(scope) { stateScope, errorSkeleton ->
             errorSkeleton.foldNullable(
                 ifNull = {
-                    QuestionStateModel.Input(
+                    QuestionStateModelElement.input(
                         InputModel(
                             input = skeleton.input,
                             onGradeSelected = ::onGrade,
@@ -126,7 +126,7 @@ class QuestionModel(
                     )
                 },
                 ifNotNull = { error ->
-                    QuestionStateModel.Error(
+                    QuestionStateModelElement.error(
                         ErrorModel(
                             scope = stateScope,
                             skeleton = error,
