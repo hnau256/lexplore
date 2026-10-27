@@ -27,6 +27,7 @@ import hnau.lexplore.common.ui.utils.horizontalDisplayPadding
 import hnau.lexplore.exercise.dto.FsrsRating
 import hnau.lexplore.ui.model.exercise.question.labelRes
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.ifTrue
 import kotlinx.coroutines.CoroutineScope
 
@@ -53,11 +54,9 @@ class InputProjector(
                 keyboardOptions = KeyboardOptions(
                     autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
+                    imeAction = ImeAction.None,
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = { model.onPrimaryGrade() },
-                ),
+                keyboardActions = KeyboardActions {},
                 maxLines = 1,
                 value = model.input,
                 modifier = Modifier
@@ -80,11 +79,10 @@ class InputProjector(
                                 )
                             },
                             shape = corners.toShape(),
-                            style = when {
-                                !enabled -> ChipStyle.chip
-                                rating == FsrsRating.Good -> ChipStyle.button
-                                else -> ChipStyle.chipHighlighted
-                            },
+                            style = enabled.foldBoolean(
+                                ifTrue = { ChipStyle.button },
+                                ifFalse = { ChipStyle.chip },
+                            ),
                             onClick = enabled.ifTrue {
                                 { model.onGrade(rating) }
                             },
