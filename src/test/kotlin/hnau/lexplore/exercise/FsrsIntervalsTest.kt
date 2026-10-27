@@ -1,10 +1,13 @@
 package hnau.lexplore.exercise
 
+import hnau.lexplore.exercise.dto.Difficulty
 import hnau.lexplore.exercise.dto.FsrsRating
 import hnau.lexplore.exercise.dto.Stability
+import hnau.lexplore.exercise.dto.WordInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -101,6 +104,31 @@ class FsrsIntervalsTest {
         assertEquals(12, reviews.reviewsWithin(24.0 * 60.0))
         assertTrue(reviews[11].timeMinutes <= 24.0 * 60.0)
         assertTrue(reviews[12].timeMinutes > 24.0 * 60.0)
+    }
+
+    @Test
+    fun `again increases difficulty more than hard`() {
+        val info = WordInfo(
+            stability = Stability(2.days),
+            difficulty = Difficulty(5.0),
+            lastAnswerTimestamp = start,
+        )
+        val now = start + 2.days
+
+        val again = Fsrs.review(
+            info = info,
+            rating = FsrsRating.Again,
+            now = now,
+        )
+        val hard = Fsrs.review(
+            info = info,
+            rating = FsrsRating.Hard,
+            now = now,
+        )
+
+        assertClose(8.3475, again.difficulty.value, tolerance = 1e-3)
+        assertClose(6.6718, hard.difficulty.value, tolerance = 1e-3)
+        assertTrue(again.difficulty.value > hard.difficulty.value)
     }
 
     @Test
