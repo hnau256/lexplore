@@ -21,6 +21,11 @@ fun WordInfo.retrievability(
     elapsed = now - lastAnswerTimestamp,
 )
 
+val WordInfo.difficultyFrom0To1: Float
+    get() = ((difficulty.value - 1.0) / 9.0)
+        .toFloat()
+        .coerceIn(0f, 1f)
+
 val WordInfo?.stabilityFrom0To1: Float
     get() = foldNullable(
         ifNull = { 0f },

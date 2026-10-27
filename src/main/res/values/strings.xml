@@ -15,6 +15,7 @@
     <string name="dictionaries_none">Ни одного</string>
     <string name="edit_incorrect_number">Неверный формат числа</string>
     <string name="question_info_forgetting_factor">Знаю</string>
+    <string name="question_info_difficulty">Сложность</string>
     <string name="question_info_knowledge_level">Помню</string>
     <string name="question_info_last_ask">Пауза</string>
     <string name="question_info_last_ask_days">д</string>

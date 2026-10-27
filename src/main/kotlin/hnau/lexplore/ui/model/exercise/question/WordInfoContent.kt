@@ -20,6 +20,7 @@ import hnau.lexplore.common.ui.uikit.table.cellBox
 import hnau.lexplore.common.ui.uikit.table.subtable
 import hnau.lexplore.common.ui.uikit.utils.Dimens
 import hnau.lexplore.exercise.dto.WordInfo
+import hnau.lexplore.exercise.difficultyFrom0To1
 import hnau.lexplore.exercise.durationFromLastAnswer
 import hnau.lexplore.exercise.retrievability
 import hnau.lexplore.exercise.stabilityFrom0To1
@@ -73,6 +74,11 @@ fun WordInfo.Content(
                                     horizontal = Dimens.separation,
                                 ),
                             progress = { value.fraction },
+                            color = if (value.isNegative) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            },
                             drawStopIndicator = {},
                         )
 
@@ -106,6 +112,13 @@ private fun WordInfo.generateRows(
     Row(
         title = context.getString(R.string.question_info_forgetting_factor),
         value = Row.Value.Fraction(stabilityFrom0To1),
+    ),
+    Row(
+        title = context.getString(R.string.question_info_difficulty),
+        value = Row.Value.Fraction(
+            fraction = difficultyFrom0To1,
+            isNegative = true,
+        ),
     ),
     Row(
         title = context.getString(R.string.question_info_last_ask),
@@ -146,6 +159,7 @@ private data class Row(
 
         data class Fraction(
             val fraction: Float,
+            val isNegative: Boolean = false,
         ) : Value
 
         data class Text(
