@@ -15,8 +15,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import arrow.core.toNonEmptyListOrThrow
 import hnau.lexplore.fsrs.dto.FsrsRating
+import hnau.lexplore.fsrs.dto.nonEmptyEntries
 import hnau.lexplore.model.exercise.question.ErrorModel
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
@@ -116,7 +116,7 @@ class ErrorProjector(
             }
             STabs(
                 modifier = Modifier.fillMaxWidth(),
-                items = FsrsRating.entries.toNonEmptyListOrThrow(),
+                items = FsrsRating.nonEmptyEntries,
                 getSelection = { selectedRating },
                 onSelectionChanged = model::selectRating,
             ) { rating ->

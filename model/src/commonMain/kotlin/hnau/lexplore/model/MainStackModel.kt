@@ -1,5 +1,6 @@
 package hnau.lexplore.model
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.dictionary.Dictionaries
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.settings.AppSettings
@@ -31,13 +32,11 @@ class MainStackModel(
     data class Skeleton(
         @Serializable(MutableStateFlowSerializer::class)
         val stack: MutableStateFlow<NonEmptyStack<MainStackElementSkeleton>> =
-            MutableStateFlow(
-                NonEmptyStack(
-                    ElementSkeleton.dictionaries(
-                        DictionariesModel.Skeleton(),
-                    )
+            NonEmptyStack(
+                ElementSkeleton.dictionaries(
+                    DictionariesModel.Skeleton(),
                 )
-            ),
+            ).toMutableStateFlowAsInitial(),
     )
 
     @Pipe

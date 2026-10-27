@@ -2,6 +2,7 @@ package hnau.lexplore.fsrs
 
 import kotlin.jvm.JvmInline
 
+import org.hnau.commons.kotlin.foldBoolean
 import kotlin.math.exp
 
 private const val correctnessSoftness = 0.5
@@ -71,7 +72,10 @@ private fun levenshteinDistance(
     a.forEachIndexed { aIndex, aChar ->
         current[0] = aIndex + 1
         b.forEachIndexed { bIndex, bChar ->
-            val substitutionCost = if (aChar == bChar) 0 else 1
+            val substitutionCost = (aChar == bChar).foldBoolean(
+                ifTrue = { 0 },
+                ifFalse = { 1 },
+            )
             current[bIndex + 1] = minOf(
                 current[bIndex] + 1,
                 previous[bIndex + 1] + 1,

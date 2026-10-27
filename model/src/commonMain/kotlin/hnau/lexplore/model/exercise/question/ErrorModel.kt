@@ -1,5 +1,6 @@
 package hnau.lexplore.model.exercise.question
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.speaker.Speaker
 import hnau.lexplore.fsrs.dto.FsrsRating
@@ -15,6 +16,7 @@ import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.actionOrCancel
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
+import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
 class ErrorModel(
@@ -38,9 +40,9 @@ class ErrorModel(
         val incorrectInput: String,
         val defaultRating: FsrsRating = FsrsRating.Hard,
         @Serializable(MutableStateFlowSerializer::class)
-        val input: MutableStateFlow<String> = MutableStateFlow(""),
+        val input: MutableStateFlow<String> = "".toMutableStateFlowAsInitial(),
         @Serializable(MutableStateFlowSerializer::class)
-        val selectedRating: MutableStateFlow<FsrsRating> = MutableStateFlow(defaultRating),
+        val selectedRating: MutableStateFlow<FsrsRating> = defaultRating.toMutableStateFlowAsInitial(),
     )
 
     val incorrectInput: String
@@ -55,7 +57,7 @@ class ErrorModel(
     init {
         scope.launch {
             skeleton.input.collect { newValue ->
-                if (newValue.normalized == wordToLearn.word.normalized) {
+                (newValue.normalized == wordToLearn.word.normalized).ifTrue {
                     onAnswer(skeleton.selectedRating.value)
                 }
             }
@@ -74,7 +76,7 @@ class ErrorModel(
         }
 
     init {
-        if (dependencies.autoTTS.active.value) {
+        dependencies.autoTTS.active.value.ifTrue {
             correctWordSpeaker.value.actionOrCancel()
         }
     }

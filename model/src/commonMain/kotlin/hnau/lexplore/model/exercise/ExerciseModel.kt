@@ -1,5 +1,6 @@
 package hnau.lexplore.model.exercise
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.DictionaryWord
 import hnau.lexplore.common.Translation
 import hnau.lexplore.common.WordToLearn
@@ -31,6 +32,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.hnau.commons.app.model.goback.GoBackHandler
 import org.hnau.commons.app.model.goback.NeverGoBackHandler
+import org.hnau.commons.gen.fold.annotations.Fold
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.Loadable
 import org.hnau.commons.kotlin.Loading
@@ -42,6 +44,8 @@ import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.coroutines.flow.state.mapStateLite
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import arrow.core.getOrElse
+import org.hnau.commons.kotlin.ifTrue
+import org.hnau.commons.kotlin.it
 import org.hnau.commons.kotlin.map
 import org.hnau.commons.kotlin.mapper.Mapper
 import org.hnau.commons.kotlin.mapper.stringToBoolean
@@ -56,16 +60,17 @@ class ExerciseModel(
     @Serializable
     data class Skeleton(
         @Serializable(MutableStateFlowSerializer::class)
-        val state: MutableStateFlow<State> = MutableStateFlow(
-            State.Prepare(
+        val state: MutableStateFlow<State> = State
+            .Prepare(
                 previousWord = null,
             )
-        ),
+            .toMutableStateFlowAsInitial(),
 
 
         val dictionaries: Set<DictionaryName>,
     )
 
+    @Fold
     @Serializable
     sealed interface State {
 
@@ -137,7 +142,7 @@ class ExerciseModel(
 
     private val engine: Deferred<Engine> = scope.async {
         Engine(
-            wordsToLearn = exerciseWordsMap.await().map { it.key },
+            wordsToLearn = exerciseWordsMap.await().keys.toList(),
             knowledgeRepository = dependencies.knowledgeRepository,
         )
     }
@@ -147,13 +152,14 @@ class ExerciseModel(
             skeleton
                 .state
                 .collectLatest { state ->
-                    when (state) {
-                        is State.Prepare -> switchToNewQuestion(
-                            previousWord = state.previousWord,
-                        )
-
-                        is State.Question -> Unit
-                    }
+                    state.fold(
+                        ifPrepare = { previousWord ->
+                            switchToNewQuestion(
+                                previousWord = previousWord,
+                            )
+                        },
+                        ifQuestion = { _ -> Unit },
+                    )
                 }
         }
     }
@@ -169,7 +175,7 @@ class ExerciseModel(
             skeleton.state.value = State.Question(
                 question = QuestionModel.Skeleton(
                     wordToLearn = newWordToLearn,
-                    previousWord = MutableStateFlow(previousWord),
+                    previousWord = previousWord.toMutableStateFlowAsInitial(),
                 )
             )
         }
@@ -192,10 +198,10 @@ class ExerciseModel(
     val question: StateFlow<Loadable<QuestionModel>> = skeleton
         .state
         .mapNotNull { state ->
-            when (state) {
-                is State.Question -> state.question
-                is State.Prepare -> null
-            }
+            state.fold(
+                ifPrepare = { null },
+                ifQuestion = ::it,
+            )
         }
         .map { questionSkeleton ->
             val exerciseWords = exerciseWordsMap.await().let(::ExerciseWords)
@@ -211,14 +217,12 @@ class ExerciseModel(
                         val currentQuestionWord: WordToLearn? = skeleton
                             .state
                             .value
-                            .let { localState ->
-                                when (localState) {
-                                    is State.Question -> localState.question.wordToLearn
-                                    is State.Prepare -> null
-                                }
-                            }
+                            .fold(
+                                ifPrepare = { null },
+                                ifQuestion = QuestionModel.Skeleton::wordToLearn,
+                            )
                         val wordToLearn = questionSkeleton.wordToLearn
-                        if (wordToLearn == currentQuestionWord) {
+                        (wordToLearn == currentQuestionWord).ifTrue {
                             answer(
                                 wordToLearn = wordToLearn,
                                 rating = rating,

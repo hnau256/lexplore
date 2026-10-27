@@ -1,5 +1,6 @@
 package hnau.lexplore.model.exercise.question
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.exercise.ExerciseWords
 import hnau.lexplore.common.knowledge.KnowledgeRepository
@@ -24,6 +25,8 @@ import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
+import org.hnau.commons.kotlin.ifTrue
+import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
 class QuestionModel(
@@ -37,11 +40,11 @@ class QuestionModel(
     data class Skeleton(
         val wordToLearn: WordToLearn,
         @Serializable(MutableStateFlowSerializer::class)
-        val previousWord: MutableStateFlow<WordToLearn?> = MutableStateFlow(null),
+        val previousWord: MutableStateFlow<WordToLearn?> = null.toMutableStateFlowAsInitial(),
         @Serializable(MutableStateFlowSerializer::class)
-        val error: MutableStateFlow<ErrorModel.Skeleton?> = MutableStateFlow(null),
+        val error: MutableStateFlow<ErrorModel.Skeleton?> = null.toMutableStateFlowAsInitial(),
         @Serializable(MutableStateFlowSerializer::class)
-        val input: MutableStateFlow<String> = MutableStateFlow(""),
+        val input: MutableStateFlow<String> = "".toMutableStateFlowAsInitial(),
     )
 
     @Pipe
@@ -69,21 +72,24 @@ class QuestionModel(
     val previousWordSpeaker: StateFlow<PreviousWordSpeaker?> = skeleton
         .previousWord
         .mapWithScope(scope) { previousWordScope, previousWordOrNull ->
-            previousWordOrNull?.let { previousWord ->
-                PreviousWordSpeaker(
-                    word = previousWord,
-                    speak = actionOrCancelIfExecuting(
-                        scope = previousWordScope,
-                    ) {
-                        dependencies.speaker.speak(previousWord.word)
-                    },
-                    close = { skeleton.previousWord.value = null },
-                )
-            }
+            previousWordOrNull.foldNullable(
+                ifNull = { null },
+                ifNotNull = { previousWord ->
+                    PreviousWordSpeaker(
+                        word = previousWord,
+                        speak = actionOrCancelIfExecuting(
+                            scope = previousWordScope,
+                        ) {
+                            dependencies.speaker.speak(previousWord.word)
+                        },
+                        close = { skeleton.previousWord.value = null },
+                    )
+                },
+            )
         }
 
     init {
-        if (dependencies.autoTTS.active.value) {
+        dependencies.autoTTS.active.value.ifTrue {
             previousWordSpeaker
                 .value
                 ?.speak
@@ -114,7 +120,6 @@ class QuestionModel(
                 ifNull = {
                     QuestionStateModel.Input(
                         InputModel(
-                            scope = stateScope,
                             input = skeleton.input,
                             onGradeSelected = ::onGrade,
                         )
@@ -138,9 +143,9 @@ class QuestionModel(
         rating: FsrsRating,
         input: String,
     ) {
-        when (rating) {
-            FsrsRating.Again -> onAnswer(rating)
-            else -> {
+        (rating == FsrsRating.Again).foldBoolean(
+            ifTrue = { onAnswer(rating) },
+            ifFalse = {
                 val target = wordToLearn.word
                 (input.normalized == target.normalized).foldBoolean(
                     ifTrue = { onAnswer(rating) },
@@ -152,8 +157,8 @@ class QuestionModel(
                         )
                     },
                 )
-            }
-        }
+            },
+        )
     }
 
     fun onAnswer(

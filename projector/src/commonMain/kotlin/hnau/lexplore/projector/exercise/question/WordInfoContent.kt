@@ -9,6 +9,7 @@ import hnau.lexplore.fsrs.durationFromLastAnswer
 import hnau.lexplore.fsrs.retrievability
 import hnau.lexplore.fsrs.stabilityFrom0To1
 import hnau.lexplore.projector.Localization
+import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.app.projector.fractal.SItem
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.SProgress
@@ -103,15 +104,14 @@ private fun STableScope.InfoCell(
                     when (val value = cell.value) {
                         is Cell.Value.Fraction -> FContext(
                             update = {
-                                if (value.isNegative) {
-                                    copy(mood = Mood.Error)
-                                } else {
-                                    this
-                                }
+                                value.isNegative.foldBoolean(
+                                    ifTrue = { copy(mood = Mood.Error) },
+                                    ifFalse = { this },
+                                )
                             },
                         ) {
                             SProgress(
-                                getFraction = { value.fraction },
+                                getFraction = value::fraction,
                                 onFractionChanged = null,
                                 modifier = Modifier.fillMaxWidth(),
                             )

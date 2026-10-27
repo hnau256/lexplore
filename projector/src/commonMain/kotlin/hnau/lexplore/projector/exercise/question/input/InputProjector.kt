@@ -15,6 +15,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.model.exercise.question.InputModel
+import org.hnau.commons.kotlin.foldBoolean
+import org.hnau.commons.kotlin.ifTrue
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
 import org.hnau.commons.app.projector.fractal.SPanel
@@ -42,8 +44,8 @@ class InputProjector(
 
     @Composable
     fun Content() {
-        val hasInput by model.hasInput.collectAsState()
         val input by model.input.collectAsState()
+        val hasInput = input.trim().isNotEmpty()
         val focusRequester = remember { FocusRequester() }
 
         STable(
@@ -68,22 +70,15 @@ class InputProjector(
                 }
             }
             Subtable {
-                GradeCell(
-                    rating = FsrsRating.Again,
-                    enabled = true,
-                )
-                GradeCell(
-                    rating = FsrsRating.Hard,
-                    enabled = hasInput,
-                )
-                GradeCell(
-                    rating = FsrsRating.Good,
-                    enabled = hasInput,
-                )
-                GradeCell(
-                    rating = FsrsRating.Easy,
-                    enabled = hasInput,
-                )
+                FsrsRating.entries.forEach { rating ->
+                    GradeCell(
+                        rating = rating,
+                        enabled = (rating == FsrsRating.Again).foldBoolean(
+                            ifTrue = { true },
+                            ifFalse = { hasInput },
+                        ),
+                    )
+                }
             }
         }
 
@@ -101,9 +96,8 @@ class InputProjector(
             modifier = Modifier.weight(1f),
         ) {
             SButton(
-                actionOrElseOrDisabled = when (enabled) {
-                    true -> ActionOrElse.instant { model.onGrade(rating) }
-                    false -> null
+                actionOrElseOrDisabled = enabled.ifTrue {
+                    ActionOrElse.instant { model.onGrade(rating) }
                 },
                 titleOrIcon = TitleOrIcon.Title(
                     dependencies.localization.gradeLabel(rating),

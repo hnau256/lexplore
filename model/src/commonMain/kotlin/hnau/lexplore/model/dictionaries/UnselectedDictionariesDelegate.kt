@@ -1,5 +1,6 @@
 package hnau.lexplore.model.dictionaries
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import arrow.core.getOrElse
 import hnau.lexplore.common.dictionary.DictionaryName
 import hnau.lexplore.common.settings.AppSettings
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.hnau.commons.kotlin.coroutines.flow.state.flatMapState
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
+import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.mapper.Mapper
 import org.hnau.commons.kotlin.mapper.plus
 import org.hnau.commons.kotlin.mapper.stringSplit
@@ -39,9 +41,10 @@ class UnselectedDictionariesDelegate(
         .flatMapState(
             scope = scope,
         ) { overwrittenValue ->
-            overwrittenValue
-                ?.let(::MutableStateFlow)
-                ?: persisted
+            overwrittenValue.foldNullable(
+                ifNull = { persisted },
+                ifNotNull = { it.toMutableStateFlowAsInitial() },
+            )
         }
 
     fun update(

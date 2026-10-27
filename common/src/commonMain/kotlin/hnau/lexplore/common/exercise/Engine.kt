@@ -10,8 +10,10 @@ import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.retrievability
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.ifNull
+import org.hnau.commons.kotlin.ifTrue
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.pow
@@ -72,19 +74,22 @@ class Engine(
             word to knowledgeRepository[word].value
         }
         val candidates = wordsWithInfo.mapNotNull { (word, info) ->
-            info?.let { startedInfo ->
-                Candidate(
-                    word = word,
-                    info = startedInfo,
-                    retention = startedInfo.retrievability(now),
-                )
-            }
+            info.foldNullable(
+                ifNull = { null },
+                ifNotNull = { startedInfo ->
+                    Candidate(
+                        word = word,
+                        info = startedInfo,
+                        retention = startedInfo.retrievability(now),
+                    )
+                },
+            )
         }
         val nextNewWord = wordsWithInfo
             .firstOrNull { (_, info) -> info == null }
             ?.first
 
-        if (candidates.isEmpty()) {
+        candidates.isEmpty().ifTrue {
             return nextNewWord.ifNull { error("There are no words to learn") }
         }
 
@@ -103,8 +108,8 @@ class Engine(
             },
         )
 
-        if (nextNewWord != null && Random.nextDouble() < newWordProbability) {
-            return nextNewWord
+        (nextNewWord != null && Random.nextDouble() < newWordProbability).ifTrue {
+            return nextNewWord.ifNull { error("There are no words to learn") }
         }
 
         return chooseOldWord(
@@ -119,26 +124,25 @@ class Engine(
     ): WordToLearn {
         val weightedWords = candidates.map { candidate ->
             val weight = candidate.weight.let { weight ->
-                if (candidate.word == previousWord) {
-                    weight * LearningConstants.previousWordPenalty
-                } else {
-                    weight
-                }
+                (candidate.word == previousWord).foldBoolean(
+                    ifTrue = { weight * LearningConstants.previousWordPenalty },
+                    ifFalse = { weight },
+                )
             }
             candidate.word to weight
         }
         val totalWeight = weightedWords.sumOf { (_, weight) -> weight }
-        if (totalWeight <= 0.0) {
+        (totalWeight <= 0.0).ifTrue {
             return candidates
                 .minByOrNull { candidate -> candidate.info.stability.duration }
                 ?.word
-                ?: candidates.first().word
+                .ifNull { candidates.first().word }
         }
         val targetWeight = Random.nextDouble() * totalWeight
         var currentWeight = 0.0
         weightedWords.forEach { (word, weight) ->
             currentWeight += weight
-            if (currentWeight >= targetWeight) {
+            (currentWeight >= targetWeight).ifTrue {
                 return word
             }
         }
@@ -149,7 +153,7 @@ class Engine(
         values: List<Double>,
         tau: Double,
     ): Double {
-        val min = values.minOrNull() ?: return 0.0
+        val min = values.minOrNull().ifNull { return 0.0 }
         val meanExp = values.sumOf { value ->
             exp(-(value - min) / tau)
         } / values.size

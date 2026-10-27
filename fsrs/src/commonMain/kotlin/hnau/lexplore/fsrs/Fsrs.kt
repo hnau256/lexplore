@@ -2,6 +2,7 @@ package hnau.lexplore.fsrs
 
 import hnau.lexplore.fsrs.dto.Difficulty
 import hnau.lexplore.fsrs.dto.FsrsRating
+import hnau.lexplore.fsrs.dto.fold
 import hnau.lexplore.fsrs.dto.Retrievability
 import hnau.lexplore.fsrs.dto.Stability
 import hnau.lexplore.fsrs.dto.WordInfo
@@ -38,7 +39,7 @@ object Fsrs {
         rating: FsrsRating,
         now: Instant,
     ): WordInfo = WordInfo(
-        stability = initialStability(rating),
+        stability = parameters.initialStability[rating].coerceAtLeast(minStability),
         difficulty = initialDifficulty(rating),
         lastAnswerTimestamp = now,
     )
@@ -54,19 +55,39 @@ object Fsrs {
             stability = stability,
             elapsed = now - info.lastAnswerTimestamp,
         )
-        val newStability = when (rating) {
-            FsrsRating.Again -> lapseStability(
-                stability = stability,
-                difficulty = difficulty,
-                retrievability = retrievability,
-            )
-            else -> successStability(
-                stability = stability,
-                difficulty = difficulty,
-                retrievability = retrievability,
-                rating = rating,
-            )
-        }.coerceAtLeast(minStability)
+        val newStability = rating.fold(
+            ifAgain = {
+                lapseStability(
+                    stability = stability,
+                    difficulty = difficulty,
+                    retrievability = retrievability,
+                )
+            },
+            ifHard = {
+                successStability(
+                    stability = stability,
+                    difficulty = difficulty,
+                    retrievability = retrievability,
+                    rating = rating,
+                )
+            },
+            ifGood = {
+                successStability(
+                    stability = stability,
+                    difficulty = difficulty,
+                    retrievability = retrievability,
+                    rating = rating,
+                )
+            },
+            ifEasy = {
+                successStability(
+                    stability = stability,
+                    difficulty = difficulty,
+                    retrievability = retrievability,
+                    rating = rating,
+                )
+            },
+        ).coerceAtLeast(minStability)
         return info.copy(
             stability = newStability,
             difficulty = nextDifficulty(
@@ -75,18 +96,6 @@ object Fsrs {
             ),
             lastAnswerTimestamp = now,
         )
-    }
-
-    private fun initialStability(
-        rating: FsrsRating,
-    ): Stability {
-        val stability = when (rating) {
-            FsrsRating.Again -> parameters.initialStabilityAgain
-            FsrsRating.Hard -> parameters.initialStabilityHard
-            FsrsRating.Good -> parameters.initialStabilityGood
-            FsrsRating.Easy -> parameters.initialStabilityEasy
-        }
-        return stability.coerceAtLeast(minStability)
     }
 
     private fun initialDifficulty(

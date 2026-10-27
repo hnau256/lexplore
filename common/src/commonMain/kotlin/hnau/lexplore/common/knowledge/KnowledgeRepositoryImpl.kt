@@ -1,6 +1,8 @@
 package hnau.lexplore.common.knowledge
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.WordToLearn
+import org.hnau.commons.kotlin.foldNullable
 import hnau.lexplore.fsrs.dto.WordInfo
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
@@ -18,7 +20,7 @@ class KnowledgeRepositoryImpl(
 
     private val infos: MutableMap<WordToLearn, MutableStateFlow<WordInfo?>> =
         initial
-            .mapValues { (_, value) -> MutableStateFlow<WordInfo?>(value) }
+            .mapValues { (_, value) -> value.toMutableStateFlowAsInitial<WordInfo?>() }
             .toMutableMap()
 
     private val updateMutex = Mutex()
@@ -27,7 +29,7 @@ class KnowledgeRepositoryImpl(
         key: WordToLearn,
     ): StateFlow<WordInfo?> = synchronized(lock) {
         infos.getOrPut(key) {
-            MutableStateFlow(null)
+            null.toMutableStateFlowAsInitial<WordInfo?>()
         }
     }
 
@@ -37,10 +39,10 @@ class KnowledgeRepositoryImpl(
     ) {
         updateMutex.withLock {
             synchronized(lock) {
-                infos[key] = when (val stateFlow = infos[key]) {
-                    null -> MutableStateFlow(info)
-                    else -> stateFlow.apply { value = info }
-                }
+                infos[key] = infos[key].foldNullable(
+                    ifNull = { info.toMutableStateFlowAsInitial() },
+                    ifNotNull = { stateFlow -> stateFlow.apply { value = info } },
+                )
             }
             persist(key, info)
         }

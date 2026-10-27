@@ -24,6 +24,7 @@ import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.Loadable
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
+import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.map
 
 class ExerciseProjector(
@@ -76,10 +77,10 @@ class ExerciseProjector(
                     actionOrElseOrDisabled = switchAutoTTS,
                     titleOrIcon = TitleOrIcon.Icon(
                         Drawable.Vector(
-                            when (autoTTS) {
-                                true -> Icons.Default.VolumeUp
-                                false -> Icons.Default.VolumeOff
-                            }
+                            autoTTS.foldBoolean(
+                                ifTrue = { Icons.Default.VolumeUp },
+                                ifFalse = { Icons.Default.VolumeOff },
+                            )
                         )
                     ),
                 )

@@ -27,6 +27,8 @@ import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.instant
+import org.hnau.commons.kotlin.foldBoolean
+import org.hnau.commons.kotlin.ifTrue
 
 class DictionariesProjector(
     private val model: DictionariesModel,
@@ -46,23 +48,13 @@ class DictionariesProjector(
         val localization = dependencies.localization
         val unselectedNames by model.unselectedNames.collectAsState()
         val start by model.start.collectAsState()
-        val startAction = if (unselectedNames.size < model.allDictionaryNamesSet.size) {
-            start
-        } else {
-            null
-        }
-        val selectAllAction: (() -> Unit)? = if (unselectedNames.isEmpty()) {
-            null
-        } else {
-            { model.update { emptySet() } }
-        }
-        val selectNoneAction: (() -> Unit)? = if (
-            unselectedNames.size == model.allDictionaryNamesSet.size
-        ) {
-            null
-        } else {
-            { model.update { model.allDictionaryNamesSet } }
-        }
+        val startAction = (unselectedNames.size < model.allDictionaryNamesSet.size)
+            .ifTrue { start }
+        val selectAllAction: (() -> Unit)? = unselectedNames
+            .isNotEmpty()
+            .ifTrue { { model.update { emptySet() } } }
+        val selectNoneAction: (() -> Unit)? = (unselectedNames.size != model.allDictionaryNamesSet.size)
+            .ifTrue { { model.update { model.allDictionaryNamesSet } } }
 
         SScreen(
             contentPadding = contentPadding,
@@ -98,11 +90,10 @@ class DictionariesProjector(
                             SPanel(
                                 actionOrElseOrDisabled = ActionOrElse.instant {
                                     model.update { current ->
-                                        if (isSelected) {
-                                            current + dictionaryName
-                                        } else {
-                                            current - dictionaryName
-                                        }
+                                        isSelected.foldBoolean(
+                                            ifTrue = { current + dictionaryName },
+                                            ifFalse = { current - dictionaryName },
+                                        )
                                     }
                                 },
                                 importanceToActivate = null,

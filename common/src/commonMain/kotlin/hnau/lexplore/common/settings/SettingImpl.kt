@@ -1,5 +1,6 @@
 package hnau.lexplore.common.settings
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import arrow.core.Option
 import arrow.core.Some
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,7 @@ class SettingImpl<T>(
 ) : Setting<T> {
 
     private val _state: MutableStateFlow<Option<T>> =
-        MutableStateFlow(initialValue)
+        initialValue.toMutableStateFlowAsInitial()
 
     override val state: StateFlow<Option<T>>
         get() = _state

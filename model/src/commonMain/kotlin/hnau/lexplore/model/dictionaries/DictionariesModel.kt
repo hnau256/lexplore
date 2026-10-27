@@ -1,9 +1,11 @@
 package hnau.lexplore.model.dictionaries
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.dictionary.Dictionaries
 import hnau.lexplore.common.dictionary.DictionaryName
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.settings.AppSettings
+import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.Fsrs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,7 @@ import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.foldNullable
+import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
 class DictionariesModel(
@@ -29,7 +32,7 @@ class DictionariesModel(
     data class Skeleton(
         @Serializable(MutableStateFlowSerializer::class)
         val overwrittenUnselectedDictionaries: MutableStateFlow<Set<DictionaryName>?> =
-            MutableStateFlow(null),
+            null.toMutableStateFlowAsInitial(),
     )
 
     @Pipe
@@ -62,7 +65,7 @@ class DictionariesModel(
         actionOrCancelIfExecuting(scope) {
             unselectedDictionariesDelegate.apply()
             val selectedNames = allDictionaryNamesSet - unselectedNames.value
-            if (selectedNames.isNotEmpty()) {
+            selectedNames.isNotEmpty().ifTrue {
                 openQuestions(selectedNames)
             }
         }
@@ -90,9 +93,7 @@ class DictionariesModel(
                     .value
                     .foldNullable(
                         ifNull = { false },
-                        ifNotNull = { info ->
-                            info.stability > Fsrs.minStability
-                        },
+                        ifNotNull = WordInfo::isKnown,
                     )
             }
         )
@@ -104,3 +105,5 @@ class DictionariesModel(
     val goBackHandler: GoBackHandler
         get() = NeverGoBackHandler
 }
+
+private fun WordInfo.isKnown(): Boolean = stability > Fsrs.minStability

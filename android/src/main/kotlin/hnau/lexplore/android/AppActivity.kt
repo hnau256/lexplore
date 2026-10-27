@@ -1,6 +1,7 @@
 package hnau.lexplore.android
 
 import android.os.Bundle
+import java.io.BufferedReader
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import hnau.lexplore.app.createLEXploreAppSeed
 import hnau.lexplore.app.impl
 import hnau.lexplore.data.AndroidAppDataFactory
 import hnau.lexplore.model.RootModel
+import org.hnau.commons.kotlin.ifTrue
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -80,9 +82,7 @@ class AppActivity : ComponentActivity() {
 
 
     override fun onDestroy() {
-        if (isFinishing) {
-            speaker.close()
-        }
+        isFinishing.ifTrue(speaker::close)
         super.onDestroy()
     }
 
@@ -108,5 +108,5 @@ class AppActivity : ComponentActivity() {
     private fun loadDictionariesJson(): String = resources
         .openRawResource(R.raw.dictionaries)
         .bufferedReader()
-        .use { it.readText() }
+        .use(BufferedReader::readText)
 }

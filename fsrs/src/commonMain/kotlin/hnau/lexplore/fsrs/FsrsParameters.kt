@@ -1,15 +1,13 @@
 package hnau.lexplore.fsrs
 
 import hnau.lexplore.fsrs.dto.Difficulty
+import hnau.lexplore.fsrs.dto.FsrsRatingValues
 import hnau.lexplore.fsrs.dto.Retention
 import hnau.lexplore.fsrs.dto.Stability
 import kotlin.time.Duration.Companion.minutes
 
 internal data class FsrsParameters(
-    val initialStabilityAgain: Stability,
-    val initialStabilityHard: Stability,
-    val initialStabilityGood: Stability,
-    val initialStabilityEasy: Stability,
+    val initialStability: FsrsRatingValues<Stability>,
     val stabilityReferenceRetention: Retention,
     val initialDifficultyAgain: Difficulty,
     val initialDifficultySlope: Double,
@@ -30,14 +28,16 @@ internal data class FsrsParameters(
     companion object {
 
         val Default = FsrsParameters(
-            // canonical FSRS-6: 0.212 days
-            initialStabilityAgain = Stability(0.212.minutes),
-            // canonical FSRS-6: 1.2931 days
-            initialStabilityHard = Stability(1.2931.minutes),
-            // canonical FSRS-6: 2.3065 days
-            initialStabilityGood = Stability(2.3065.minutes),
-            // canonical FSRS-6: 8.2956 days
-            initialStabilityEasy = Stability(8.2956.minutes),
+            initialStability = FsrsRatingValues(
+                // canonical FSRS-6: 0.212 days
+                again = Stability(0.212.minutes),
+                // canonical FSRS-6: 1.2931 days
+                hard = Stability(1.2931.minutes),
+                // canonical FSRS-6: 2.3065 days
+                good = Stability(2.3065.minutes),
+                // canonical FSRS-6: 8.2956 days
+                easy = Stability(8.2956.minutes),
+            ),
             stabilityReferenceRetention = Retention(0.9),
             initialDifficultyAgain = Difficulty(6.4133),
             initialDifficultySlope = 0.8334,

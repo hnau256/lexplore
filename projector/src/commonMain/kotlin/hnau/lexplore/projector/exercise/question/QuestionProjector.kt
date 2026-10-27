@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import hnau.lexplore.model.exercise.question.QuestionModel
 import hnau.lexplore.model.exercise.question.QuestionStateModel
+import hnau.lexplore.model.exercise.question.fold
 import hnau.lexplore.projector.Localization
 import hnau.lexplore.projector.exercise.question.error.ErrorProjector
 import hnau.lexplore.projector.exercise.question.input.InputProjector
@@ -31,6 +32,8 @@ import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
+import org.hnau.commons.kotlin.foldNullable
+import org.hnau.commons.kotlin.ifNull
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import org.hnau.commons.kotlin.coroutines.instant
 
@@ -53,21 +56,24 @@ class QuestionProjector(
     private val state: StateFlow<QuestionStateProjector> = model
         .state
         .mapWithScope(scope) { _, state ->
-            when (state) {
-                is QuestionStateModel.Input -> QuestionStateProjector.Input(
-                    InputProjector(
-                        model = state.input,
-                        dependencies = dependencies.input(),
+            state.fold(
+                ifInput = { input ->
+                    QuestionStateProjector.Input(
+                        InputProjector(
+                            model = input,
+                            dependencies = dependencies.input(),
+                        )
                     )
-                )
-
-                is QuestionStateModel.Error -> QuestionStateProjector.Error(
-                    ErrorProjector(
-                        model = state.error,
-                        dependencies = dependencies.error(),
+                },
+                ifError = { error ->
+                    QuestionStateProjector.Error(
+                        ErrorProjector(
+                            model = error,
+                            dependencies = dependencies.error(),
+                        )
                     )
-                )
-            }
+                },
+            )
         }
 
     @Composable
@@ -92,14 +98,17 @@ class QuestionProjector(
                         )
                     }
                 }
-                model.info?.let { info ->
-                    item {
-                        WordInfoContent(
-                            info = info,
-                            localization = localization,
-                        )
-                    }
-                }
+                model.info.foldNullable(
+                    ifNull = {},
+                    ifNotNull = { info ->
+                        item {
+                            WordInfoContent(
+                                info = info,
+                                localization = localization,
+                            )
+                        }
+                    },
+                )
             }
             state.collectAsState().value.Content()
         }
@@ -111,7 +120,7 @@ class QuestionProjector(
             .previousWordSpeaker
             .collectAsState()
             .value
-            ?: return
+            .ifNull { return }
         val speak by previousWordSpeaker.speak.collectAsState()
         STable(
             orientation = Orientation.Horizontal,

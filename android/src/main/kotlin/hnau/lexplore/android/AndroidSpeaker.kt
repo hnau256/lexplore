@@ -1,9 +1,12 @@
 package hnau.lexplore.android
 
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import hnau.lexplore.common.speaker.Speaker
+import org.hnau.commons.kotlin.ifNull
+import org.hnau.commons.kotlin.ifTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +28,7 @@ class AndroidSpeaker(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    private val activeIds: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
+    private val activeIds: MutableStateFlow<Set<String>> = emptySet<String>().toMutableStateFlowAsInitial()
 
     @Volatile
     private var instance: TextToSpeech? = null
@@ -39,7 +42,7 @@ class AndroidSpeaker(
     override suspend fun speak(
         text: String,
     ): Boolean {
-        val textToSpeech = textToSpeech.await() ?: return false
+        val textToSpeech = textToSpeech.await().ifNull { return false }
         val id = UUID.randomUUID().toString()
         val startSpeakStatus = textToSpeech.speak(
             text,
@@ -47,7 +50,7 @@ class AndroidSpeaker(
             null,
             id,
         )
-        if (startSpeakStatus != TextToSpeech.SUCCESS) {
+        (startSpeakStatus != TextToSpeech.SUCCESS).ifTrue {
             return false
         }
         activeIds.first { activeIds -> id !in activeIds }
@@ -71,7 +74,7 @@ class AndroidSpeaker(
                     textToSpeech.takeIf { status == TextToSpeech.SUCCESS }
                 )
             }
-        } ?: return null
+        }.ifNull { return null }
 
         result.setSpeechRate(0.75f)
         result.language = Locale("el", "GR")
