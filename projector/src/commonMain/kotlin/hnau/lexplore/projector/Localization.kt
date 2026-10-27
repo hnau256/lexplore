@@ -1,0 +1,56 @@
+package hnau.lexplore.projector
+
+import androidx.compose.runtime.Immutable
+import hnau.lexplore.fsrs.dto.FsrsRating
+
+@Immutable
+data class Localization(
+    val dictionariesTitle: String = "Словари",
+    val start: String = "Начать",
+    val all: String = "Все",
+    val none: String = "Ни одного",
+    val exerciseTitle: String = "Упражнение",
+    val gradeAgain: String = "Не знаю",
+    val gradeHard: String = "Сложно",
+    val gradeGood: String = "Нормально",
+    val gradeEasy: String = "Легко",
+    val infoKnowledgeLevel: String = "Помню",
+    val infoForgettingFactor: String = "Знаю",
+    val infoDifficulty: String = "Сложность",
+    val infoLastAsk: String = "Пауза",
+    val lastAskDays: String = "д",
+    val lastAskHours: String = "ч",
+    val lastAskMinutes: String = "м",
+    val lastAskSeconds: String = "с",
+    val dictionarySubtitle: (known: Int, unknown: Int, total: Int) -> String =
+        { known, unknown, total -> "$known (знаю) + $unknown (не знаю) = $total" },
+    val lastAsk: (days: Long, hours: Long, minutes: Long, seconds: Long) -> String =
+        { days, hours, minutes, seconds ->
+            listOf(
+                lastAskDays to days,
+                lastAskHours to hours,
+                lastAskMinutes to minutes,
+                lastAskSeconds to seconds,
+            )
+                .dropWhile { (_, value) -> value <= 0 }
+                .take(2)
+                .joinToString(
+                    separator = " ",
+                ) { (suffix, value) -> value.toString() + suffix }
+        },
+) {
+
+    fun gradeLabel(
+        rating: FsrsRating,
+    ): String = when (rating) {
+        FsrsRating.Again -> gradeAgain
+        FsrsRating.Hard -> gradeHard
+        FsrsRating.Good -> gradeGood
+        FsrsRating.Easy -> gradeEasy
+    }
+
+    companion object {
+
+        val default = Localization()
+    }
+}

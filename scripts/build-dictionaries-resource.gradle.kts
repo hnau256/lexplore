@@ -5,8 +5,8 @@ import java.text.Normalizer
 import kotlin.text.lowercase
 
 tasks.register<BuildDictionariesResourceTask>("buildDictionariesResource") {
-    sourceDir = file("data")
-    outputDir = file("src/main/res/raw")
+    sourceDir = rootProject.file("data")
+    outputDir = project.file("src/main/res/raw")
 }
 
 open class BuildDictionariesResourceTask : DefaultTask() {

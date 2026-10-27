@@ -1,0 +1,12 @@
+<resources>
+
+    <style name="Theme.LEXplore.NightBase" parent="Theme.LEXplore.Base">
+        <item name="android:windowBackground">@color/background_night</item>
+    </style>
+
+    <style name="Theme.LEXplore" parent="Theme.LEXplore.NightBase">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

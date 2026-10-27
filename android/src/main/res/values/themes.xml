@@ -1,0 +1,19 @@
+<resources>
+
+    <style name="Theme.LEXplore.Base" parent="Theme.AppCompat">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:navigationBarColor">@color/status_navigation_bars_compat</item>
+        <item name="android:statusBarColor">@color/status_navigation_bars_compat</item>
+    </style>
+
+    <style name="Theme.LEXplore.DayBase" parent="Theme.LEXplore.Base">
+        <item name="android:windowBackground">@color/background_day</item>
+    </style>
+
+    <style name="Theme.LEXplore" parent="Theme.LEXplore.DayBase">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

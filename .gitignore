@@ -6,4 +6,8 @@
 build
 /captures
 local.properties
-/src/main/res/raw/dictionaries.json
+.kotlin
+/android/src/main/res/raw/dictionaries.json
+
+#Kotlin/JS
+kotlin-js-store/

@@ -1,24 +1,14 @@
+rootProject.name = "LEXplore"
+
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        maven("https://jitpack.io")
-        mavenCentral()
         mavenLocal()
+        gradlePluginPortal()
+        google()
+        mavenCentral()
     }
 }
 
-rootProject.name = "LEXplore"
+plugins {
+    id("org.hnau.plugin.settings") version "1.31.0"
+}
