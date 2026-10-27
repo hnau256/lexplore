@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class KnowledgeRepositoryImpl private constructor(
     initial: Map<WordToLearn, WordInfo>,
-    private val update: suspend (WordToLearn, WordInfo) -> Unit,
+    private val persist: suspend (WordToLearn, WordInfo) -> Unit,
 ) : KnowledgeRepository {
 
     private val infos: MutableMap<WordToLearn, MutableStateFlow<WordInfo?>> =
@@ -44,7 +44,9 @@ class KnowledgeRepositoryImpl private constructor(
                     else -> stateFlow.apply { value = info }
                 }
             }
-            update(key, info)
+            withContext(Dispatchers.IO) {
+                persist(key, info)
+            }
         }
     }
 
@@ -70,7 +72,7 @@ class KnowledgeRepositoryImpl private constructor(
 
             return KnowledgeRepositoryImpl(
                 initial = initial,
-                update = { question, info ->
+                persist = { question, info ->
                     dao.insert(
                         knowledge = KnowledgeLevelOfWord(
                             question = question,
@@ -82,5 +84,13 @@ class KnowledgeRepositoryImpl private constructor(
                 }
             )
         }
+
+        internal fun createForTest(
+            initial: Map<WordToLearn, WordInfo> = emptyMap(),
+            persist: suspend (WordToLearn, WordInfo) -> Unit,
+        ): KnowledgeRepository = KnowledgeRepositoryImpl(
+            initial = initial,
+            persist = persist,
+        )
     }
 }

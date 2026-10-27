@@ -7,6 +7,7 @@ import hnau.lexplore.common.model.goback.GoBackHandlerProvider
 import hnau.lexplore.common.ui.utils.TextFieldValueSerializer
 import hnau.lexplore.exercise.dto.FsrsRating
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.ifTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,17 @@ class InputModel(
         rating: FsrsRating,
     ) {
         onGradeSelected(rating, input.value.text)
+    }
+
+    fun onPrimaryGrade() {
+        input
+            .value
+            .text
+            .trim()
+            .isNotEmpty()
+            .ifTrue {
+                onGrade(FsrsRating.Good)
+            }
     }
 
     @Pipe
