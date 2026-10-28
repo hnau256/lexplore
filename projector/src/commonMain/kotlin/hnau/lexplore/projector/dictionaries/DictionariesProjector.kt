@@ -25,10 +25,6 @@ import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
-import org.hnau.commons.kotlin.coroutines.ActionOrElse
-import org.hnau.commons.kotlin.coroutines.instant
-import org.hnau.commons.kotlin.foldBoolean
-import org.hnau.commons.kotlin.ifTrue
 
 class DictionariesProjector(
     private val model: DictionariesModel,
@@ -46,15 +42,10 @@ class DictionariesProjector(
         contentPadding: PaddingValues,
     ) {
         val localization = dependencies.localization
-        val unselectedNames by model.unselectedNames.collectAsState()
+        val items by model.items.collectAsState()
         val start by model.start.collectAsState()
-        val startAction = (unselectedNames.size < model.allDictionaryNamesSet.size)
-            .ifTrue { start }
-        val selectAllAction: (() -> Unit)? = unselectedNames
-            .isNotEmpty()
-            .ifTrue { { model.update { emptySet() } } }
-        val selectNoneAction: (() -> Unit)? = (unselectedNames.size != model.allDictionaryNamesSet.size)
-            .ifTrue { { model.update { model.allDictionaryNamesSet } } }
+        val selectAll by model.selectAll.collectAsState()
+        val selectNone by model.selectNone.collectAsState()
 
         SScreen(
             contentPadding = contentPadding,
@@ -66,11 +57,11 @@ class DictionariesProjector(
             },
             actions = {
                 Action(
-                    actionOrElseOrDisabled = ActionOrElse.instant(selectNoneAction),
+                    actionOrElseOrDisabled = selectNone,
                     titleOrIcon = TitleOrIcon.Title(localization.none),
                 )
                 Action(
-                    actionOrElseOrDisabled = ActionOrElse.instant(selectAllAction),
+                    actionOrElseOrDisabled = selectAll,
                     titleOrIcon = TitleOrIcon.Title(localization.all),
                 )
             },
@@ -82,32 +73,23 @@ class DictionariesProjector(
                         modifier = Modifier.fillMaxSize(),
                     ) {
                         cells(
-                            items = model.items,
+                            items = items,
                             key = { item -> item.dictionaryName.name },
                         ) { item ->
-                            val dictionaryName = item.dictionaryName
-                            val isSelected = dictionaryName !in unselectedNames
                             SPanel(
-                                actionOrElseOrDisabled = ActionOrElse.instant {
-                                    model.update { current ->
-                                        isSelected.foldBoolean(
-                                            ifTrue = { current + dictionaryName },
-                                            ifFalse = { current - dictionaryName },
-                                        )
-                                    }
-                                },
+                                actionOrElseOrDisabled = item.action,
                                 importanceToActivate = null,
                             ) {
                                 SItem(
                                     endAccessory = {
                                         SCheckBox(
-                                            isChecked = isSelected,
+                                            isChecked = item.isSelected,
                                         )
                                     },
                                     content = {
                                         SElements {
                                             SText(
-                                                text = dictionaryName.name,
+                                                text = item.dictionaryName.name,
                                                 type = SizeType.Medium,
                                             )
                                             SText(
@@ -127,7 +109,7 @@ class DictionariesProjector(
                 },
                 actions = {
                     SButton(
-                        actionOrElseOrDisabled = startAction,
+                        actionOrElseOrDisabled = start,
                         titleOrIcon = TitleOrIcon.Both(
                             title = localization.start,
                             icon = Drawable.Vector(Icons.Default.RocketLaunch),

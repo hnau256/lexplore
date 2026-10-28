@@ -26,7 +26,6 @@ import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.ifTrue
-import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
 class QuestionModel(
@@ -92,18 +91,22 @@ class QuestionModel(
         dependencies.autoTTS.active.value.ifTrue {
             previousWordSpeaker
                 .value
-                ?.speak
-                ?.value
-                ?.actionOrCancel()
+                .foldNullable(
+                    ifNull = {},
+                    ifNotNull = { speaker ->
+                        speaker.speak
+                            .value
+                            .actionOrCancel()
+                    },
+                )
         }
     }
 
     val wordToLearn: WordToLearn
         get() = skeleton.wordToLearn
 
-    val info: WordInfo? = dependencies
-        .repository[wordToLearn]
-        .value
+    val info: StateFlow<WordInfo?> =
+        dependencies.repository[wordToLearn]
 
     val input: MutableStateFlow<String>
         get() = skeleton.input

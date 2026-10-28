@@ -34,7 +34,7 @@ import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.ifNull
-import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
+import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 import org.hnau.commons.kotlin.coroutines.instant
 
 class QuestionProjector(
@@ -55,7 +55,7 @@ class QuestionProjector(
 
     private val state: StateFlow<QuestionStateProjector> = model
         .state
-        .mapWithScope(scope) { _, state ->
+        .mapState(scope) { state ->
             state.fold(
                 ifInput = { input ->
                     QuestionStateProjectorElement.input(
@@ -79,6 +79,7 @@ class QuestionProjector(
     @Composable
     fun Content() {
         val localization = dependencies.localization
+        val info by model.info.collectAsState()
         SLine(
             orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxSize(),
@@ -98,7 +99,7 @@ class QuestionProjector(
                         )
                     }
                 }
-                model.info.foldNullable(
+                info.foldNullable(
                     ifNull = {},
                     ifNotNull = { info ->
                         item {

@@ -17,15 +17,20 @@ import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
+import org.hnau.commons.kotlin.coroutines.instant
+import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
-import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
+import arrow.core.NonEmptySet
+import arrow.core.toNonEmptySetOrNull
+import org.hnau.commons.kotlin.coroutines.flow.state.flatMapWithScope
+import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 
 class DictionariesModel(
     scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val openQuestions: (Set<DictionaryName>) -> Unit,
+    private val openQuestions: (NonEmptySet<DictionaryName>) -> Unit,
 ) {
 
     @Serializable
@@ -45,46 +50,58 @@ class DictionariesModel(
         val dictionaries: Dictionaries
     }
 
+    private val dictionaryNames: List<DictionaryName> = dependencies
+        .dictionaries
+        .names
+
+    private val allDictionaryNamesSet: Set<DictionaryName> =
+        dictionaryNames.toSet()
+
     @PublishedApi
     internal val unselectedDictionariesDelegate = UnselectedDictionariesDelegate(
         scope = scope,
         settings = dependencies.appSettings,
+        validNames = allDictionaryNamesSet,
         overwritten = skeleton.overwrittenUnselectedDictionaries,
     )
 
-    val unselectedNames: StateFlow<Set<DictionaryName>>
+    private val unselectedNames: StateFlow<Set<DictionaryName>>
         get() = unselectedDictionariesDelegate.unselectedNames
 
-    fun update(
-        newValue: (Set<DictionaryName>) -> Set<DictionaryName>,
+    private fun update(
+        newValue: Set<DictionaryName>,
     ) {
         unselectedDictionariesDelegate.update(newValue)
     }
 
-    val start: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>> =
-        actionOrCancelIfExecuting(scope) {
-            unselectedDictionariesDelegate.apply()
-            val selectedNames = allDictionaryNamesSet - unselectedNames.value
-            selectedNames.isNotEmpty().ifTrue {
-                openQuestions(selectedNames)
-            }
+    val start: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>?> = unselectedNames
+        .flatMapWithScope(scope) { scope, unselected ->
+            (allDictionaryNamesSet - unselected)
+                .toNonEmptySetOrNull()
+                .foldNullable(
+                    ifNull = { null.toMutableStateFlowAsInitial() },
+                    ifNotNull = { selectedNames ->
+                        actionOrCancelIfExecuting(scope) {
+                            unselectedDictionariesDelegate.apply(
+                                unselectedNames = unselected,
+                            )
+                            openQuestions(selectedNames)
+                        }
+                    },
+                )
         }
 
-    data class Item(
+    private data class ItemInfo(
         val dictionaryName: DictionaryName,
         val totalWordsCount: Int,
         val knownWordsCount: Int,
     )
 
-    private val dictionaryNames: List<DictionaryName> = dependencies
-        .dictionaries
-        .names
-
-    val items: List<Item> = dictionaryNames.map { dictionaryName ->
+    private val itemInfos: List<ItemInfo> = dictionaryNames.map { dictionaryName ->
         val words = dependencies
             .dictionaries[dictionaryName]
             .dictionaryWords
-        Item(
+        ItemInfo(
             dictionaryName = dictionaryName,
             totalWordsCount = words.size,
             knownWordsCount = words.count { word ->
@@ -95,12 +112,65 @@ class DictionariesModel(
                         ifNull = { false },
                         ifNotNull = WordInfo::isKnown,
                     )
-            }
+            },
         )
     }
 
-    val allDictionaryNamesSet: Set<DictionaryName> =
-        dictionaryNames.toSet()
+    data class Item(
+        val dictionaryName: DictionaryName,
+        val totalWordsCount: Int,
+        val knownWordsCount: Int,
+        val isSelected: Boolean,
+        val action: ActionOrElse<Unit, CancelOrInProgress.Cancel>?,
+    )
+
+    val items: StateFlow<List<Item>> = unselectedNames
+        .mapState(scope) { unselected ->
+            itemInfos.map { info ->
+            val isSelected = info.dictionaryName !in unselected
+            val target = isSelected.foldBoolean(
+                ifTrue = { unselected + info.dictionaryName },
+                ifFalse = { unselected - info.dictionaryName },
+            )
+                Item(
+                    dictionaryName = info.dictionaryName,
+                    totalWordsCount = info.totalWordsCount,
+                    knownWordsCount = info.knownWordsCount,
+                    isSelected = isSelected,
+                    action = createAction(
+                        current = unselected,
+                        target = target,
+                    ),
+                )
+            }
+        }
+
+    val selectAll: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>?> = unselectedNames
+        .mapState(scope) { unselected ->
+            createAction(
+                current = unselected,
+                target = emptySet(),
+            )
+        }
+
+    val selectNone: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>?> = unselectedNames
+        .mapState(scope) { unselected ->
+            createAction(
+                current = unselected,
+                target = allDictionaryNamesSet,
+            )
+        }
+
+    private fun createAction(
+        current: Set<DictionaryName>,
+        target: Set<DictionaryName>,
+    ): ActionOrElse<Unit, CancelOrInProgress.Cancel>? = target
+        .takeIf { it != current }
+        ?.let { target ->
+            ActionOrElse.instant {
+                update(target)
+            }
+        }
 
     val goBackHandler: GoBackHandler
         get() = NeverGoBackHandler

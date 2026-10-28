@@ -41,7 +41,7 @@ import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.InProgressRegistry
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
-import org.hnau.commons.kotlin.coroutines.flow.state.mapStateLite
+import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import arrow.core.getOrElse
 import org.hnau.commons.kotlin.ifTrue
@@ -106,12 +106,17 @@ class ExerciseModel(
 
     private val autoTTSSetting: Setting<Boolean> = dependencies
         .appSettings["auto_tts"]
-        .map(Mapper.stringToBoolean)
+        .map(
+            scope = scope,
+            mapper = Mapper.stringToBoolean,
+        )
 
     val autoTTS: AutoTTS = AutoTTS(
         active = autoTTSSetting
             .state
-            .mapStateLite { it.getOrElse { true } },
+            .mapState(scope) { valueOrNone ->
+                valueOrNone.getOrElse { true }
+            },
     )
 
     val switchAutoTTS: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>> =

@@ -1,17 +1,24 @@
 package hnau.lexplore.common.settings
 
 import arrow.core.Option
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
+import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 import org.hnau.commons.kotlin.mapper.Mapper
 
-val <T> Setting<T>.value: Option<T>
-    get() = state.value
-
 fun <I, O> Setting<I>.map(
+    scope: CoroutineScope,
     mapper: Mapper<I, O>,
-): Setting<O> = SettingImpl(
-    initialValue = value.map(mapper.direct),
-    update = { newValue ->
-        val transformedNewValue = mapper.reverse(newValue)
-        update(transformedNewValue)
-    },
-)
+): Setting<O> = object : Setting<O> {
+
+    override val state: StateFlow<Option<O>> =
+        this@map.state.mapState(scope) { value ->
+            value.map(mapper.direct)
+        }
+
+    override suspend fun update(
+        newValue: O,
+    ) {
+        this@map.update(mapper.reverse(newValue))
+    }
+}

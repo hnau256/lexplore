@@ -10,11 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import org.hnau.commons.app.model.goback.GoBackHandler
-import org.hnau.commons.app.model.goback.NeverGoBackHandler
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.Loadable
 import org.hnau.commons.kotlin.LoadableStateFlow
-import org.hnau.commons.kotlin.coroutines.flow.state.flatMapState
+import org.hnau.commons.kotlin.coroutines.flow.state.derivedStateFlowOf
 import org.hnau.commons.kotlin.fold
 
 class RootModel(
@@ -60,10 +59,12 @@ class RootModel(
         )
     }
 
-    val goBackHandler: GoBackHandler = mainStack.flatMapState(scope) { mainStackOrLoading ->
-        mainStackOrLoading.fold(
-            ifLoading = { NeverGoBackHandler },
-            ifReady = MainStackModel::goBackHandler,
+    val goBackHandler: GoBackHandler = derivedStateFlowOf(scope) {
+        mainStack.state.fold(
+            ifLoading = { null },
+            ifReady = { mainStackModel ->
+                mainStackModel.goBackHandler.state
+            },
         )
     }
 }
