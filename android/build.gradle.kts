@@ -1,8 +1,6 @@
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id(hnau.plugins.ksp.get().pluginId)
     id(hnau.plugins.hnau.jvmAndroidApp.get().pluginId)
 }
