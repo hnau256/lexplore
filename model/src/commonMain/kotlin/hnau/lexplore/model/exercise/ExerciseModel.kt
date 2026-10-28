@@ -6,6 +6,8 @@ import hnau.lexplore.common.Translation
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.dictionary.Dictionaries
 import hnau.lexplore.common.dictionary.DictionaryName
+import arrow.core.NonEmptySet
+import arrow.core.serialization.NonEmptySetSerializer
 import hnau.lexplore.common.exercise.Engine
 import hnau.lexplore.common.exercise.ExerciseWords
 import hnau.lexplore.common.knowledge.KnowledgeRepository
@@ -67,7 +69,8 @@ class ExerciseModel(
             .toMutableStateFlowAsInitial(),
 
 
-        val dictionaries: Set<DictionaryName>,
+        @Serializable(with = NonEmptySetSerializer::class)
+        val dictionaries: NonEmptySet<DictionaryName>,
     )
 
     @Fold
@@ -128,6 +131,7 @@ class ExerciseModel(
         withContext(Dispatchers.Default) {
             skeleton
                 .dictionaries
+                .toSet()
                 .flatMap { dictionaryName ->
                     dependencies
                         .dictionaries[dictionaryName]
