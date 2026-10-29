@@ -147,20 +147,35 @@ class QuestionModel(
         input: String,
     ) {
         (rating == FsrsRating.Again).foldBoolean(
-            ifTrue = { onAnswer(rating) },
+            ifTrue = {
+                openError(
+                    incorrectInput = "",
+                    defaultRating = FsrsRating.Again,
+                )
+            },
             ifFalse = {
                 val target = wordToLearn.word
                 (input.normalized == target.normalized).foldBoolean(
                     ifTrue = { onAnswer(rating) },
                     ifFalse = {
                         val score = input.recallScore(target)
-                        skeleton.error.value = ErrorModel.Skeleton(
+                        openError(
                             incorrectInput = input,
                             defaultRating = defaultRating(score),
                         )
                     },
                 )
             },
+        )
+    }
+
+    private fun openError(
+        incorrectInput: String,
+        defaultRating: FsrsRating,
+    ) {
+        skeleton.error.value = ErrorModel.Skeleton(
+            incorrectInput = incorrectInput,
+            defaultRating = defaultRating,
         )
     }
 

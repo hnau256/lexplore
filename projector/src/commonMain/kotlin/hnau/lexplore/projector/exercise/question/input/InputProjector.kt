@@ -27,6 +27,7 @@ import org.hnau.commons.app.projector.fractal.table.Subtable
 import org.hnau.commons.app.projector.uikit.line.weight
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
+import org.hnau.commons.app.projector.fractal.utils.Importance
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.instant
@@ -70,7 +71,7 @@ class InputProjector(
                 }
             }
             Subtable {
-                FsrsRating.entries.forEach { rating ->
+                FsrsRating.gradeOrder.forEach { rating ->
                     GradeCell(
                         rating = rating,
                         enabled = (rating == FsrsRating.Again).foldBoolean(
@@ -101,6 +102,10 @@ class InputProjector(
                 },
                 titleOrIcon = TitleOrIcon.Title(
                     dependencies.localization.gradeLabel(rating),
+                ),
+                importanceToActivate = (rating == FsrsRating.Good).foldBoolean(
+                    ifTrue = { Importance.Primary },
+                    ifFalse = { Importance.Secondary },
                 ),
             )
         }

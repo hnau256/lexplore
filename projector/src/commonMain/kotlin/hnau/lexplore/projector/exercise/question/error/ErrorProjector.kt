@@ -16,7 +16,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import hnau.lexplore.fsrs.dto.FsrsRating
-import hnau.lexplore.fsrs.dto.nonEmptyEntries
 import hnau.lexplore.model.exercise.question.ErrorModel
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
@@ -34,6 +33,7 @@ import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.foldNullable
 
 class ErrorProjector(
     private val model: ErrorModel,
@@ -56,20 +56,25 @@ class ErrorProjector(
         SElements(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            SPanel(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                FContext(
-                    update = {
-                        copy(mood = Mood.Error)
-                    },
-                ) {
-                    SText(
-                        text = model.incorrectInput,
-                        type = SizeType.Large,
-                    )
-                }
-            }
+            model.incorrectInput.foldNullable(
+                ifNull = {},
+                ifNotNull = { incorrectInput ->
+                    SPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        FContext(
+                            update = {
+                                copy(mood = Mood.Error)
+                            },
+                        ) {
+                            SText(
+                                text = incorrectInput,
+                                type = SizeType.Large,
+                            )
+                        }
+                    }
+                },
+            )
             STable(
                 orientation = Orientation.Horizontal,
                 modifier = Modifier.fillMaxWidth(),
@@ -116,7 +121,7 @@ class ErrorProjector(
             }
             STabs(
                 modifier = Modifier.fillMaxWidth(),
-                items = FsrsRating.nonEmptyEntries,
+                items = FsrsRating.gradeOrder,
                 getSelection = { selectedRating },
                 onSelectionChanged = model::selectRating,
             ) { rating ->

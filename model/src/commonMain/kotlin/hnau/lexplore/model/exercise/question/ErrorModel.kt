@@ -45,8 +45,8 @@ class ErrorModel(
         val selectedRating: MutableStateFlow<FsrsRating> = defaultRating.toMutableStateFlowAsInitial(),
     )
 
-    val incorrectInput: String
-        get() = skeleton.incorrectInput
+    val incorrectInput: String?
+        get() = skeleton.incorrectInput.takeIf(String::isNotEmpty)
 
     val selectedRating: StateFlow<FsrsRating>
         get() = skeleton.selectedRating
