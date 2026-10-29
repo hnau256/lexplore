@@ -7,6 +7,7 @@ import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.speaker.Speaker
 import hnau.lexplore.fsrs.defaultRating
 import hnau.lexplore.fsrs.dto.FsrsRating
+import hnau.lexplore.fsrs.dto.fold
 import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.normalized
 import hnau.lexplore.fsrs.recallScore
@@ -91,14 +92,11 @@ class QuestionModel(
         dependencies.autoTTS.active.value.ifTrue {
             previousWordSpeaker
                 .value
-                .foldNullable(
-                    ifNull = {},
-                    ifNotNull = { speaker ->
-                        speaker.speak
-                            .value
-                            .actionOrCancel()
-                    },
-                )
+                ?.let { speaker ->
+                    speaker.speak
+                        .value
+                        .actionOrCancel()
+                }
         }
     }
 
@@ -146,24 +144,31 @@ class QuestionModel(
         rating: FsrsRating,
         input: String,
     ) {
-        (rating == FsrsRating.Again).foldBoolean(
-            ifTrue = {
+        rating.fold(
+            ifAgain = {
                 openError(
                     incorrectInput = "",
                     defaultRating = FsrsRating.Again,
                 )
             },
+            ifHard = { gradeInput(rating = rating, input = input) },
+            ifGood = { gradeInput(rating = rating, input = input) },
+            ifEasy = { gradeInput(rating = rating, input = input) },
+        )
+    }
+
+    private fun gradeInput(
+        rating: FsrsRating,
+        input: String,
+    ) {
+        val target = wordToLearn.word
+        (input.normalized == target.normalized).foldBoolean(
+            ifTrue = { onAnswer(rating) },
             ifFalse = {
-                val target = wordToLearn.word
-                (input.normalized == target.normalized).foldBoolean(
-                    ifTrue = { onAnswer(rating) },
-                    ifFalse = {
-                        val score = input.recallScore(target)
-                        openError(
-                            incorrectInput = input,
-                            defaultRating = defaultRating(score),
-                        )
-                    },
+                val score = input.recallScore(target)
+                openError(
+                    incorrectInput = input,
+                    defaultRating = defaultRating(score),
                 )
             },
         )

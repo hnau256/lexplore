@@ -32,7 +32,6 @@ import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
-import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.ifNull
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 import org.hnau.commons.kotlin.coroutines.instant
@@ -99,17 +98,14 @@ class QuestionProjector(
                         )
                     }
                 }
-                info.foldNullable(
-                    ifNull = {},
-                    ifNotNull = { info ->
-                        item {
-                            WordInfoContent(
-                                info = info,
-                                localization = localization,
-                            )
-                        }
-                    },
-                )
+                info?.let { info ->
+                    item {
+                        WordInfoContent(
+                            info = info,
+                            localization = localization,
+                        )
+                    }
+                }
             }
             state.collectAsState().value.Content()
         }

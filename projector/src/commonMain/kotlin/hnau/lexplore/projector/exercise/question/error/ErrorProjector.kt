@@ -33,7 +33,6 @@ import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
-import org.hnau.commons.kotlin.foldNullable
 
 class ErrorProjector(
     private val model: ErrorModel,
@@ -56,25 +55,22 @@ class ErrorProjector(
         SElements(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            model.incorrectInput.foldNullable(
-                ifNull = {},
-                ifNotNull = { incorrectInput ->
-                    SPanel(
-                        modifier = Modifier.fillMaxWidth(),
+            model.incorrectInput?.let { incorrectInput ->
+                SPanel(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    FContext(
+                        update = {
+                            copy(mood = Mood.Error)
+                        },
                     ) {
-                        FContext(
-                            update = {
-                                copy(mood = Mood.Error)
-                            },
-                        ) {
-                            SText(
-                                text = incorrectInput,
-                                type = SizeType.Large,
-                            )
-                        }
+                        SText(
+                            text = incorrectInput,
+                            type = SizeType.Large,
+                        )
                     }
-                },
-            )
+                }
+            }
             STable(
                 orientation = Orientation.Horizontal,
                 modifier = Modifier.fillMaxWidth(),

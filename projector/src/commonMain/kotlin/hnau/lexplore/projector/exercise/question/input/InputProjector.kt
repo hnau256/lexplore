@@ -14,8 +14,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import hnau.lexplore.fsrs.dto.FsrsRating
+import hnau.lexplore.fsrs.dto.fold
 import hnau.lexplore.model.exercise.question.InputModel
-import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.ifTrue
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
@@ -74,9 +74,11 @@ class InputProjector(
                 FsrsRating.gradeOrder.forEach { rating ->
                     GradeCell(
                         rating = rating,
-                        enabled = (rating == FsrsRating.Again).foldBoolean(
-                            ifTrue = { true },
-                            ifFalse = { hasInput },
+                        enabled = rating.fold(
+                            ifAgain = { true },
+                            ifHard = { hasInput },
+                            ifGood = { hasInput },
+                            ifEasy = { hasInput },
                         ),
                     )
                 }
@@ -103,9 +105,11 @@ class InputProjector(
                 titleOrIcon = TitleOrIcon.Title(
                     dependencies.localization.gradeLabel(rating),
                 ),
-                importanceToActivate = (rating == FsrsRating.Good).foldBoolean(
-                    ifTrue = { Importance.Primary },
-                    ifFalse = { Importance.Secondary },
+                importanceToActivate = rating.fold(
+                    ifAgain = { Importance.Secondary },
+                    ifHard = { Importance.Secondary },
+                    ifGood = { Importance.Primary },
+                    ifEasy = { Importance.Secondary },
                 ),
             )
         }

@@ -6,7 +6,6 @@ import hnau.lexplore.fsrs.dto.fold
 import hnau.lexplore.fsrs.dto.Retrievability
 import hnau.lexplore.fsrs.dto.Stability
 import hnau.lexplore.fsrs.dto.WordInfo
-import org.hnau.commons.kotlin.foldBoolean
 import kotlin.math.exp
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -112,13 +111,17 @@ object Fsrs {
         retrievability: Retrievability,
         rating: FsrsRating,
     ): Stability {
-        val hardPenalty = (rating == FsrsRating.Hard).foldBoolean(
-            ifTrue = { parameters.hardPenalty },
-            ifFalse = { 1.0 },
+        val hardPenalty = rating.fold(
+            ifAgain = { 1.0 },
+            ifHard = { parameters.hardPenalty },
+            ifGood = { 1.0 },
+            ifEasy = { 1.0 },
         )
-        val easyBonus = (rating == FsrsRating.Easy).foldBoolean(
-            ifTrue = { parameters.easyBonus },
-            ifFalse = { 1.0 },
+        val easyBonus = rating.fold(
+            ifAgain = { 1.0 },
+            ifHard = { 1.0 },
+            ifGood = { 1.0 },
+            ifEasy = { parameters.easyBonus },
         )
         val stabilityDays = stability.days.coerceAtLeast(minStability.days)
         val stabilityIncrease = 1.0 +
