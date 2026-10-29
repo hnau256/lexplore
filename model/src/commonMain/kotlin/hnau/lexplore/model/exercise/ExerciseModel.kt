@@ -46,6 +46,11 @@ import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import arrow.core.getOrElse
+import org.hnau.commons.kotlin.KeyValue
+import org.hnau.commons.kotlin.coroutines.flow.state.flatMapWithScope
+import org.hnau.commons.kotlin.coroutines.toStateFlow
+import org.hnau.commons.kotlin.flatMap
+import org.hnau.commons.kotlin.fold
 import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.it
 import org.hnau.commons.kotlin.map
@@ -127,7 +132,7 @@ class ExerciseModel(
             autoTTSSetting.update(!autoTTS.active.value)
         }
 
-    private val exerciseWordsMap: Deferred<Map<WordToLearn, Translation>> = scope.async {
+    private val exerciseWordsMap: Deferred<ExerciseWords> = scope.async {
         withContext(Dispatchers.Default) {
             skeleton
                 .dictionaries
@@ -141,6 +146,7 @@ class ExerciseModel(
                 .associate { dictionaryWord ->
                     dictionaryWord.toLearn to dictionaryWord.translation
                 }
+                .let(::ExerciseWords)
         }
     }
 
@@ -151,7 +157,7 @@ class ExerciseModel(
 
     private val engine: Deferred<Engine> = scope.async {
         Engine(
-            wordsToLearn = exerciseWordsMap.await().keys.toList(),
+            wordsToLearn = exerciseWordsMap.await().words.keys.toList(),
             knowledgeRepository = dependencies.knowledgeRepository,
         )
     }
@@ -167,7 +173,7 @@ class ExerciseModel(
                                 previousWord = previousWord,
                             )
                         },
-                        ifQuestion = { _ -> Unit },
+                        ifQuestion = { _ -> },
                     )
                 }
         }
@@ -204,53 +210,56 @@ class ExerciseModel(
         )
     }
 
-    val question: StateFlow<Loadable<QuestionModel>> = skeleton
-        .state
-        .mapNotNull { state ->
-            state.fold(
-                ifPrepare = { null },
-                ifQuestion = ::it,
-            )
-        }
-        .map { questionSkeleton ->
-            val exerciseWords = exerciseWordsMap.await().let(::ExerciseWords)
-            val questionModelBuilder: (CoroutineScope) -> QuestionModel = { stateScope ->
-                QuestionModel(
-                    scope = stateScope,
-                    dependencies = dependencies.question(
-                        exerciseWords = exerciseWords,
-                        autoTTS = autoTTS,
-                    ),
-                    skeleton = questionSkeleton,
-                    onAnswer = { rating ->
-                        val currentQuestionWord: WordToLearn? = skeleton
-                            .state
-                            .value
-                            .fold(
-                                ifPrepare = { null },
-                                ifQuestion = QuestionModel.Skeleton::wordToLearn,
-                            )
-                        val wordToLearn = questionSkeleton.wordToLearn
-                        (wordToLearn == currentQuestionWord).ifTrue {
-                            answer(
-                                wordToLearn = wordToLearn,
-                                rating = rating,
+    val question: StateFlow<Loadable<KeyValue<WordToLearn, QuestionModel>>> = exerciseWordsMap
+        .toStateFlow(
+            scope = scope,
+            initial = Loading,
+            transform = ::Ready,
+        )
+        .flatMapWithScope(scope) { scope, wordsOrLoading ->
+            wordsOrLoading.fold(
+                ifLoading = { Loading.toMutableStateFlowAsInitial() },
+                ifReady = { words ->
+                    skeleton
+                        .state
+                        .mapWithScope(scope) { scope, state ->
+                            state.fold(
+                                ifPrepare = { Loading },
+                                ifQuestion = { questionSkeleton ->
+                                    Ready(
+                                        KeyValue(
+                                            key = questionSkeleton.wordToLearn,
+                                            value = QuestionModel(
+                                                scope = scope,
+                                                dependencies = dependencies.question(
+                                                    exerciseWords = words,
+                                                    autoTTS = autoTTS,
+                                                ),
+                                                skeleton = questionSkeleton,
+                                                onAnswer = { rating ->
+                                                    val currentQuestionWord: WordToLearn? = skeleton
+                                                        .state
+                                                        .value
+                                                        .fold(
+                                                            ifPrepare = { null },
+                                                            ifQuestion = QuestionModel.Skeleton::wordToLearn,
+                                                        )
+                                                    val wordToLearn = questionSkeleton.wordToLearn
+                                                    (wordToLearn == currentQuestionWord).ifTrue {
+                                                        answer(
+                                                            wordToLearn = wordToLearn,
+                                                            rating = rating,
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        )
+                                    )
+                                }
                             )
                         }
-                    }
-                )
-            }
-            Ready(questionModelBuilder)
-        }
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = Loading,
-        )
-        .mapWithScope(scope) { stateScope, questionModelBuilderOrLoading ->
-            questionModelBuilderOrLoading.map { questionModelBuilder ->
-                questionModelBuilder(stateScope)
-            }
+                }
+            )
         }
 
     val goBackHandler: GoBackHandler

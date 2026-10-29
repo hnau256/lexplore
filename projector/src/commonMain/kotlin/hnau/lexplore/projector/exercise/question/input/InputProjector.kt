@@ -53,23 +53,6 @@ class InputProjector(
             orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            SCell {
-                SPanel(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    STextField(
-                        value = input,
-                        onValueChanged = { newValue -> model.input.value = newValue },
-                        modifier = Modifier.focusRequester(focusRequester),
-                        keyboardOptions = KeyboardOptions(
-                            autoCorrectEnabled = false,
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.None,
-                        ),
-                        lineLimits = TextFieldLineLimits.SingleLine,
-                    )
-                }
-            }
             Subtable {
                 FsrsRating.gradeOrder.forEach { rating ->
                     GradeCell(
@@ -82,6 +65,19 @@ class InputProjector(
                         ),
                     )
                 }
+            }
+            SCell {
+                STextField(
+                    value = input,
+                    onValueChanged = { newValue -> model.input.value = newValue },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.None,
+                    ),
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                )
             }
         }
 

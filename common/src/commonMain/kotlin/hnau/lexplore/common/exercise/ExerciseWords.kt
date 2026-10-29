@@ -4,7 +4,7 @@ import hnau.lexplore.common.Translation
 import hnau.lexplore.common.WordToLearn
 
 data class ExerciseWords(
-    private val words: Map<WordToLearn, Translation>,
+    val words: Map<WordToLearn, Translation>,
 ) {
 
     operator fun get(

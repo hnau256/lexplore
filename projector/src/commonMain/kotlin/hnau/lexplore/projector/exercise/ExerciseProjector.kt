@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.model.exercise.ExerciseModel
 import hnau.lexplore.projector.Localization
 import hnau.lexplore.projector.exercise.question.QuestionProjector
@@ -18,10 +20,12 @@ import org.hnau.commons.app.projector.fractal.size.SizeType
 import org.hnau.commons.app.projector.uikit.progressindicator.ProgressIndicatorInBox
 import org.hnau.commons.app.projector.uikit.state.BooleanStateContent
 import org.hnau.commons.app.projector.uikit.state.LoadableContent
+import org.hnau.commons.app.projector.uikit.state.StateContent
 import org.hnau.commons.app.projector.uikit.transition.TransitionSpec
 import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.KeyValue
 import org.hnau.commons.kotlin.Loadable
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import org.hnau.commons.kotlin.foldBoolean
@@ -44,15 +48,17 @@ class ExerciseProjector(
     private val localization: Localization
         get() = dependencies.localization
 
-    private val question: StateFlow<Loadable<QuestionProjector>> = model
+    private val question: StateFlow<Loadable<KeyValue<WordToLearn, QuestionProjector>>> = model
         .question
         .mapWithScope(scope) { questionScope, questionOrLoading ->
-            questionOrLoading.map { questionModel ->
-                QuestionProjector(
-                    scope = questionScope,
-                    model = questionModel,
-                    dependencies = dependencies.question(),
-                )
+            questionOrLoading.map { wordWithQuestion ->
+                wordWithQuestion.map { question ->
+                    QuestionProjector(
+                        scope = questionScope,
+                        model = question,
+                        dependencies = dependencies.question(),
+                    )
+                }
             }
         }
 
@@ -89,7 +95,15 @@ class ExerciseProjector(
             question.collectAsState().value.LoadableContent(
                 transitionSpec = TransitionSpec.rememberCrossfade(),
             ) { questionProjector ->
-                questionProjector.Content()
+                questionProjector.StateContent(
+                    contentKey = KeyValue<WordToLearn, *>::key,
+                    label = "Question",
+                    transitionSpec = TransitionSpec.remember(
+                        showAlignment = Alignment.CenterEnd,
+                    ),
+                ) { (_, question) ->
+                    question.Content()
+                }
             }
             isInProgress.BooleanStateContent(
                 transitionSpec = TransitionSpec.rememberCrossfade(),
