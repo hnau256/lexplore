@@ -19,7 +19,6 @@ import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.model.exercise.question.ErrorModel
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
-import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.STextField
 import org.hnau.commons.app.projector.fractal.STabs
@@ -27,6 +26,7 @@ import org.hnau.commons.app.projector.fractal.SText
 import org.hnau.commons.app.projector.fractal.context.FContext
 import org.hnau.commons.app.projector.fractal.size.SizeType
 import org.hnau.commons.app.projector.fractal.table.STable
+import org.hnau.commons.app.projector.fractal.table.Subtable
 import org.hnau.commons.app.projector.fractal.utils.Mood
 import org.hnau.commons.app.projector.uikit.line.weight
 import org.hnau.commons.app.projector.utils.Drawable
@@ -52,29 +52,29 @@ class ErrorProjector(
         val correctWordSpeaker by model.correctWordSpeaker.collectAsState()
         val focusRequester = remember { FocusRequester() }
 
-        SElements(
+        STable(
+            orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxWidth(),
         ) {
             model.incorrectInput?.let { incorrectInput ->
-                SPanel(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    FContext(
-                        update = {
-                            copy(mood = Mood.Error)
-                        },
+                SCell {
+                    SPanel(
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        SText(
-                            text = incorrectInput,
-                            type = SizeType.Large,
-                        )
+                        FContext(
+                            update = {
+                                copy(mood = Mood.Error)
+                            },
+                        ) {
+                            SText(
+                                text = incorrectInput,
+                                type = SizeType.Large,
+                            )
+                        }
                     }
                 }
             }
-            STable(
-                orientation = Orientation.Horizontal,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Subtable {
                 SCell(
                     modifier = Modifier.weight(1f),
                 ) {
@@ -100,9 +100,7 @@ class ErrorProjector(
                     )
                 }
             }
-            SPanel(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            SCell {
                 STextField(
                     value = input,
                     onValueChanged = { newValue -> model.input.value = newValue },
@@ -115,17 +113,19 @@ class ErrorProjector(
                     lineLimits = TextFieldLineLimits.SingleLine,
                 )
             }
-            STabs(
-                modifier = Modifier.fillMaxWidth(),
-                items = FsrsRating.gradeOrder,
-                getSelection = { selectedRating },
-                onSelectionChanged = model::selectRating,
-            ) { rating ->
-                SText(
-                    text = dependencies.localization.gradeLabel(rating),
-                    type = SizeType.Small,
-                    maxLines = 1,
-                )
+            SCell {
+                STabs(
+                    modifier = Modifier.fillMaxWidth(),
+                    items = FsrsRating.gradeOrder,
+                    getSelection = { selectedRating },
+                    onSelectionChanged = model::selectRating,
+                ) { rating ->
+                    SText(
+                        text = dependencies.localization.gradeLabel(rating),
+                        type = SizeType.Small,
+                        maxLines = 1,
+                    )
+                }
             }
         }
 
