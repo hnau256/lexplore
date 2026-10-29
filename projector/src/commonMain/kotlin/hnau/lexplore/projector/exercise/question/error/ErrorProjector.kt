@@ -19,6 +19,7 @@ import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.model.exercise.question.ErrorModel
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
+import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.STextField
 import org.hnau.commons.app.projector.fractal.STabs
@@ -47,92 +48,97 @@ class ErrorProjector(
 
     @Composable
     fun Content() {
-        val input by model.input.collectAsState()
-        val selectedRating by model.selectedRating.collectAsState()
-        val correctWordSpeaker by model.correctWordSpeaker.collectAsState()
-        val focusRequester = remember { FocusRequester() }
-
-        STable(
-            orientation = Orientation.Vertical,
+        SElements(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            model.incorrectInput?.let { incorrectInput ->
-                SCell {
-                    SPanel(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        FContext(
-                            update = {
-                                copy(mood = Mood.Error)
-                            },
-                        ) {
-                            SText(
-                                text = incorrectInput,
-                                type = SizeType.Large,
-                            )
-                        }
-                    }
-                }
-            }
-            Subtable {
-                SCell(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    SPanel {
-                        FContext(
-                            update = {
-                                copy(mood = Mood.Active.default)
-                            },
-                        ) {
-                            SText(
-                                text = model.wordToLearn.word,
-                                type = SizeType.Large,
-                            )
-                        }
-                    }
-                }
-                SCell {
-                    SButton(
-                        actionOrElseOrDisabled = correctWordSpeaker,
-                        titleOrIcon = TitleOrIcon.Icon(
-                            Drawable.Vector(Icons.Default.VolumeUp),
-                        ),
-                    )
-                }
-            }
-            SCell {
-                STextField(
-                    value = input,
-                    onValueChanged = { newValue -> model.input.value = newValue },
-                    modifier = Modifier.focusRequester(focusRequester),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrectEnabled = false,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.None,
-                    ),
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                )
-            }
-            SCell {
-                STabs(
-                    modifier = Modifier.fillMaxWidth(),
-                    items = FsrsRating.gradeOrder,
-                    getSelection = { selectedRating },
-                    onSelectionChanged = model::selectRating,
-                ) { rating ->
-                    SText(
-                        text = dependencies.localization.gradeLabel(rating),
-                        type = SizeType.Small,
-                        maxLines = 1,
-                    )
-                }
-            }
-        }
 
-        LaunchedEffect(focusRequester) {
-            focusRequester.requestFocus()
+            val input by model.input.collectAsState()
+            val selectedRating by model.selectedRating.collectAsState()
+            val correctWordSpeaker by model.correctWordSpeaker.collectAsState()
+            val focusRequester = remember { FocusRequester() }
+            LaunchedEffect(focusRequester) {
+                focusRequester.requestFocus()
+            }
+
+            STable(
+                orientation = Orientation.Vertical,
+            ) {
+                model.incorrectInput?.let { incorrectInput ->
+                    SCell {
+                        SPanel(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            FContext(
+                                update = {
+                                    copy(mood = Mood.Error)
+                                },
+                            ) {
+                                SText(
+                                    text = incorrectInput,
+                                    type = SizeType.Large,
+                                )
+                            }
+                        }
+                    }
+                }
+                Subtable {
+                    SCell(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        SPanel {
+                            FContext(
+                                update = {
+                                    copy(mood = Mood.Active.default)
+                                },
+                            ) {
+                                SText(
+                                    text = model.wordToLearn.word,
+                                    type = SizeType.Large,
+                                )
+                            }
+                        }
+                    }
+                    SCell {
+                        SButton(
+                            actionOrElseOrDisabled = correctWordSpeaker,
+                            titleOrIcon = TitleOrIcon.Icon(
+                                Drawable.Vector(Icons.Default.VolumeUp),
+                            ),
+                        )
+                    }
+                }
+            }
+            STable(
+                orientation = Orientation.Vertical,
+            ) {
+                SCell {
+                    STabs(
+                        modifier = Modifier.fillMaxWidth(),
+                        items = FsrsRating.gradeOrder,
+                        getSelection = { selectedRating },
+                        onSelectionChanged = model::selectRating,
+                    ) { rating ->
+                        SText(
+                            text = dependencies.localization.gradeLabel(rating),
+                            type = SizeType.Small,
+                            maxLines = 1,
+                        )
+                    }
+                }
+                SCell {
+                    STextField(
+                        value = input,
+                        onValueChanged = { newValue -> model.input.value = newValue },
+                        modifier = Modifier.focusRequester(focusRequester),
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.None,
+                        ),
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                    )
+                }
+            }
         }
     }
-
-
 }
