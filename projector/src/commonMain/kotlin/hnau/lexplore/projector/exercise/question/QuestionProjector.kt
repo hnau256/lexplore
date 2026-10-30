@@ -115,8 +115,6 @@ class QuestionProjector(
     private fun PreviousWordSpeaker() {
         val previousWordSpeaker = model
             .previousWordSpeaker
-            .collectAsState()
-            .value
             .ifNull { return }
         val speak by previousWordSpeaker.speak.collectAsState()
         STable(
@@ -138,14 +136,6 @@ class QuestionProjector(
                     actionOrElseOrDisabled = speak,
                     titleOrIcon = TitleOrIcon.Icon(
                         Drawable.Vector(Icons.Default.VolumeUp),
-                    ),
-                )
-            }
-            SCell {
-                SButton(
-                    actionOrElseOrDisabled = ActionOrElse.instant(previousWordSpeaker.close),
-                    titleOrIcon = TitleOrIcon.Icon(
-                        Drawable.Vector(Icons.Default.Close),
                     ),
                 )
             }

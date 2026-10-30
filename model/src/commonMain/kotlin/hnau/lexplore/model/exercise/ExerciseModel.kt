@@ -190,7 +190,7 @@ class ExerciseModel(
             skeleton.state.value = State.Question(
                 question = QuestionModel.Skeleton(
                     wordToLearn = newWordToLearn,
-                    previousWord = previousWord.toMutableStateFlowAsInitial(),
+                    previousWord = previousWord,
                 )
             )
         }

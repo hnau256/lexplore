@@ -39,8 +39,7 @@ class QuestionModel(
     @Serializable
     data class Skeleton(
         val wordToLearn: WordToLearn,
-        @Serializable(MutableStateFlowSerializer::class)
-        val previousWord: MutableStateFlow<WordToLearn?> = null.toMutableStateFlowAsInitial(),
+        val previousWord: WordToLearn?,
         @Serializable(MutableStateFlowSerializer::class)
         val error: MutableStateFlow<ErrorModel.Skeleton?> = null.toMutableStateFlowAsInitial(),
         @Serializable(MutableStateFlowSerializer::class)
@@ -66,38 +65,30 @@ class QuestionModel(
     data class PreviousWordSpeaker(
         val word: WordToLearn,
         val speak: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>>,
-        val close: () -> Unit,
     )
 
-    val previousWordSpeaker: StateFlow<PreviousWordSpeaker?> = skeleton
+    val previousWordSpeaker: PreviousWordSpeaker? = skeleton
         .previousWord
-        .mapWithScope(scope) { previousWordScope, previousWordOrNull ->
-            previousWordOrNull.foldNullable(
-                ifNull = { null },
-                ifNotNull = { previousWord ->
-                    PreviousWordSpeaker(
-                        word = previousWord,
-                        speak = actionOrCancelIfExecuting(
-                            scope = previousWordScope,
-                        ) {
-                            dependencies.speaker.speak(previousWord.word)
-                        },
-                        close = { skeleton.previousWord.value = null },
-                    )
-                },
-            )
-        }
+        .foldNullable(
+            ifNull = { null },
+            ifNotNull = { previousWord ->
+                PreviousWordSpeaker(
+                    word = previousWord,
+                    speak = actionOrCancelIfExecuting(
+                        scope = scope,
+                    ) {
+                        dependencies.speaker.speak(previousWord.word)
+                    },
+                )
+            }
+        )
 
     init {
-        dependencies.autoTTS.active.value.ifTrue {
-            previousWordSpeaker
-                .value
-                ?.let { speaker ->
-                    speaker.speak
-                        .value
-                        .actionOrCancel()
-                }
-        }
+        previousWordSpeaker
+            ?.takeIf { dependencies.autoTTS.active.value }
+            ?.speak
+            ?.value
+            ?.actionOrCancel()
     }
 
     val wordToLearn: WordToLearn
