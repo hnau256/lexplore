@@ -8071,20 +8071,20 @@
     },
     {
       "word": "σκουπίζω",
-      "translation": "вытирать",
+      "translation": "подметать, вытирать",
       "pos": "verb",
       "level": "B1",
-      "theme": "Разное",
-      "subtheme": "Разное",
+      "theme": "Быт",
+      "subtheme": "Дом",
       "status": "active"
     },
     {
       "word": "σκούπισα",
-      "translation": "вытер",
+      "translation": "подмёл, вытер",
       "pos": "verb [aorist]",
       "level": "B1",
-      "theme": "Разное",
-      "subtheme": "Разное",
+      "theme": "Быт",
+      "subtheme": "Дом",
       "lemma": "σκουπίζω",
       "status": "active"
     },
