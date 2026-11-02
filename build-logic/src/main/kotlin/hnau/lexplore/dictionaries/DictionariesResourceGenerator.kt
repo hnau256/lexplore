@@ -8,6 +8,7 @@ import arrow.core.nonEmptyListOf
 import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.addJsonObject
@@ -22,41 +23,64 @@ private typealias ParseResult<T> = Either<String, T>
 
 private typealias GenerateResult<T> = Either<NonEmptyList<String>, T>
 
-private val wordsTableColumns = listOf(
-    "word",
-    "translation",
-    "pos",
-    "level",
-    "theme",
-    "subtheme",
-    "form_type",
-    "lemma",
-    "weight",
-    "status",
-    "notes",
+@Serializable
+private data class WordsFile(
+    val words: List<WordEntryJson>,
 )
 
-private val allowedPos = setOf(
-    "noun",
-    "verb",
-    "adjective",
-    "adverb",
-    "pronoun",
-    "numeral",
-    "phrase",
-    "particle",
-    "preposition",
-    "conjunction",
-    "interjection",
+@Serializable
+private data class WordEntryJson(
+    val word: String,
+    val translation: String,
+    val pos: Pos,
+    val level: Level,
+    val theme: String,
+    val subtheme: String? = null,
+    val formType: FormType? = null,
+    val lemma: String? = null,
+    val weight: Int? = null,
+    val status: Status = Status.active,
+    val notes: String? = null,
 )
 
-private val allowedLevels = setOf(
-    "A1",
-    "A2",
-    "B1",
-    "B2",
-    "C1",
-)
+@Serializable
+private enum class Pos {
+    noun,
+    verb,
+    adjective,
+    adverb,
+    pronoun,
+    numeral,
+    phrase,
+    particle,
+    preposition,
+    conjunction,
+    interjection,
+}
+
+@Serializable
+private enum class Level {
+    A1,
+    A2,
+    B1,
+    B2,
+    C1,
+    C2,
+}
+
+@Serializable
+private enum class Status {
+    active,
+    hidden,
+}
+
+@Serializable
+private enum class FormType {
+    aorist,
+    declension,
+    conjugation,
+    irregular,
+}
 
 internal class DictionariesResourceGenerator(
     private val sourceDir: File,
@@ -64,7 +88,7 @@ internal class DictionariesResourceGenerator(
 
     private val wordCountsFile: File = File(sourceDir, "word_counts.txt")
 
-    private val wordsFile: File = File(sourceDir, "words.tsv")
+    private val wordsFile: File = File(sourceDir, "words.json")
 
     private val json: Json = Json {
         prettyPrint = true
@@ -79,10 +103,10 @@ internal class DictionariesResourceGenerator(
 
     private fun generateDictionaries(): GenerateResult<List<GeneratedDictionary>> = either {
         val counts = readCounts().bind()
-        val rows = readWordsTable().bind()
+        val rows = readWordsJson().bind()
         val errors = mutableListOf<String>()
         val dictionaries = rows
-            .filter { row -> row.status == EntryStatus.active }
+            .filter { row -> row.status == Status.active }
             .groupBy(WordRow::theme)
             .entries
             .sortedBy { (theme, _) -> theme }
@@ -103,6 +127,31 @@ internal class DictionariesResourceGenerator(
         dictionaries
     }
 
+    private fun readWordsJson(): GenerateResult<List<WordRow>> = either {
+        if (!wordsFile.exists()) {
+            raise(nonEmptyListOf("File ${wordsFile.path} not found"))
+        }
+        val table = try {
+            json.decodeFromString(
+                deserializer = WordsFile.serializer(),
+                string = wordsFile.readText(),
+            )
+        } catch (e: Exception) {
+            raise(nonEmptyListOf("${wordsFile.name}: ${e.message ?: e::class.simpleName}"))
+        }
+        val errors = mutableListOf<String>()
+        val rows = table.words
+            .mapIndexedNotNull { index, entry ->
+                entry.toWordRow(index = index).fold(
+                    ifLeft = { error -> errors += error; null },
+                    ifRight = { it },
+                )
+            }
+        errors.toNonEmptyListOrNull()?.let { raise(it) }
+        validateRows(rows).bind()
+        rows
+    }
+
     private fun readCounts(): GenerateResult<WordCounts> = either {
         val lines = readLines(wordCountsFile).bind()
         val entries = lines
@@ -120,119 +169,62 @@ internal class DictionariesResourceGenerator(
         WordCounts(entries.associate { entry -> entry.word to entry.count })
     }
 
-    private fun readWordsTable(): GenerateResult<List<WordRow>> = either {
-        val lines = readLines(wordsFile).bind()
-        val headerLine = lines.firstOrNull()
-            ?: raise(nonEmptyListOf("File ${wordsFile.path} is empty"))
-        val header = splitTsv(headerLine.text.removePrefix("\uFEFF"))
-            .map(String::trim)
-        if (header.size != wordsTableColumns.size || header.toSet() != wordsTableColumns.toSet()) {
-            raise(
-                nonEmptyListOf(
-                    "${headerLine.location}: expected header ${wordsTableColumns.joinToString(separator = "\t")}, " +
-                        "got ${headerLine.text}"
-                )
-            )
-        }
-        val errors = mutableListOf<String>()
-        val rows = lines
-            .drop(1)
-            .mapNotNull { line ->
-                parseWordRow(line = line, header = header).fold(
-                    ifLeft = { error -> errors += error; null },
-                    ifRight = { it },
-                )
-            }
-        errors.toNonEmptyListOrNull()?.let { raise(it) }
-        validateRows(rows).bind()
-        rows
-    }
-
-    private fun parseWordRow(
-        line: SourceLine,
-        header: List<String>,
-    ): ParseResult<WordRow> = either {
-        val fields = splitTsv(line.text).map(String::trim)
-        if (fields.size != header.size) {
-            raise("${line.location}: expected ${header.size} columns, got ${fields.size}")
-        }
-        val values = header
-            .indices
-            .associate { index -> header[index] to fields[index] }
-        val wordString = values.getValue("word")
-        if (wordString.isEmpty()) {
-            raise("${line.location}: field 'word' is empty")
-        }
-        val translation = values.getValue("translation")
-        if (translation.isEmpty()) {
-            raise("${line.location}: field 'translation' is empty")
-        }
-        val pos = values.getValue("pos")
-        if (pos !in allowedPos) {
-            raise("${line.location}: unknown part of speech '$pos'")
-        }
-        val level = values.getValue("level")
-        if (level !in allowedLevels) {
-            raise("${line.location}: unknown level '$level'")
-        }
-        val status = when (val value = values.getValue("status")) {
-            "active" -> EntryStatus.active
-            "hidden" -> EntryStatus.hidden
-            else -> raise("${line.location}: unknown status '$value'")
-        }
-        val theme = values.getValue("theme")
-        if (theme.isEmpty()) {
-            raise("${line.location}: field 'theme' is empty")
-        }
-        val explicitWeight = values
-            .getValue("weight")
-            .takeIf(String::isNotEmpty)
-            ?.let { value ->
-                value.toIntOrNull()?.takeIf { it >= 0 }
-                    ?: raise("${line.location}: expected non-negative integer weight, got '$value'")
-            }
-        val word = parseWord(line = line, rawWord = wordString).bind()
-        WordRow(
-            source = line,
-            rawWord = wordString,
-            word = word,
-            translation = translation,
-            pos = pos,
-            level = level,
-            theme = theme,
-            subtheme = values.getValue("subtheme"),
-            formType = values.getValue("form_type"),
-            lemma = values.getValue("lemma"),
-            explicitWeight = explicitWeight,
-            status = status,
-        )
-    }
-
     private fun validateRows(
         rows: List<WordRow>,
     ): GenerateResult<Unit> = either {
         val errors = mutableListOf<String>()
-        val seenWords = mutableMapOf<String, SourceLine>()
-        val seenTranslations = mutableMapOf<String, SourceLine>()
+        val seenWords = mutableMapOf<String, String>()
+        val seenTranslations = mutableMapOf<String, String>()
         val allWords = rows.map(WordRow::rawWord).toSet()
         rows.forEach { row ->
             val wordKey = row.rawWord.lowercase()
             val previousWord = seenWords.putIfAbsent(wordKey, row.source)
             if (previousWord != null) {
-                errors += "${row.source.location}: duplicate word '${row.rawWord}' " +
-                    "(first at ${previousWord.location})"
+                errors += "${row.source}: duplicate word '${row.rawWord}' (first at $previousWord)"
             }
             val translationKey = row.translation.lowercase()
             val previousTranslation = seenTranslations.putIfAbsent(translationKey, row.source)
             if (previousTranslation != null) {
-                errors += "${row.source.location}: duplicate translation '${row.translation}' " +
-                    "(first at ${previousTranslation.location})"
+                errors += "${row.source}: duplicate translation '${row.translation}' " +
+                    "(first at $previousTranslation)"
             }
             if (row.lemma.isNotEmpty() && row.lemma !in allWords) {
-                errors += "${row.source.location}: lemma '${row.lemma}' not found"
+                errors += "${row.source}: lemma '${row.lemma}' not found"
             }
         }
         errors.toNonEmptyListOrNull()?.let { raise(it) }
+    }
+
+    private fun WordEntryJson.toWordRow(
+        index: Int,
+    ): ParseResult<WordRow> = either {
+        val location = "words.json [${index + 1}] '$word'"
+        if (word.isEmpty()) {
+            raise("$location: field 'word' is empty")
+        }
+        if (translation.isEmpty()) {
+            raise("$location: field 'translation' is empty")
+        }
+        if (theme.isEmpty()) {
+            raise("$location: field 'theme' is empty")
+        }
+        if (weight != null && weight < 0) {
+            raise("$location: weight must be non-negative")
+        }
+        WordRow(
+            source = location,
+            rawWord = word,
+            word = parseWord(location = location, rawWord = word).bind(),
+            translation = translation,
+            pos = pos,
+            level = level,
+            theme = theme,
+            subtheme = subtheme.orEmpty(),
+            formType = formType,
+            lemma = lemma.orEmpty(),
+            explicitWeight = weight,
+            status = status,
+        )
     }
 
     private fun parseCountLine(line: SourceLine): ParseResult<WordCountEntry> = either {
@@ -254,12 +246,12 @@ internal class DictionariesResourceGenerator(
     }
 
     private fun parseWord(
-        line: SourceLine,
+        location: String,
         rawWord: String,
     ): ParseResult<Word> = either {
         val tokens = rawWord.split(' ')
         if (tokens.any(String::isEmpty)) {
-            raise("${line.location}: Word '$rawWord' contains repeated spaces")
+            raise("$location: Word '$rawWord' contains repeated spaces")
         }
         val significantParts = mutableListOf<String>()
         tokens.forEachIndexed { index, token ->
@@ -267,25 +259,25 @@ internal class DictionariesResourceGenerator(
             val isAdditional = token.startsWith('[') || token.endsWith(']')
             if (isAdditional) {
                 if (!token.startsWith('[') || !token.endsWith(']')) {
-                    raise("${line.location}: Word '$rawWord' has an invalid bracket part '$token'")
+                    raise("$location: Word '$rawWord' has an invalid bracket part '$token'")
                 }
                 val inner = token.substring(1, token.length - 1)
                 if (inner.isEmpty() || !inner.isGreekWord()) {
-                    raise("${line.location}: Word '$rawWord' has an invalid bracket part '$token'")
+                    raise("$location: Word '$rawWord' has an invalid bracket part '$token'")
                 }
             } else {
                 if (token.endsWith(';') && !isLast) {
-                    raise("${line.location}: Word '$rawWord' has ';' not at the end")
+                    raise("$location: Word '$rawWord' has ';' not at the end")
                 }
                 val word = token.removeSuffix(";")
                 if (!word.isGreekWord()) {
-                    raise("${line.location}: Word '$rawWord' contains non-Greek characters in '$token'")
+                    raise("$location: Word '$rawWord' contains non-Greek characters in '$token'")
                 }
                 significantParts += word
             }
         }
         val parts = significantParts.toNonEmptyListOrNull()
-            ?: raise("${line.location}: Word '$rawWord' has no significant parts")
+            ?: raise("$location: Word '$rawWord' has no significant parts")
         Word(parts = parts)
     }
 
@@ -321,19 +313,6 @@ internal class DictionariesResourceGenerator(
         line
             .split('|')
             .map(String::trim)
-
-    private fun splitTsv(line: String): List<String> {
-        val result = mutableListOf<String>()
-        var start = 0
-        line.forEachIndexed { index, char ->
-            if (char == '\t') {
-                result += line.substring(start, index)
-                start = index + 1
-            }
-        }
-        result += line.substring(start)
-        return result
-    }
 
     private fun render(
         dictionaries: List<GeneratedDictionary>,
@@ -378,24 +357,19 @@ internal class DictionariesResourceGenerator(
         val count: Int,
     )
 
-    private enum class EntryStatus {
-        active,
-        hidden,
-    }
-
     private data class WordRow(
-        val source: SourceLine,
+        val source: String,
         val rawWord: String,
         val word: Word,
         val translation: String,
-        val pos: String,
-        val level: String,
+        val pos: Pos,
+        val level: Level,
         val theme: String,
         val subtheme: String,
-        val formType: String,
+        val formType: FormType?,
         val lemma: String,
         val explicitWeight: Int?,
-        val status: EntryStatus,
+        val status: Status,
     ) {
 
         fun toGeneratedWord(
@@ -406,7 +380,7 @@ internal class DictionariesResourceGenerator(
                     word
                         .findCount(counts)
                         .fold(
-                            ifLeft = { error -> return "${source.location}: $error".left() },
+                            ifLeft = { error -> return "$source: $error".left() },
                             ifRight = { it },
                         )
                 },

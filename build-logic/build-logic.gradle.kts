@@ -1,5 +1,6 @@
 plugins {
     id("org.hnau.plugin.jvm")
+    id("org.jetbrains.kotlin.plugin.serialization")
     `java-gradle-plugin`
 }
 
