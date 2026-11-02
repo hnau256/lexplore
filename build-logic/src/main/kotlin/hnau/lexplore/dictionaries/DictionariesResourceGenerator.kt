@@ -22,13 +22,49 @@ private typealias ParseResult<T> = Either<String, T>
 
 private typealias GenerateResult<T> = Either<NonEmptyList<String>, T>
 
+private val wordsTableColumns = listOf(
+    "word",
+    "translation",
+    "pos",
+    "level",
+    "theme",
+    "subtheme",
+    "form_type",
+    "lemma",
+    "weight",
+    "status",
+    "notes",
+)
+
+private val allowedPos = setOf(
+    "noun",
+    "verb",
+    "adjective",
+    "adverb",
+    "pronoun",
+    "numeral",
+    "phrase",
+    "particle",
+    "preposition",
+    "conjunction",
+    "interjection",
+)
+
+private val allowedLevels = setOf(
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+)
+
 internal class DictionariesResourceGenerator(
     private val sourceDir: File,
 ) {
 
     private val wordCountsFile: File = File(sourceDir, "word_counts.txt")
 
-    private val dictionariesDir: File = File(sourceDir, "dictionaries")
+    private val wordsFile: File = File(sourceDir, "words.tsv")
 
     private val json: Json = Json {
         prettyPrint = true
@@ -43,23 +79,27 @@ internal class DictionariesResourceGenerator(
 
     private fun generateDictionaries(): GenerateResult<List<GeneratedDictionary>> = either {
         val counts = readCounts().bind()
-        val parsedDictionaries = readDictionaries().bind()
+        val rows = readWordsTable().bind()
         val errors = mutableListOf<String>()
-        val dictionaries = parsedDictionaries.map { dictionary ->
-            GeneratedDictionary(
-                name = dictionary.name,
-                words = dictionary.entries
-                    .mapNotNull { entry ->
-                        entry.toGeneratedWord(counts).fold(
-                            ifLeft = { error -> errors += error; null },
-                            ifRight = { it },
-                        )
-                    }
-                    .sortedByDescending(GeneratedWord::weight),
-            )
-        }
+        val dictionaries = rows
+            .filter { row -> row.status == EntryStatus.active }
+            .groupBy(WordRow::theme)
+            .entries
+            .sortedBy { (theme, _) -> theme }
+            .map { (theme, themeRows) ->
+                GeneratedDictionary(
+                    name = theme,
+                    words = themeRows
+                        .mapNotNull { row ->
+                            row.toGeneratedWord(counts).fold(
+                                ifLeft = { error -> errors += error; null },
+                                ifRight = { it },
+                            )
+                        }
+                        .sortedByDescending(GeneratedWord::weight),
+                )
+            }
         errors.toNonEmptyListOrNull()?.let { raise(it) }
-        ensureUniqueTranslations(dictionaries).bind()
         dictionaries
     }
 
@@ -80,66 +120,119 @@ internal class DictionariesResourceGenerator(
         WordCounts(entries.associate { entry -> entry.word to entry.count })
     }
 
-    private fun readDictionaries(): GenerateResult<List<ParsedDictionary>> = either {
+    private fun readWordsTable(): GenerateResult<List<WordRow>> = either {
+        val lines = readLines(wordsFile).bind()
+        val headerLine = lines.firstOrNull()
+            ?: raise(nonEmptyListOf("File ${wordsFile.path} is empty"))
+        val header = splitTsv(headerLine.text.removePrefix("\uFEFF"))
+            .map(String::trim)
+        if (header.size != wordsTableColumns.size || header.toSet() != wordsTableColumns.toSet()) {
+            raise(
+                nonEmptyListOf(
+                    "${headerLine.location}: expected header ${wordsTableColumns.joinToString(separator = "\t")}, " +
+                        "got ${headerLine.text}"
+                )
+            )
+        }
         val errors = mutableListOf<String>()
-        val seenWords = mutableMapOf<String, SourceLine>()
-        val dictionaries = dictionaryFiles()
-            .bind()
-            .mapNotNull { file ->
-                val name = file.name.removeSuffix(".$dictionaryExtension")
-                if (name.isEmpty()) {
-                    errors += "${file.name}: dictionary name is empty"
-                    return@mapNotNull null
-                }
-                val entries = readLines(file)
-                    .bind()
-                    .mapNotNull { line ->
-                        parseDictionaryLine(line).fold(
-                            ifLeft = { error -> errors += error; null },
-                            ifRight = { entry ->
-                                val key = entry.rawWord.lowercase()
-                                val previous = seenWords.putIfAbsent(key, line)
-                                if (previous != null) {
-                                    errors += "${line.location}: duplicate word '${entry.rawWord}' " +
-                                        "(first at ${previous.location})"
-                                    null
-                                } else {
-                                    entry
-                                }
-                            },
-                        )
-                    }
-                ParsedDictionary(
-                    name = name,
-                    entries = entries,
+        val rows = lines
+            .drop(1)
+            .mapNotNull { line ->
+                parseWordRow(line = line, header = header).fold(
+                    ifLeft = { error -> errors += error; null },
+                    ifRight = { it },
                 )
             }
         errors.toNonEmptyListOrNull()?.let { raise(it) }
-        dictionaries
+        validateRows(rows).bind()
+        rows
     }
 
-    private fun ensureUniqueTranslations(
-        dictionaries: List<GeneratedDictionary>,
+    private fun parseWordRow(
+        line: SourceLine,
+        header: List<String>,
+    ): ParseResult<WordRow> = either {
+        val fields = splitTsv(line.text).map(String::trim)
+        if (fields.size != header.size) {
+            raise("${line.location}: expected ${header.size} columns, got ${fields.size}")
+        }
+        val values = header
+            .indices
+            .associate { index -> header[index] to fields[index] }
+        val wordString = values.getValue("word")
+        if (wordString.isEmpty()) {
+            raise("${line.location}: field 'word' is empty")
+        }
+        val translation = values.getValue("translation")
+        if (translation.isEmpty()) {
+            raise("${line.location}: field 'translation' is empty")
+        }
+        val pos = values.getValue("pos")
+        if (pos !in allowedPos) {
+            raise("${line.location}: unknown part of speech '$pos'")
+        }
+        val level = values.getValue("level")
+        if (level !in allowedLevels) {
+            raise("${line.location}: unknown level '$level'")
+        }
+        val status = when (val value = values.getValue("status")) {
+            "active" -> EntryStatus.active
+            "hidden" -> EntryStatus.hidden
+            else -> raise("${line.location}: unknown status '$value'")
+        }
+        val theme = values.getValue("theme")
+        if (theme.isEmpty()) {
+            raise("${line.location}: field 'theme' is empty")
+        }
+        val explicitWeight = values
+            .getValue("weight")
+            .takeIf(String::isNotEmpty)
+            ?.let { value ->
+                value.toIntOrNull()?.takeIf { it >= 0 }
+                    ?: raise("${line.location}: expected non-negative integer weight, got '$value'")
+            }
+        val word = parseWord(line = line, rawWord = wordString).bind()
+        WordRow(
+            source = line,
+            rawWord = wordString,
+            word = word,
+            translation = translation,
+            pos = pos,
+            level = level,
+            theme = theme,
+            subtheme = values.getValue("subtheme"),
+            formType = values.getValue("form_type"),
+            lemma = values.getValue("lemma"),
+            explicitWeight = explicitWeight,
+            status = status,
+        )
+    }
+
+    private fun validateRows(
+        rows: List<WordRow>,
     ): GenerateResult<Unit> = either {
-        dictionaries
-            .flatMap { dictionary ->
-                dictionary.words.map { word -> dictionary.name to word }
+        val errors = mutableListOf<String>()
+        val seenWords = mutableMapOf<String, SourceLine>()
+        val seenTranslations = mutableMapOf<String, SourceLine>()
+        val allWords = rows.map(WordRow::rawWord).toSet()
+        rows.forEach { row ->
+            val wordKey = row.rawWord.lowercase()
+            val previousWord = seenWords.putIfAbsent(wordKey, row.source)
+            if (previousWord != null) {
+                errors += "${row.source.location}: duplicate word '${row.rawWord}' " +
+                    "(first at ${previousWord.location})"
             }
-            .groupBy { (_, word) -> word.translation.lowercase() }
-            .filterValues { occurrences -> occurrences.size > 1 }
-            .values
-            .map { occurrences ->
-                val translation = occurrences.first().second.translation
-                val words = occurrences.joinToString(separator = ", ") { (dictionaryName, word) ->
-                    "'${word.word}' ($dictionaryName)"
-                }
-                "Translation '$translation' is used for multiple words: $words"
+            val translationKey = row.translation.lowercase()
+            val previousTranslation = seenTranslations.putIfAbsent(translationKey, row.source)
+            if (previousTranslation != null) {
+                errors += "${row.source.location}: duplicate translation '${row.translation}' " +
+                    "(first at ${previousTranslation.location})"
             }
-            .toNonEmptyListOrNull()
-            .foldNullable(
-                ifNull = { },
-                ifNotNull = { errors -> raise(errors) },
-            )
+            if (row.lemma.isNotEmpty() && row.lemma !in allWords) {
+                errors += "${row.source.location}: lemma '${row.lemma}' not found"
+            }
+        }
+        errors.toNonEmptyListOrNull()?.let { raise(it) }
     }
 
     private fun parseCountLine(line: SourceLine): ParseResult<WordCountEntry> = either {
@@ -157,28 +250,6 @@ internal class DictionariesResourceGenerator(
             source = line,
             word = parts[1].lowercase(),
             count = count,
-        )
-    }
-
-    private fun parseDictionaryLine(line: SourceLine): ParseResult<DictionaryEntry> = either {
-        val parts = splitLine(line.text)
-        if ((parts.size != 2 && parts.size != 3) || parts.any(String::isEmpty)) {
-            raise("${line.location}: Expected <word>|<translation>{|<count>}, got ${line.text}")
-        }
-        val rawWord = parts[0]
-        val word = parseWord(line = line, rawWord = rawWord).bind()
-        val explicitWeight = parts
-            .getOrNull(2)
-            ?.let { value ->
-                value.toIntOrNull()?.takeIf { it >= 0 }
-                    ?: raise("${line.location}: Expected non-negative integer weight, got '$value'")
-            }
-        DictionaryEntry(
-            source = line,
-            rawWord = rawWord,
-            word = word,
-            translation = parts[1],
-            explicitWeight = explicitWeight,
         )
     }
 
@@ -218,23 +289,6 @@ internal class DictionariesResourceGenerator(
         Word(parts = parts)
     }
 
-    private fun dictionaryFiles(): GenerateResult<List<File>> = either {
-        val files = dictionariesDir
-            .listFiles()
-            .orEmpty()
-            .sortedBy(File::getName)
-        val (dictionaries, invalidFiles) = files.partition { file ->
-            file.extension == dictionaryExtension
-        }
-        invalidFiles
-            .map { file -> "Expected file with .$dictionaryExtension extension, got ${file.name}" }
-            .toNonEmptyListOrNull()
-            .foldNullable(
-                ifNull = { dictionaries },
-                ifNotNull = { errors -> raise(errors) },
-            )
-    }
-
     private fun readLines(file: File): GenerateResult<List<SourceLine>> =
         file
             .takeIf(File::exists)
@@ -243,19 +297,20 @@ internal class DictionariesResourceGenerator(
                 ifNotNull = { existingFile ->
                     existingFile
                         .readLines()
-                        .mapIndexedNotNull { index, line ->
+                        .mapIndexedNotNull { index, rawLine ->
+                            val line = rawLine.removeSuffix("\r")
+                            val trimmed = line.trim()
                             line
-                                .trim()
-                                .takeIf { trimmed ->
+                                .takeIf {
                                     trimmed.isNotEmpty() &&
                                         !trimmed.startsWith("#") &&
                                         !trimmed.startsWith("//")
                                 }
-                                ?.let { trimmed ->
+                                ?.let {
                                     SourceLine(
                                         file = file,
                                         number = index + 1,
-                                        text = trimmed,
+                                        text = line,
                                     )
                                 }
                         }.right()
@@ -266,6 +321,19 @@ internal class DictionariesResourceGenerator(
         line
             .split('|')
             .map(String::trim)
+
+    private fun splitTsv(line: String): List<String> {
+        val result = mutableListOf<String>()
+        var start = 0
+        line.forEachIndexed { index, char ->
+            if (char == '\t') {
+                result += line.substring(start, index)
+                start = index + 1
+            }
+        }
+        result += line.substring(start)
+        return result
+    }
 
     private fun render(
         dictionaries: List<GeneratedDictionary>,
@@ -304,23 +372,30 @@ internal class DictionariesResourceGenerator(
             get() = "${file.name}:$number"
     }
 
-    private data class ParsedDictionary(
-        val name: String,
-        val entries: List<DictionaryEntry>,
-    )
-
     private data class WordCountEntry(
         val source: SourceLine,
         val word: String,
         val count: Int,
     )
 
-    private data class DictionaryEntry(
+    private enum class EntryStatus {
+        active,
+        hidden,
+    }
+
+    private data class WordRow(
         val source: SourceLine,
         val rawWord: String,
         val word: Word,
         val translation: String,
+        val pos: String,
+        val level: String,
+        val theme: String,
+        val subtheme: String,
+        val formType: String,
+        val lemma: String,
         val explicitWeight: Int?,
+        val status: EntryStatus,
     ) {
 
         fun toGeneratedWord(
@@ -398,8 +473,6 @@ internal class DictionariesResourceGenerator(
         }
     }
 }
-
-private const val dictionaryExtension = "txt"
 
 private const val wordCountsColumns = 14
 
