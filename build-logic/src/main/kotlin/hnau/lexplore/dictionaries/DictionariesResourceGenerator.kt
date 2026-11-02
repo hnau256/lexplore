@@ -14,7 +14,6 @@ import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
 import java.io.File
 import java.text.Normalizer
@@ -44,9 +43,22 @@ internal class DictionariesResourceGenerator(
 
     private fun generateDictionaries(): GenerateResult<List<GeneratedDictionary>> = either {
         val counts = readCounts().bind()
-        val dictionaries = readDictionaries()
-            .bind()
-            .map { dictionary -> buildDictionary(dictionary = dictionary, counts = counts).bind() }
+        val parsedDictionaries = readDictionaries().bind()
+        val errors = mutableListOf<String>()
+        val dictionaries = parsedDictionaries.map { dictionary ->
+            GeneratedDictionary(
+                name = dictionary.name,
+                words = dictionary.entries
+                    .mapNotNull { entry ->
+                        entry.toGeneratedWord(counts).fold(
+                            ifLeft = { error -> errors += error; null },
+                            ifRight = { it },
+                        )
+                    }
+                    .sortedByDescending(GeneratedWord::weight),
+            )
+        }
+        errors.toNonEmptyListOrNull()?.let { raise(it) }
         ensureUniqueTranslations(dictionaries).bind()
         dictionaries
     }
@@ -56,41 +68,54 @@ internal class DictionariesResourceGenerator(
         val entries = lines
             .mapOrAccumulate { line -> parseCountLine(line).bind() }
             .bind()
-        WordCounts(entries.toMap())
+        val duplicates = entries
+            .groupBy(WordCountEntry::word)
+            .filterValues { occurrences -> occurrences.size > 1 }
+            .values
+            .map { occurrences ->
+                val location = occurrences.joinToString(separator = ", ") { it.source.location }
+                "Duplicate word '${occurrences.first().word}' at $location"
+            }
+        duplicates.toNonEmptyListOrNull()?.let { raise(it) }
+        WordCounts(entries.associate { entry -> entry.word to entry.count })
     }
 
     private fun readDictionaries(): GenerateResult<List<ParsedDictionary>> = either {
-        val seenWords = mutableSetOf<String>()
-        dictionaryFiles()
+        val errors = mutableListOf<String>()
+        val seenWords = mutableMapOf<String, SourceLine>()
+        val dictionaries = dictionaryFiles()
             .bind()
-            .map { file ->
+            .mapNotNull { file ->
                 val name = file.name.removeSuffix(".$dictionaryExtension")
+                if (name.isEmpty()) {
+                    errors += "${file.name}: dictionary name is empty"
+                    return@mapNotNull null
+                }
                 val entries = readLines(file)
                     .bind()
                     .mapNotNull { line ->
                         parseDictionaryLine(line).fold(
-                            ifLeft = { null },
-                            ifRight = { it },
+                            ifLeft = { error -> errors += error; null },
+                            ifRight = { entry ->
+                                val key = entry.rawWord.lowercase()
+                                val previous = seenWords.putIfAbsent(key, line)
+                                if (previous != null) {
+                                    errors += "${line.location}: duplicate word '${entry.rawWord}' " +
+                                        "(first at ${previous.location})"
+                                    null
+                                } else {
+                                    entry
+                                }
+                            },
                         )
-                    }.filter { entry -> seenWords.add(entry.rawWord.lowercase()) }
+                    }
                 ParsedDictionary(
                     name = name,
                     entries = entries,
                 )
             }
-    }
-
-    private fun buildDictionary(
-        dictionary: ParsedDictionary,
-        counts: WordCounts,
-    ): GenerateResult<GeneratedDictionary> = either {
-        GeneratedDictionary(
-            name = dictionary.name,
-            words = dictionary.entries
-                .mapOrAccumulate { entry -> entry.toGeneratedWord(counts).bind() }
-                .bind()
-                .sortedByDescending(GeneratedWord::weight),
-        )
+        errors.toNonEmptyListOrNull()?.let { raise(it) }
+        dictionaries
     }
 
     private fun ensureUniqueTranslations(
@@ -117,47 +142,80 @@ internal class DictionariesResourceGenerator(
             )
     }
 
-    private fun parseCountLine(line: String): ParseResult<Pair<String, Int>> {
-        val parts = splitLine(line)
-        return (parts.size == wordCountsColumns).foldBoolean(
-            ifTrue = {
-                val word = parts[1].lowercase()
-                val count = parts[2].toIntOrNull()
-                    ?: return "Expected integer count, got ${parts[2]}".left()
-                (word to count).right()
-            },
-            ifFalse = {
-                ("Expected ID|Word|FREQcount|CD|SUBTLEX_WF|Lg10WF|SUBTLEX_CD|Lg10CD|" +
-                        "FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got $line").left()
-            },
+    private fun parseCountLine(line: SourceLine): ParseResult<WordCountEntry> = either {
+        val parts = splitLine(line.text)
+        if (parts.size != wordCountsColumns || parts.any(String::isEmpty)) {
+            raise("${line.location}: Expected ID|Word|FREQcount|CD|SUBTLEX_WF|Lg10WF|" +
+                "SUBTLEX_CD|Lg10CD|FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got ${line.text}")
+        }
+        if (!parts[1].isGreekWord()) {
+            raise("${line.location}: Expected Greek word, got '${parts[1]}'")
+        }
+        val count = parts[2].toIntOrNull()?.takeIf { it >= 0 }
+            ?: raise("${line.location}: Expected non-negative integer count, got '${parts[2]}'")
+        WordCountEntry(
+            source = line,
+            word = parts[1].lowercase(),
+            count = count,
         )
     }
 
-    private fun parseDictionaryLine(line: String): ParseResult<DictionaryEntry> {
-        val parts = splitLine(line)
-        return (parts.size == 2 || parts.size == 3).foldBoolean(
-            ifTrue = {
-                val rawWord = parts[0]
-                val word = Word.parse(rawWord)
-                    ?: return "'$rawWord' has no significant parts".left()
-                val explicitWeight = parts
-                    .getOrNull(2)
-                    .foldNullable(
-                        ifNull = { null },
-                        ifNotNull = { value ->
-                            value.toIntOrNull()
-                                ?: return "Expected integer weight, got $value".left()
-                        },
-                    )
-                DictionaryEntry(
-                    rawWord = rawWord,
-                    word = word,
-                    translation = parts[1],
-                    explicitWeight = explicitWeight,
-                ).right()
-            },
-            ifFalse = { "Expected <word>|<translation>{|<count>}, got $line".left() },
+    private fun parseDictionaryLine(line: SourceLine): ParseResult<DictionaryEntry> = either {
+        val parts = splitLine(line.text)
+        if ((parts.size != 2 && parts.size != 3) || parts.any(String::isEmpty)) {
+            raise("${line.location}: Expected <word>|<translation>{|<count>}, got ${line.text}")
+        }
+        val rawWord = parts[0]
+        val word = parseWord(line = line, rawWord = rawWord).bind()
+        val explicitWeight = parts
+            .getOrNull(2)
+            ?.let { value ->
+                value.toIntOrNull()?.takeIf { it >= 0 }
+                    ?: raise("${line.location}: Expected non-negative integer weight, got '$value'")
+            }
+        DictionaryEntry(
+            source = line,
+            rawWord = rawWord,
+            word = word,
+            translation = parts[1],
+            explicitWeight = explicitWeight,
         )
+    }
+
+    private fun parseWord(
+        line: SourceLine,
+        rawWord: String,
+    ): ParseResult<Word> = either {
+        val tokens = rawWord.split(' ')
+        if (tokens.any(String::isEmpty)) {
+            raise("${line.location}: Word '$rawWord' contains repeated spaces")
+        }
+        val significantParts = mutableListOf<String>()
+        tokens.forEachIndexed { index, token ->
+            val isLast = index == tokens.lastIndex
+            val isAdditional = token.startsWith('[') || token.endsWith(']')
+            if (isAdditional) {
+                if (!token.startsWith('[') || !token.endsWith(']')) {
+                    raise("${line.location}: Word '$rawWord' has an invalid bracket part '$token'")
+                }
+                val inner = token.substring(1, token.length - 1)
+                if (inner.isEmpty() || !inner.isGreekWord()) {
+                    raise("${line.location}: Word '$rawWord' has an invalid bracket part '$token'")
+                }
+            } else {
+                if (token.endsWith(';') && !isLast) {
+                    raise("${line.location}: Word '$rawWord' has ';' not at the end")
+                }
+                val word = token.removeSuffix(";")
+                if (!word.isGreekWord()) {
+                    raise("${line.location}: Word '$rawWord' contains non-Greek characters in '$token'")
+                }
+                significantParts += word
+            }
+        }
+        val parts = significantParts.toNonEmptyListOrNull()
+            ?: raise("${line.location}: Word '$rawWord' has no significant parts")
+        Word(parts = parts)
     }
 
     private fun dictionaryFiles(): GenerateResult<List<File>> = either {
@@ -177,7 +235,7 @@ internal class DictionariesResourceGenerator(
             )
     }
 
-    private fun readLines(file: File): GenerateResult<List<String>> =
+    private fun readLines(file: File): GenerateResult<List<SourceLine>> =
         file
             .takeIf(File::exists)
             .foldNullable(
@@ -185,9 +243,21 @@ internal class DictionariesResourceGenerator(
                 ifNotNull = { existingFile ->
                     existingFile
                         .readLines()
-                        .map(String::trim)
-                        .filterNot { line ->
-                            line.isEmpty() || line.startsWith("#") || line.startsWith("//")
+                        .mapIndexedNotNull { index, line ->
+                            line
+                                .trim()
+                                .takeIf { trimmed ->
+                                    trimmed.isNotEmpty() &&
+                                        !trimmed.startsWith("#") &&
+                                        !trimmed.startsWith("//")
+                                }
+                                ?.let { trimmed ->
+                                    SourceLine(
+                                        file = file,
+                                        number = index + 1,
+                                        text = trimmed,
+                                    )
+                                }
                         }.right()
                 },
             )
@@ -196,7 +266,6 @@ internal class DictionariesResourceGenerator(
         line
             .split('|')
             .map(String::trim)
-            .filterNot(String::isEmpty)
 
     private fun render(
         dictionaries: List<GeneratedDictionary>,
@@ -220,12 +289,34 @@ internal class DictionariesResourceGenerator(
             json.encodeToString(JsonElement.serializer(), element)
         }
 
+    private fun String.isGreekWord(): Boolean =
+        isNotEmpty() && all { char ->
+            Character.UnicodeScript.of(char.code) == Character.UnicodeScript.GREEK
+        }
+
+    private data class SourceLine(
+        val file: File,
+        val number: Int,
+        val text: String,
+    ) {
+
+        val location: String
+            get() = "${file.name}:$number"
+    }
+
     private data class ParsedDictionary(
         val name: String,
         val entries: List<DictionaryEntry>,
     )
 
+    private data class WordCountEntry(
+        val source: SourceLine,
+        val word: String,
+        val count: Int,
+    )
+
     private data class DictionaryEntry(
+        val source: SourceLine,
         val rawWord: String,
         val word: Word,
         val translation: String,
@@ -239,7 +330,10 @@ internal class DictionariesResourceGenerator(
                 ifNull = {
                     word
                         .findCount(counts)
-                        ?: return "Unknown count of word ${word.build()}".left()
+                        .fold(
+                            ifLeft = { error -> return "${source.location}: $error".left() },
+                            ifRight = { it },
+                        )
                 },
                 ifNotNull = { it },
             )
@@ -285,25 +379,22 @@ internal class DictionariesResourceGenerator(
 
         fun findCount(
             counts: WordCounts,
-        ): Int? =
-            parts
-                .map(String::lowercase)
-                .mapNotNull(counts::find)
+        ): ParseResult<Int> {
+            val countsByPart = parts.map { part ->
+                val word = part.lowercase()
+                word to counts.find(word)
+            }
+            val missing = countsByPart
+                .filter { (_, count) -> count == null }
+                .map { (word, _) -> word }
+            if (missing.isNotEmpty()) {
+                return "Unknown count of word(s): ${missing.joinToString(separator = ", ")}".left()
+            }
+            val count = countsByPart
+                .mapNotNull { (_, count) -> count }
                 .minOrNull()
-
-        companion object {
-
-            fun parse(source: String): Word? =
-                source
-                    .split(' ')
-                    .map(String::trim)
-                    .filterNot(String::isEmpty)
-                    .filterNot { part -> part.startsWith('[') && part.endsWith(']') }
-                    .toNonEmptyListOrNull()
-                    .foldNullable(
-                        ifNull = { null },
-                        ifNotNull = { parts -> Word(parts = parts) },
-                    )
+                ?: return "Unknown count of word(s): ${parts.joinToString(separator = ", ")}".left()
+            return count.right()
         }
     }
 }
