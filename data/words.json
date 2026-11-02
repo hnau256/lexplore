@@ -1290,11 +1290,10 @@
     {
       "word": "είχα",
       "translation": "имел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "έχω",
       "status": "active"
     },
@@ -1310,11 +1309,10 @@
     {
       "word": "πήγα",
       "translation": "пошёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πηγαίνω",
       "status": "active"
     },
@@ -1330,11 +1328,10 @@
     {
       "word": "κοίταξα",
       "translation": "посмотрел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κοιτάζω",
       "status": "active"
     },
@@ -1350,11 +1347,10 @@
     {
       "word": "είπα",
       "translation": "сказал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "λέω",
       "status": "active"
     },
@@ -1370,11 +1366,10 @@
     {
       "word": "έγραψα",
       "translation": "написал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γράφω",
       "status": "active"
     },
@@ -1390,11 +1385,10 @@
     {
       "word": "θέλησα",
       "translation": "захотел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "θέλω",
       "status": "active"
     },
@@ -1410,11 +1404,10 @@
     {
       "word": "μπόρεσα",
       "translation": "смог",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μπορώ",
       "status": "active"
     },
@@ -1430,11 +1423,10 @@
     {
       "word": "δούλεψα",
       "translation": "поработал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "δουλεύω",
       "status": "active"
     },
@@ -1450,11 +1442,10 @@
     {
       "word": "αγάπησα",
       "translation": "полюбил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "αγαπάω",
       "status": "active"
     },
@@ -1470,11 +1461,10 @@
     {
       "word": "ήξερα",
       "translation": "знал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ξέρω",
       "status": "active"
     },
@@ -1490,11 +1480,10 @@
     {
       "word": "κατάλαβα",
       "translation": "понял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "καταλαβαίνω",
       "status": "active"
     },
@@ -1510,11 +1499,10 @@
     {
       "word": "άνοιξα",
       "translation": "открыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ανοίγω",
       "status": "active"
     },
@@ -1530,11 +1518,10 @@
     {
       "word": "σπούδασα",
       "translation": "учился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "σπουδάζω",
       "status": "active"
     },
@@ -1550,11 +1537,10 @@
     {
       "word": "πέρασα",
       "translation": "прошёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πέρναω",
       "status": "active"
     },
@@ -1570,11 +1556,10 @@
     {
       "word": "νόμισα",
       "translation": "счёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "νομίζω",
       "status": "active"
     },
@@ -1590,11 +1575,10 @@
     {
       "word": "ρώτησα",
       "translation": "спросил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ρωτάω",
       "status": "active"
     },
@@ -1610,11 +1594,10 @@
     {
       "word": "απάντησα",
       "translation": "ответил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "απαντώ",
       "status": "active"
     },
@@ -1630,11 +1613,10 @@
     {
       "word": "γνώρισα",
       "translation": "познакомился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γνωρίζω",
       "status": "active"
     },
@@ -1650,11 +1632,10 @@
     {
       "word": "κοιμήθηκα",
       "translation": "поспал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κοιμάμαι",
       "status": "active"
     },
@@ -1670,11 +1651,10 @@
     {
       "word": "χρειάστηκα",
       "translation": "понадобился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "χρειάζομαι",
       "status": "active"
     },
@@ -1690,11 +1670,10 @@
     {
       "word": "τραγούδησα",
       "translation": "спел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "τραγουδώ",
       "status": "active"
     },
@@ -1710,11 +1689,10 @@
     {
       "word": "χόρεψα",
       "translation": "станцевал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "χορεύω",
       "status": "active"
     },
@@ -1730,11 +1708,10 @@
     {
       "word": "κράτησα",
       "translation": "подержал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κρατάω",
       "status": "active"
     },
@@ -1750,11 +1727,10 @@
     {
       "word": "γέλασα",
       "translation": "засмеялся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γελάω",
       "status": "active"
     },
@@ -1770,11 +1746,10 @@
     {
       "word": "συζήτησα",
       "translation": "обсудил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "συζητάω",
       "status": "active"
     },
@@ -1790,11 +1765,10 @@
     {
       "word": "παρήγγειλα",
       "translation": "заказал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "παραγγέλνω",
       "status": "active"
     },
@@ -1810,11 +1784,10 @@
     {
       "word": "οδήγησα",
       "translation": "повёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "οδηγώ",
       "status": "active"
     },
@@ -1830,11 +1803,10 @@
     {
       "word": "υπήρξα",
       "translation": "существовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "υπάρχω",
       "status": "active"
     },
@@ -1859,11 +1831,10 @@
     {
       "word": "γύρισα",
       "translation": "обернулся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γυρίζω",
       "status": "active"
     },
@@ -1879,11 +1850,10 @@
     {
       "word": "ξύπνησα",
       "translation": "проснулся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ξυπνάω",
       "status": "active"
     },
@@ -1899,11 +1869,10 @@
     {
       "word": "μαγείρεψα",
       "translation": "приготовил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μαγειρεύω",
       "status": "active"
     },
@@ -1919,11 +1888,10 @@
     {
       "word": "μίλησα",
       "translation": "поговорил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μιλάω",
       "status": "active"
     },
@@ -1939,11 +1907,10 @@
     {
       "word": "είδα",
       "translation": "увидел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βλέπω",
       "status": "active"
     },
@@ -1959,11 +1926,10 @@
     {
       "word": "ήρθα",
       "translation": "пришёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "έρχομαι",
       "status": "active"
     },
@@ -1979,11 +1945,10 @@
     {
       "word": "διάβασα",
       "translation": "прочитал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "διαβάζω",
       "status": "active"
     },
@@ -1999,11 +1964,10 @@
     {
       "word": "έμαθα",
       "translation": "узнал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μαθαίνω",
       "status": "active"
     },
@@ -2019,11 +1983,10 @@
     {
       "word": "έτρεξα",
       "translation": "побежал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "τρέχω",
       "status": "active"
     },
@@ -2039,11 +2002,10 @@
     {
       "word": "έφαγα",
       "translation": "съел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "τρώω",
       "status": "active"
     },
@@ -2059,11 +2021,10 @@
     {
       "word": "αγόρασα",
       "translation": "купил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "αγοράζω",
       "status": "active"
     },
@@ -2079,11 +2040,10 @@
     {
       "word": "πούλησα",
       "translation": "продал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πουλάω",
       "status": "active"
     },
@@ -2099,11 +2059,10 @@
     {
       "word": "ξεκίνησα",
       "translation": "начал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ξεκινάω",
       "status": "active"
     },
@@ -2119,11 +2078,10 @@
     {
       "word": "άκουσα",
       "translation": "услышал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ακούω",
       "status": "active"
     },
@@ -2139,11 +2097,10 @@
     {
       "word": "ταξίδεψα",
       "translation": "попутешествовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ταξιδεύω",
       "status": "active"
     },
@@ -2159,11 +2116,10 @@
     {
       "word": "κολύμπησα",
       "translation": "поплавал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κολυμπάω",
       "status": "active"
     },
@@ -2179,11 +2135,10 @@
     {
       "word": "έμεινα",
       "translation": "остался",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μένω",
       "status": "active"
     },
@@ -2199,11 +2154,10 @@
     {
       "word": "κάθισα",
       "translation": "сел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κάθομαι",
       "status": "active"
     },
@@ -2219,11 +2173,10 @@
     {
       "word": "έγινα",
       "translation": "стал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γίνομαι",
       "status": "active"
     },
@@ -2248,11 +2201,10 @@
     {
       "word": "έδωσα",
       "translation": "дал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "δίνω",
       "status": "active"
     },
@@ -2268,11 +2220,10 @@
     {
       "word": "πήρα",
       "translation": "взял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "παίρνω",
       "status": "active"
     },
@@ -2288,11 +2239,10 @@
     {
       "word": "έκλεισα",
       "translation": "закрыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κλείνω",
       "status": "active"
     },
@@ -2317,11 +2267,10 @@
     {
       "word": "έφτιαξα",
       "translation": "создал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "φτιάχνω",
       "status": "active"
     },
@@ -2337,11 +2286,10 @@
     {
       "word": "καθάρισα",
       "translation": "почистил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "καθαρίζω",
       "status": "active"
     },
@@ -2357,11 +2305,10 @@
     {
       "word": "πλήρωσα",
       "translation": "заплатил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πληρώνω",
       "status": "active"
     },
@@ -2377,11 +2324,10 @@
     {
       "word": "γιόρτασα",
       "translation": "отпраздновал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "γιορτάζω",
       "status": "active"
     },
@@ -2397,11 +2343,10 @@
     {
       "word": "περίμενα",
       "translation": "подождал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "περιμένω",
       "status": "active"
     },
@@ -2417,11 +2362,10 @@
     {
       "word": "ετοίμασα",
       "translation": "подготовил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ετοιμάζω",
       "status": "active"
     },
@@ -2437,11 +2381,10 @@
     {
       "word": "έπαιξα",
       "translation": "поиграл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "παίζω",
       "status": "active"
     },
@@ -2457,11 +2400,10 @@
     {
       "word": "έπλεξα",
       "translation": "связал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πλέκω",
       "status": "active"
     },
@@ -2477,11 +2419,10 @@
     {
       "word": "πρόσεξα",
       "translation": "позаботился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "προσέχω",
       "status": "active"
     },
@@ -2497,11 +2438,10 @@
     {
       "word": "έλειψα",
       "translation": "отсутствовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "λείπω",
       "status": "active"
     },
@@ -2517,11 +2457,10 @@
     {
       "word": "άναψα",
       "translation": "включил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ανάβω",
       "status": "active"
     },
@@ -2537,11 +2476,10 @@
     {
       "word": "φόρεσα",
       "translation": "надел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "φοράω",
       "status": "active"
     },
@@ -2557,11 +2495,10 @@
     {
       "word": "πέταξα",
       "translation": "полетел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πετάω",
       "status": "active"
     },
@@ -2577,11 +2514,10 @@
     {
       "word": "έβαλα",
       "translation": "положил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βάζω",
       "status": "active"
     },
@@ -2597,11 +2533,10 @@
     {
       "word": "έβγαλα",
       "translation": "вынул",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βγάζω",
       "status": "active"
     },
@@ -2617,11 +2552,10 @@
     {
       "word": "έπλυνα",
       "translation": "помыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πλένω",
       "status": "active"
     },
@@ -2637,11 +2571,10 @@
     {
       "word": "έστειλα",
       "translation": "отправил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "στέλνω",
       "status": "active"
     },
@@ -2657,11 +2590,10 @@
     {
       "word": "έφυγα",
       "translation": "ушёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "φεύγω",
       "status": "active"
     },
@@ -2677,11 +2609,10 @@
     {
       "word": "έκανα",
       "translation": "сделал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κάνω",
       "status": "active"
     },
@@ -2697,11 +2628,10 @@
     {
       "word": "ήμουν",
       "translation": "я был",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "είμαι",
       "status": "active"
     },
@@ -2717,11 +2647,10 @@
     {
       "word": "βγήκα",
       "translation": "вышел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βγαίνω",
       "status": "active"
     },
@@ -2737,11 +2666,10 @@
     {
       "word": "βρήκα",
       "translation": "нашёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βρίσκω",
       "status": "active"
     },
@@ -2757,11 +2685,10 @@
     {
       "word": "ήπια",
       "translation": "выпил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "πίνω",
       "status": "active"
     },
@@ -2777,11 +2704,10 @@
     {
       "word": "ζήτησα",
       "translation": "запросил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ζητάω",
       "status": "active"
     },
@@ -2797,11 +2723,10 @@
     {
       "word": "τελείωσα",
       "translation": "закончил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "τελειώνω",
       "status": "active"
     },
@@ -2817,11 +2742,10 @@
     {
       "word": "βοήθησα",
       "translation": "помог",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "βοηθάω",
       "status": "active"
     },
@@ -2837,11 +2761,10 @@
     {
       "word": "περπάτησα",
       "translation": "погулял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "περπατάω",
       "status": "active"
     },
@@ -2857,11 +2780,10 @@
     {
       "word": "σταμάτησα",
       "translation": "остановился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "σταματάω",
       "status": "active"
     },
@@ -2877,11 +2799,10 @@
     {
       "word": "συνάντησα",
       "translation": "встретил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "συναντάω",
       "status": "active"
     },
@@ -2897,11 +2818,10 @@
     {
       "word": "άργησα",
       "translation": "опоздал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "αργώ",
       "status": "active"
     },
@@ -2917,11 +2837,10 @@
     {
       "word": "τηλεφώνησα",
       "translation": "позвонил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "τηλεφωνώ",
       "status": "active"
     },
@@ -2937,11 +2856,10 @@
     {
       "word": "κάλεσα",
       "translation": "позвал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "καλώ",
       "status": "active"
     },
@@ -2957,11 +2875,10 @@
     {
       "word": "άλλαξα",
       "translation": "изменил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "αλλάζω",
       "status": "active"
     },
@@ -2977,11 +2894,10 @@
     {
       "word": "έμοιασα",
       "translation": "был похож",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μοιάζω",
       "status": "active"
     },
@@ -2997,11 +2913,10 @@
     {
       "word": "νύσταξα",
       "translation": "захотел спать",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "νυστάζω",
       "status": "active"
     },
@@ -3017,11 +2932,10 @@
     {
       "word": "μπήκα",
       "translation": "вошёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "μπαίνω",
       "status": "active"
     },
@@ -3037,11 +2951,10 @@
     {
       "word": "ανέβηκα",
       "translation": "поднялся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "ανεβαίνω",
       "status": "active"
     },
@@ -3057,11 +2970,10 @@
     {
       "word": "κατέβηκα",
       "translation": "спустился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "κατεβαίνω",
       "status": "active"
     },
@@ -3077,11 +2989,10 @@
     {
       "word": "αποφάσισα",
       "translation": "решил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "αποφασίζω",
       "status": "active"
     },
@@ -3097,11 +3008,10 @@
     {
       "word": "χαμογέλασα",
       "translation": "улыбнулся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "χαμογελάω",
       "status": "active"
     },
@@ -3117,11 +3027,10 @@
     {
       "word": "χάρηκα",
       "translation": "обрадовался",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Глаголы",
       "subtheme": "Базовые",
-      "formType": "aorist",
       "lemma": "χαίρομαι",
       "status": "active"
     },
@@ -3137,11 +3046,10 @@
     {
       "word": "έπεσα",
       "translation": "упал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "πέφτω",
       "status": "active"
     },
@@ -3157,11 +3065,10 @@
     {
       "word": "πέτυχα",
       "translation": "преуспел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "πετυχαίνω",
       "status": "active"
     },
@@ -3177,11 +3084,10 @@
     {
       "word": "πρόλαβα",
       "translation": "успел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "προλαβαίνω",
       "status": "active"
     },
@@ -3197,11 +3103,10 @@
     {
       "word": "έλαβα",
       "translation": "получил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "λαμβάνω",
       "status": "active"
     },
@@ -3217,11 +3122,10 @@
     {
       "word": "ντράπηκα",
       "translation": "постыдился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "ντρέπομαι",
       "status": "active"
     },
@@ -3237,11 +3141,10 @@
     {
       "word": "υποσχέθηκα",
       "translation": "пообещал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "υπόσχομαι",
       "status": "active"
     },
@@ -3257,11 +3160,10 @@
     {
       "word": "απέφυγα",
       "translation": "избежал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "αποφεύγω",
       "status": "active"
     },
@@ -3277,11 +3179,10 @@
     {
       "word": "πρότεινα",
       "translation": "предложил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "προτείνω",
       "status": "active"
     },
@@ -3297,11 +3198,10 @@
     {
       "word": "αισθάνθηκα",
       "translation": "почувствовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "αισθάνομαι",
       "status": "active"
     },
@@ -3317,11 +3217,10 @@
     {
       "word": "σκέφτηκα",
       "translation": "подумал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "σκέφτομαι",
       "status": "active"
     },
@@ -3337,11 +3236,10 @@
     {
       "word": "δέχτηκα",
       "translation": "принял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "δέχομαι",
       "status": "active"
     },
@@ -3357,11 +3255,10 @@
     {
       "word": "υπέφερα",
       "translation": "вытерпел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "υποφέρω",
       "status": "active"
     },
@@ -3377,11 +3274,10 @@
     {
       "word": "εξήγησα",
       "translation": "объяснил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Глаголы",
       "subtheme": "Неправильные",
-      "formType": "aorist",
       "lemma": "εξηγώ",
       "status": "active"
     },
@@ -3892,806 +3788,726 @@
     {
       "word": "[του] ανθρώπου",
       "translation": "человека (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τον] άνθρωπο",
       "translation": "человека (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "άνθρωπε",
       "translation": "человек (З.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] πολίτη",
       "translation": "гражданина (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τον] πολίτη",
       "translation": "гражданина (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "πολίτη",
       "translation": "гражданин (З.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] πατέρα",
       "translation": "отца (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τον] πατέρα",
       "translation": "отца (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "πατέρα",
       "translation": "отец (З.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[οι] άνθρωποι",
       "translation": "люди (И.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] ανθρώπων",
       "translation": "людей (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τους] ανθρώπους",
       "translation": "людей (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[οι] πολίτες",
       "translation": "граждане (И.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] πολιτών",
       "translation": "граждан (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τους] πολίτες",
       "translation": "граждан (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[οι] πατέρες",
       "translation": "отцы (И.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] πατέρων",
       "translation": "отцов (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τους] πατέρες",
       "translation": "отцов (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[της] μάχης",
       "translation": "битвы (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[την] μάχη",
       "translation": "битву (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[της] θάλασσας",
       "translation": "моря (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[την] θάλασσα",
       "translation": "море (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[οι] μάχες",
       "translation": "битвы (И.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "weight": 35,
       "status": "active"
     },
     {
       "word": "[των] μαχών",
       "translation": "битв (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τις] μάχες",
       "translation": "битвы (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "weight": 35,
       "status": "active"
     },
     {
       "word": "[οι] θάλασσες",
       "translation": "моря (И.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] θαλασσών",
       "translation": "морей (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τις] θάλασσες",
       "translation": "моря (В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] βιβλίου",
       "translation": "книги (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] παιδιού",
       "translation": "ребёнка (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] προβλήματος",
       "translation": "проблемы (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] μεγέθους",
       "translation": "размера (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[του] δεσίματος",
       "translation": "связывания (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τα] βιβλία",
       "translation": "книги (И.П., В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] βιβλίων",
       "translation": "книг (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τα] παιδιά",
       "translation": "дети (И.П., В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] παιδιών",
       "translation": "детей (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τα] προβλήματα",
       "translation": "проблемы (И.П., В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] προβλημάτων",
       "translation": "проблем (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τα] μεγέθη",
       "translation": "размеры (И.П., В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] μεγεθών",
       "translation": "размеров (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[τα] δεσίματα",
       "translation": "связывания (И.П., В.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "status": "active"
     },
     {
       "word": "[των] δεσιμάτων",
       "translation": "связываний (Р.П.)",
-      "pos": "noun",
+      "pos": "noun [declension]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Склонения",
-      "formType": "declension",
       "weight": 12,
       "status": "active"
     },
     {
       "word": "[εσύ] βλέπεις",
       "translation": "ты видишь",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτός] βλέπει",
       "translation": "он видит",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εμείς] βλέπουμε",
       "translation": "мы видим",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσείς] βλέπετε",
       "translation": "вы видите",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτοί] βλέπουν",
       "translation": "они видят",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσύ] τρως",
       "translation": "ты ешь",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "weight": 300,
       "status": "active"
     },
     {
       "word": "[αυτός] τρώει",
       "translation": "он ест",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εμείς] τρώμε",
       "translation": "мы едим",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσείς] τρώτε",
       "translation": "вы едите",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτοί] τρώνε",
       "translation": "они едят",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσύ] πας",
       "translation": "ты идёшь",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτός] πάει",
       "translation": "он идёт",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εμείς] πάμε",
       "translation": "мы идём",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσείς] πάτε",
       "translation": "вы идёте",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτοί] πάνε",
       "translation": "они идут",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσύ] οδηγείς",
       "translation": "ты водишь",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτός] οδηγεί",
       "translation": "он водит",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εμείς] οδηγούμε",
       "translation": "мы водим",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσείς] οδηγείτε",
       "translation": "вы водите",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτοί] οδηγούν",
       "translation": "они водят",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσύ] έρχεσαι",
       "translation": "ты приходишь",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτός] έρχεται",
       "translation": "он приходит",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εμείς] ερχόμαστε",
       "translation": "мы приходим",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εσείς] έρχεστε",
       "translation": "вы приходите",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[αυτοί] έρχονται",
       "translation": "они приходят",
-      "pos": "verb",
+      "pos": "verb [conjugation]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Спряжения",
-      "formType": "conjugation",
       "status": "active"
     },
     {
       "word": "[εγώ] είμαι",
       "translation": "я есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εσύ] είσαι",
       "translation": "ты есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[αυτός] είναι",
       "translation": "он есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εμείς] είμαστε",
       "translation": "мы есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εσείς] είστε",
       "translation": "вы есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[αυτοί] είναι",
       "translation": "они есть",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εγώ] ζω",
       "translation": "я живу",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εσύ] ζεις",
       "translation": "ты живёшь",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "weight": 800,
       "status": "active"
     },
     {
       "word": "[αυτός] ζει",
       "translation": "он живёт",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εμείς] ζούμε",
       "translation": "мы живём",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[εσείς] ζείτε",
       "translation": "вы живёте",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
       "word": "[αυτοί] ζουν",
       "translation": "они живут",
-      "pos": "verb",
+      "pos": "verb [irregular]",
       "level": "B1",
       "theme": "Грамматика",
       "subtheme": "Формы глаголов",
-      "formType": "irregular",
       "status": "active"
     },
     {
@@ -4949,11 +4765,10 @@
     {
       "word": "πόνεσα",
       "translation": "почувствовал боль",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Здоровье",
       "subtheme": "Здоровье",
-      "formType": "aorist",
       "lemma": "πονάω",
       "status": "active"
     },
@@ -6728,11 +6543,10 @@
     {
       "word": "ένωσα",
       "translation": "соединил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ενώνω",
       "status": "hidden"
     },
@@ -6775,11 +6589,10 @@
     {
       "word": "έψαξα",
       "translation": "поискал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ψάχνω",
       "status": "active"
     },
@@ -6858,11 +6671,10 @@
     {
       "word": "έφερα",
       "translation": "принёс",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "φέρνω",
       "status": "active"
     },
@@ -6959,11 +6771,10 @@
     {
       "word": "στάθηκα",
       "translation": "постоял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "στέκομαι",
       "status": "active"
     },
@@ -6979,11 +6790,10 @@
     {
       "word": "προτίμησα",
       "translation": "предпочёл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "προτιμώ",
       "status": "active"
     },
@@ -7008,11 +6818,10 @@
     {
       "word": "έφτασα",
       "translation": "прибыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "φτάνω",
       "status": "active"
     },
@@ -7028,11 +6837,10 @@
     {
       "word": "βόλεψα",
       "translation": "устроил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "βολεύω",
       "status": "active"
     },
@@ -7048,11 +6856,10 @@
     {
       "word": "προσκάλεσα",
       "translation": "пригласил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "προσκαλώ",
       "status": "active"
     },
@@ -7122,11 +6929,10 @@
     {
       "word": "βρέθηκα",
       "translation": "оказался",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "βρίσκομαι",
       "status": "active"
     },
@@ -7142,11 +6948,10 @@
     {
       "word": "ενοικίασα",
       "translation": "арендовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ενοικιάζω",
       "status": "active"
     },
@@ -7198,11 +7003,10 @@
     {
       "word": "άφησα",
       "translation": "оставил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "αφήνω",
       "status": "active"
     },
@@ -7254,11 +7058,10 @@
     {
       "word": "έβαψα",
       "translation": "покрасил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "βάφω",
       "status": "active"
     },
@@ -7283,11 +7086,10 @@
     {
       "word": "δίψασα",
       "translation": "захотел пить",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "διψάω",
       "status": "active"
     },
@@ -7303,11 +7105,10 @@
     {
       "word": "πείνασα",
       "translation": "захотел есть",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "πεινάω",
       "status": "active"
     },
@@ -7323,11 +7124,10 @@
     {
       "word": "δημιούργησα",
       "translation": "сотворил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "δημιουργώ",
       "status": "active"
     },
@@ -7343,11 +7143,10 @@
     {
       "word": "χρησιμοποίησα",
       "translation": "использовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "χρησιμοποιώ",
       "status": "active"
     },
@@ -7363,11 +7162,10 @@
     {
       "word": "εκμεταλλεύτηκα",
       "translation": "воспользовался",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "εκμεταλλεύομαι",
       "status": "hidden"
     },
@@ -7419,11 +7217,10 @@
     {
       "word": "ευχήθηκα",
       "translation": "пожелал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "εύχομαι",
       "status": "active"
     },
@@ -7466,11 +7263,10 @@
     {
       "word": "δοκίμασα",
       "translation": "примерил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "δοκιμάζω",
       "status": "active"
     },
@@ -7513,11 +7309,10 @@
     {
       "word": "στόλισα",
       "translation": "украсил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "στολίζω",
       "status": "active"
     },
@@ -7614,11 +7409,10 @@
     {
       "word": "χάρισα",
       "translation": "подарил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "χαρίζω",
       "status": "active"
     },
@@ -7643,11 +7437,10 @@
     {
       "word": "σχεδίασα",
       "translation": "спланировал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "σχεδιάζω",
       "status": "active"
     },
@@ -7663,11 +7456,10 @@
     {
       "word": "έδειξα",
       "translation": "показал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "δείχνω",
       "status": "active"
     },
@@ -7683,11 +7475,10 @@
     {
       "word": "υπέδειξα",
       "translation": "указал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "υποδεικνύω",
       "status": "hidden"
     },
@@ -7703,11 +7494,10 @@
     {
       "word": "μοιράστηκα",
       "translation": "поделился",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "μοιράζομαι",
       "status": "active"
     },
@@ -7823,11 +7613,10 @@
     {
       "word": "ξέχασα",
       "translation": "забыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ξεχνάω",
       "status": "active"
     },
@@ -7843,11 +7632,10 @@
     {
       "word": "έχασα",
       "translation": "потерял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "χάνω",
       "status": "active"
     },
@@ -7926,11 +7714,10 @@
     {
       "word": "αρρώστησα",
       "translation": "заболел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "αρρωσταίνω",
       "status": "active"
     },
@@ -7946,11 +7733,10 @@
     {
       "word": "ανάρρωσα",
       "translation": "выздоровел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "αναρρώνω",
       "status": "active"
     },
@@ -8101,11 +7887,10 @@
     {
       "word": "θυμήθηκα",
       "translation": "вспомнил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "θυμάμαι",
       "status": "active"
     },
@@ -8121,11 +7906,10 @@
     {
       "word": "μεγάλωσα",
       "translation": "вырос",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "μεγαλώνω",
       "status": "active"
     },
@@ -8186,11 +7970,10 @@
     {
       "word": "επέστρεψα",
       "translation": "вернулся",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "επιστρέφω",
       "status": "active"
     },
@@ -8260,11 +8043,10 @@
     {
       "word": "έσπασα",
       "translation": "сломал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "σπάω",
       "status": "active"
     },
@@ -8280,11 +8062,10 @@
     {
       "word": "διόρθωσα",
       "translation": "починил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "διορθώνω",
       "status": "active"
     },
@@ -8300,11 +8081,10 @@
     {
       "word": "σκούπισα",
       "translation": "вытер",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "σκουπίζω",
       "status": "active"
     },
@@ -8320,11 +8100,10 @@
     {
       "word": "χτένισα",
       "translation": "расчесал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "χτενίζω",
       "status": "active"
     },
@@ -8349,11 +8128,10 @@
     {
       "word": "ονομάστηκα",
       "translation": "назвался",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ονομάζομαι",
       "status": "active"
     },
@@ -8486,11 +8264,10 @@
     {
       "word": "διάλεξα",
       "translation": "выбрал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "διαλέγω",
       "status": "active"
     },
@@ -8506,11 +8283,10 @@
     {
       "word": "επέλεξα",
       "translation": "избрал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "επιλέγω",
       "status": "active"
     },
@@ -8599,11 +8375,10 @@
     {
       "word": "συνέβη",
       "translation": "произошло",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "A2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "συμβαίνω",
       "status": "active"
     },
@@ -8628,11 +8403,10 @@
     {
       "word": "έχτισα",
       "translation": "построил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "χτίζω",
       "status": "active"
     },
@@ -8684,11 +8458,10 @@
     {
       "word": "ανακάτεψα",
       "translation": "смешал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ανακατεύω",
       "status": "active"
     },
@@ -8722,11 +8495,10 @@
     {
       "word": "κόλλησα",
       "translation": "приклеил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "κολλάω",
       "status": "active"
     },
@@ -8769,11 +8541,10 @@
     {
       "word": "άντεξα",
       "translation": "выдержал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "αντέχω",
       "status": "hidden"
     },
@@ -8888,11 +8659,10 @@
     {
       "word": "θέρμανα",
       "translation": "нагрел",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "θερμαίνω",
       "status": "hidden"
     },
@@ -8917,11 +8687,10 @@
     {
       "word": "κάλυψα",
       "translation": "покрыл",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "καλύπτω",
       "status": "active"
     },
@@ -8947,11 +8716,10 @@
     {
       "word": "εξασφάλισα",
       "translation": "обеспечил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "εξασφαλίζω",
       "status": "hidden"
     },
@@ -9021,11 +8789,10 @@
     {
       "word": "ικανοποίησα",
       "translation": "удовлетворил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ικανοποιώ",
       "status": "hidden"
     },
@@ -9041,11 +8808,10 @@
     {
       "word": "έπαθα",
       "translation": "пострадал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "παθαίνω",
       "status": "active"
     },
@@ -9070,11 +8836,10 @@
     {
       "word": "πάτησα",
       "translation": "наступил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B1",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "πατάω",
       "status": "active"
     },
@@ -9126,11 +8891,10 @@
     {
       "word": "στέγνωσα",
       "translation": "высушил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "στεγνώνω",
       "status": "hidden"
     },
@@ -9146,11 +8910,10 @@
     {
       "word": "γκρέμισα",
       "translation": "снёс",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "γκρεμίζω",
       "status": "hidden"
     },
@@ -9175,11 +8938,10 @@
     {
       "word": "παρείχα",
       "translation": "предоставлял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "παρέχω",
       "status": "hidden"
     },
@@ -9195,11 +8957,10 @@
     {
       "word": "επηρέασα",
       "translation": "повлиял",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "επηρεάζω",
       "status": "hidden"
     },
@@ -9251,11 +9012,10 @@
     {
       "word": "απουσίασα",
       "translation": "не присутствовал",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "απουσιάζω",
       "weight": 25,
       "status": "hidden"
@@ -9281,11 +9041,10 @@
     {
       "word": "ξεπέρασα",
       "translation": "превысил",
-      "pos": "verb",
+      "pos": "verb [aorist]",
       "level": "B2",
       "theme": "Разное",
       "subtheme": "Разное",
-      "formType": "aorist",
       "lemma": "ξεπερνώ",
       "status": "hidden"
     },

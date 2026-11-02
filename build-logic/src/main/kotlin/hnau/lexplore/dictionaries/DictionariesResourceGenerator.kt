@@ -2,11 +2,9 @@ package hnau.lexplore.dictionaries
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.left
 import arrow.core.mapOrAccumulate
 import arrow.core.nonEmptyListOf
 import arrow.core.raise.either
-import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -32,30 +30,107 @@ private data class WordsFile(
 private data class WordEntryJson(
     val word: String,
     val translation: String,
-    val pos: Pos,
+    val pos: String,
     val level: Level,
     val theme: String,
     val subtheme: String? = null,
-    val formType: FormType? = null,
     val lemma: String? = null,
     val weight: Int? = null,
     val status: Status = Status.active,
     val notes: String? = null,
 )
 
-@Serializable
-private enum class Pos {
-    noun,
-    verb,
-    adjective,
-    adverb,
-    pronoun,
-    numeral,
-    phrase,
-    particle,
-    preposition,
-    conjunction,
-    interjection,
+private sealed interface PartOfSpeech {
+
+    data class Noun(
+        val form: Form = Form.Base,
+    ) : PartOfSpeech {
+
+        enum class Form {
+            Base,
+            Declension,
+        }
+    }
+
+    data class Verb(
+        val form: Form = Form.Base,
+    ) : PartOfSpeech {
+
+        enum class Form {
+            Base,
+            Aorist,
+            Conjugation,
+            Irregular,
+        }
+    }
+
+    data object Adjective : PartOfSpeech
+
+    data object Adverb : PartOfSpeech
+
+    data object Pronoun : PartOfSpeech
+
+    data object Numeral : PartOfSpeech
+
+    data object Phrase : PartOfSpeech
+
+    data object Particle : PartOfSpeech
+
+    data object Preposition : PartOfSpeech
+
+    data object Conjunction : PartOfSpeech
+
+    data object Interjection : PartOfSpeech
+}
+
+private val partOfSpeechRegex = Regex("""^([a-z]+)(?:\s*\[([a-z]+)])?$""")
+
+private fun parsePartOfSpeech(value: String): ParseResult<PartOfSpeech> = either {
+    val normalized = value.trim()
+    if (normalized.isEmpty()) {
+        raise("part of speech is empty")
+    }
+    val match = partOfSpeechRegex.matchEntire(normalized)
+        ?: raise("invalid part of speech '$value'")
+    val base = match.groupValues[1]
+    val form = match.groupValues[2].takeIf(String::isNotEmpty)
+    when (base) {
+        "noun" -> PartOfSpeech.Noun(
+            form = when (form) {
+                null -> PartOfSpeech.Noun.Form.Base
+                "declension" -> PartOfSpeech.Noun.Form.Declension
+                else -> raise("unknown noun form '$form'")
+            },
+        )
+
+        "verb" -> PartOfSpeech.Verb(
+            form = when (form) {
+                null -> PartOfSpeech.Verb.Form.Base
+                "aorist" -> PartOfSpeech.Verb.Form.Aorist
+                "conjugation" -> PartOfSpeech.Verb.Form.Conjugation
+                "irregular" -> PartOfSpeech.Verb.Form.Irregular
+                else -> raise("unknown verb form '$form'")
+            },
+        )
+
+        else -> {
+            if (form != null) {
+                raise("part of speech '$base' does not support form '$form'")
+            }
+            when (base) {
+                "adjective" -> PartOfSpeech.Adjective
+                "adverb" -> PartOfSpeech.Adverb
+                "pronoun" -> PartOfSpeech.Pronoun
+                "numeral" -> PartOfSpeech.Numeral
+                "phrase" -> PartOfSpeech.Phrase
+                "particle" -> PartOfSpeech.Particle
+                "preposition" -> PartOfSpeech.Preposition
+                "conjunction" -> PartOfSpeech.Conjunction
+                "interjection" -> PartOfSpeech.Interjection
+                else -> raise("unknown part of speech '$base'")
+            }
+        }
+    }
 }
 
 @Serializable
@@ -72,14 +147,6 @@ private enum class Level {
 private enum class Status {
     active,
     hidden,
-}
-
-@Serializable
-private enum class FormType {
-    aorist,
-    declension,
-    conjugation,
-    irregular,
 }
 
 internal class DictionariesResourceGenerator(
@@ -186,7 +253,7 @@ internal class DictionariesResourceGenerator(
             val previousTranslation = seenTranslations.putIfAbsent(translationKey, row.source)
             if (previousTranslation != null) {
                 errors += "${row.source}: duplicate translation '${row.translation}' " +
-                    "(first at $previousTranslation)"
+                        "(first at $previousTranslation)"
             }
             if (row.lemma.isNotEmpty() && row.lemma !in allWords) {
                 errors += "${row.source}: lemma '${row.lemma}' not found"
@@ -216,11 +283,10 @@ internal class DictionariesResourceGenerator(
             rawWord = word,
             word = parseWord(location = location, rawWord = word).bind(),
             translation = translation,
-            pos = pos,
+            pos = parsePartOfSpeech(pos).bind(),
             level = level,
             theme = theme,
             subtheme = subtheme.orEmpty(),
-            formType = formType,
             lemma = lemma.orEmpty(),
             explicitWeight = weight,
             status = status,
@@ -230,8 +296,10 @@ internal class DictionariesResourceGenerator(
     private fun parseCountLine(line: SourceLine): ParseResult<WordCountEntry> = either {
         val parts = splitLine(line.text)
         if (parts.size != wordCountsColumns || parts.any(String::isEmpty)) {
-            raise("${line.location}: Expected ID|Word|FREQcount|CD|SUBTLEX_WF|Lg10WF|" +
-                "SUBTLEX_CD|Lg10CD|FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got ${line.text}")
+            raise(
+                "${line.location}: Expected ID|Word|FREQcount|CD|SUBTLEX_WF|Lg10WF|" +
+                        "SUBTLEX_CD|Lg10CD|FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got ${line.text}"
+            )
         }
         if (!parts[1].isGreekWord()) {
             raise("${line.location}: Expected Greek word, got '${parts[1]}'")
@@ -281,33 +349,30 @@ internal class DictionariesResourceGenerator(
         Word(parts = parts)
     }
 
-    private fun readLines(file: File): GenerateResult<List<SourceLine>> =
-        file
+    private fun readLines(file: File): GenerateResult<List<SourceLine>> = either {
+        val existingFile = file
             .takeIf(File::exists)
-            .foldNullable(
-                ifNull = { nonEmptyListOf("File ${file.path} not found").left() },
-                ifNotNull = { existingFile ->
-                    existingFile
-                        .readLines()
-                        .mapIndexedNotNull { index, rawLine ->
-                            val line = rawLine.removeSuffix("\r")
-                            val trimmed = line.trim()
-                            line
-                                .takeIf {
-                                    trimmed.isNotEmpty() &&
-                                        !trimmed.startsWith("#") &&
-                                        !trimmed.startsWith("//")
-                                }
-                                ?.let {
-                                    SourceLine(
-                                        file = file,
-                                        number = index + 1,
-                                        text = line,
-                                    )
-                                }
-                        }.right()
-                },
-            )
+            ?: raise(nonEmptyListOf("File ${file.path} not found"))
+        existingFile
+            .readLines()
+            .mapIndexedNotNull { index, rawLine ->
+                val line = rawLine.removeSuffix("\r")
+                val trimmed = line.trim()
+                line
+                    .takeIf {
+                        trimmed.isNotEmpty() &&
+                            !trimmed.startsWith("#") &&
+                            !trimmed.startsWith("//")
+                    }
+                    ?.let {
+                        SourceLine(
+                            file = file,
+                            number = index + 1,
+                            text = line,
+                        )
+                    }
+            }
+    }
 
     private fun splitLine(line: String): List<String> =
         line
@@ -362,11 +427,10 @@ internal class DictionariesResourceGenerator(
         val rawWord: String,
         val word: Word,
         val translation: String,
-        val pos: Pos,
+        val pos: PartOfSpeech,
         val level: Level,
         val theme: String,
         val subtheme: String,
-        val formType: FormType?,
         val lemma: String,
         val explicitWeight: Int?,
         val status: Status,
@@ -374,23 +438,16 @@ internal class DictionariesResourceGenerator(
 
         fun toGeneratedWord(
             counts: WordCounts,
-        ): ParseResult<GeneratedWord> {
+        ): ParseResult<GeneratedWord> = either {
             val weight = explicitWeight.foldNullable(
-                ifNull = {
-                    word
-                        .findCount(counts)
-                        .fold(
-                            ifLeft = { error -> return "$source: $error".left() },
-                            ifRight = { it },
-                        )
-                },
+                ifNull = { word.findCount(counts).bind() },
                 ifNotNull = { it },
             )
-            return GeneratedWord(
+            GeneratedWord(
                 word = word.build(),
                 translation = translation,
                 weight = weight,
-            ).right()
+            )
         }
     }
 
@@ -428,7 +485,7 @@ internal class DictionariesResourceGenerator(
 
         fun findCount(
             counts: WordCounts,
-        ): ParseResult<Int> {
+        ): ParseResult<Int> = either {
             val countsByPart = parts.map { part ->
                 val word = part.lowercase()
                 word to counts.find(word)
@@ -437,13 +494,12 @@ internal class DictionariesResourceGenerator(
                 .filter { (_, count) -> count == null }
                 .map { (word, _) -> word }
             if (missing.isNotEmpty()) {
-                return "Unknown count of word(s): ${missing.joinToString(separator = ", ")}".left()
+                raise("Unknown count of word(s): ${missing.joinToString(separator = ", ")}")
             }
-            val count = countsByPart
+            countsByPart
                 .mapNotNull { (_, count) -> count }
                 .minOrNull()
-                ?: return "Unknown count of word(s): ${parts.joinToString(separator = ", ")}".left()
-            return count.right()
+                ?: raise("Unknown count of word(s): ${parts.joinToString(separator = ", ")}")
         }
     }
 }
