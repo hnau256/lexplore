@@ -45,9 +45,11 @@ internal class DictionariesResourceGenerator(
 
     private fun generateDictionaries(): GenerateResult<List<GeneratedDictionary>> = either {
         val counts = readCounts().bind()
-        readDictionaries()
+        val dictionaries = readDictionaries()
             .bind()
             .map { dictionary -> buildDictionary(dictionary = dictionary, counts = counts) }
+        ensureUniqueTranslations(dictionaries).bind()
+        dictionaries
     }
 
     private fun readCounts(): GenerateResult<WordCounts> = either {
@@ -90,6 +92,30 @@ internal class DictionariesResourceGenerator(
                 .sortedByDescending(GeneratedWord::weight),
         )
 
+    private fun ensureUniqueTranslations(
+        dictionaries: List<GeneratedDictionary>,
+    ): GenerateResult<Unit> = either {
+        dictionaries
+            .flatMap { dictionary ->
+                dictionary.words.map { word -> dictionary.name to word }
+            }
+            .groupBy { (_, word) -> word.translation.lowercase() }
+            .filterValues { occurrences -> occurrences.size > 1 }
+            .values
+            .map { occurrences ->
+                val translation = occurrences.first().second.translation
+                val words = occurrences.joinToString(separator = ", ") { (dictionaryName, word) ->
+                    "'${word.word}' ($dictionaryName)"
+                }
+                "Translation '$translation' is used for multiple words: $words"
+            }
+            .toNonEmptyListOrNull()
+            .foldNullable(
+                ifNull = { },
+                ifNotNull = { errors -> raise(errors) },
+            )
+    }
+
     private fun parseCountLine(line: String): ParseResult<Pair<String, Int>> {
         val parts = splitLine(line)
         return (parts.size == wordCountsColumns).foldBoolean(
@@ -101,7 +127,7 @@ internal class DictionariesResourceGenerator(
             },
             ifFalse = {
                 ("Expected ID|Word|FREQcount|CD|SUBTLEX_WF|Lg10WF|SUBTLEX_CD|Lg10CD|" +
-                    "FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got $line").left()
+                        "FREQlow|FREQupper|N|OLD20|Length|SUBTLEX_WF_full, got $line").left()
             },
         )
     }
