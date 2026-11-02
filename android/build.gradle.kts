@@ -1,12 +1,7 @@
 plugins {
     id(hnau.plugins.ksp.get().pluginId)
     id(hnau.plugins.hnau.jvmAndroidApp.get().pluginId)
-}
-
-apply(from = rootProject.file("scripts/build-dictionaries-resource.gradle.kts"))
-
-tasks.named("preBuild").configure {
-    dependsOn("buildDictionariesResource")
+    id("hnau.lexplore.build.dictionaries-resource")
 }
 
 android {
