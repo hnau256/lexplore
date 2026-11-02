@@ -16,7 +16,6 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
-import org.hnau.commons.kotlin.ifNull
 import java.io.File
 import java.text.Normalizer
 
@@ -47,7 +46,7 @@ internal class DictionariesResourceGenerator(
         val counts = readCounts().bind()
         val dictionaries = readDictionaries()
             .bind()
-            .map { dictionary -> buildDictionary(dictionary = dictionary, counts = counts) }
+            .map { dictionary -> buildDictionary(dictionary = dictionary, counts = counts).bind() }
         ensureUniqueTranslations(dictionaries).bind()
         dictionaries
     }
@@ -84,13 +83,15 @@ internal class DictionariesResourceGenerator(
     private fun buildDictionary(
         dictionary: ParsedDictionary,
         counts: WordCounts,
-    ): GeneratedDictionary =
+    ): GenerateResult<GeneratedDictionary> = either {
         GeneratedDictionary(
             name = dictionary.name,
             words = dictionary.entries
-                .mapNotNull { entry -> entry.toGeneratedWord(counts) }
+                .mapOrAccumulate { entry -> entry.toGeneratedWord(counts).bind() }
+                .bind()
                 .sortedByDescending(GeneratedWord::weight),
         )
+    }
 
     private fun ensureUniqueTranslations(
         dictionaries: List<GeneratedDictionary>,
@@ -233,17 +234,20 @@ internal class DictionariesResourceGenerator(
 
         fun toGeneratedWord(
             counts: WordCounts,
-        ): GeneratedWord? {
-            val weight = explicitWeight
-                .foldNullable(
-                    ifNull = { word.findCount(counts) },
-                    ifNotNull = { it },
-                ).ifNull { return null }
+        ): ParseResult<GeneratedWord> {
+            val weight = explicitWeight.foldNullable(
+                ifNull = {
+                    word
+                        .findCount(counts)
+                        ?: return "Unknown count of word ${word.build()}".left()
+                },
+                ifNotNull = { it },
+            )
             return GeneratedWord(
                 word = word.build(),
                 translation = translation,
                 weight = weight,
-            )
+            ).right()
         }
     }
 
