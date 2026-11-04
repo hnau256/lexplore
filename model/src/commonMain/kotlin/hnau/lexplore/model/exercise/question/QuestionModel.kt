@@ -5,6 +5,7 @@
 package hnau.lexplore.model.exercise.question
 
 import hnau.lexplore.common.WordToLearn
+import hnau.lexplore.common.exercise.Engine
 import hnau.lexplore.common.exercise.ExerciseWords
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.speaker.Speaker
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.hnau.commons.app.model.goback.GoBackHandler
+import org.hnau.commons.app.model.goback.NeverGoBackHandler
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.gen.sealup.annotations.SealUp
 import org.hnau.commons.gen.sealup.annotations.Variant
@@ -35,7 +38,8 @@ class QuestionModel(
     private val scope: CoroutineScope,
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
-    private val onAnswer: suspend (FsrsRating) -> Unit,
+    private val previousWord: WordToLearn?,
+    private val onReady: () -> Unit,
 ) {
 
     @SealUp(
@@ -72,19 +76,21 @@ class QuestionModel(
     )
     interface State {
 
+        val wordToLearn: WordToLearn
+
         companion object
     }
 
     @Serializable
     data class Skeleton(
-        val wordToLearn: WordToLearn,
-        val previousWord: WordToLearn?,
         val state: MutableStateFlow<QuestionModelStateSkeleton> = StateSkeleton.input()
             .toMutableStateFlowAsInitial(),
     )
 
     @Pipe
     interface Dependencies {
+
+        val engine: Engine
 
         val exerciseWords: ExerciseWords
 
@@ -176,4 +182,7 @@ class QuestionModel(
         get() = wordToLearn
             .let(dependencies.exerciseWords::get)
             .translation
+
+    val goBackHandler: GoBackHandler
+        get() = NeverGoBackHandler
 }

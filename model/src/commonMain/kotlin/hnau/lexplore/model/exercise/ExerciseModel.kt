@@ -1,55 +1,35 @@
+@file:UseSerializers(
+    MutableStateFlowSerializer::class,
+    OptionSerializer::class,
+    NonEmptySetSerializer::class,
+)
+
 package hnau.lexplore.model.exercise
 
-import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
-import hnau.lexplore.common.DictionaryWord
-import hnau.lexplore.common.Translation
-import hnau.lexplore.common.WordToLearn
-import hnau.lexplore.common.dictionary.Dictionaries
-import hnau.lexplore.common.dictionary.DictionaryName
-import arrow.core.NonEmptySet
+import arrow.core.getOrElse
 import arrow.core.serialization.NonEmptySetSerializer
-import hnau.lexplore.common.exercise.Engine
-import hnau.lexplore.common.exercise.ExerciseWords
+import arrow.core.serialization.OptionSerializer
+import hnau.lexplore.common.dictionary.Dictionaries
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.settings.AppSettings
 import hnau.lexplore.common.settings.Setting
 import hnau.lexplore.common.settings.map
 import hnau.lexplore.common.speaker.Speaker
-import hnau.lexplore.fsrs.dto.FsrsRating
-import hnau.lexplore.model.exercise.question.QuestionModel
+import hnau.lexplore.model.exercise.question.QuestionPrepareModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.hnau.commons.app.model.goback.GoBackHandler
-import org.hnau.commons.app.model.goback.NeverGoBackHandler
-import org.hnau.commons.gen.fold.annotations.Fold
 import org.hnau.commons.gen.pipe.annotations.Pipe
-import org.hnau.commons.kotlin.Loadable
-import org.hnau.commons.kotlin.Loading
-import org.hnau.commons.kotlin.Ready
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
-import org.hnau.commons.kotlin.coroutines.InProgressRegistry
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
+import org.hnau.commons.kotlin.coroutines.flow.state.flatMapState
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
-import org.hnau.commons.kotlin.coroutines.flow.state.runningFoldState
-import arrow.core.getOrElse
-import org.hnau.commons.kotlin.KeyValue
-import org.hnau.commons.kotlin.coroutines.flow.state.flatMapWithScope
-import org.hnau.commons.kotlin.coroutines.toStateFlow
-import org.hnau.commons.kotlin.flatMap
-import org.hnau.commons.kotlin.fold
-import org.hnau.commons.kotlin.ifTrue
-import org.hnau.commons.kotlin.it
-import org.hnau.commons.kotlin.map
+import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import org.hnau.commons.kotlin.mapper.Mapper
 import org.hnau.commons.kotlin.mapper.stringToBoolean
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
@@ -59,37 +39,6 @@ class ExerciseModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
 ) {
-
-    @Serializable
-    data class Skeleton(
-        @Serializable(MutableStateFlowSerializer::class)
-        val state: MutableStateFlow<State> = State
-            .Prepare(
-                previousWord = null,
-            )
-            .toMutableStateFlowAsInitial(),
-
-
-        @Serializable(with = NonEmptySetSerializer::class)
-        val dictionaries: NonEmptySet<DictionaryName>,
-    )
-
-    @Fold
-    @Serializable
-    sealed interface State {
-
-        @Serializable
-        @SerialName("prepare")
-        data class Prepare(
-            val previousWord: WordToLearn?,
-        ) : State
-
-        @Serializable
-        @SerialName("question")
-        data class Question(
-            val question: QuestionModel.Skeleton,
-        ) : State
-    }
 
     @Pipe
     interface Dependencies {
@@ -104,9 +53,15 @@ class ExerciseModel(
 
         fun question(
             autoTTS: AutoTTS,
-            exerciseWords: ExerciseWords,
-        ): QuestionModel.Dependencies
+        ): QuestionPrepareModel.Dependencies
     }
+
+    @Serializable
+    data class Skeleton(
+        val question: MutableStateFlow<QuestionPrepareModel.Skeleton> = QuestionPrepareModel.Skeleton
+            .createFirst()
+            .toMutableStateFlowAsInitial(),
+    )
 
     private val autoTTSSetting: Setting<Boolean> = dependencies
         .appSettings["auto_tts"]
@@ -128,147 +83,25 @@ class ExerciseModel(
             autoTTSSetting.update(!autoTTS.active.value)
         }
 
-    private val exerciseWordsMap: Deferred<ExerciseWords> = scope.async {
-        withContext(Dispatchers.Default) {
-            skeleton
-                .dictionaries
-                .toSet()
-                .flatMap { dictionaryName ->
-                    dependencies
-                        .dictionaries[dictionaryName]
-                        .dictionaryWords
-                }
-                .sortedByDescending(DictionaryWord::weight)
-                .associate { dictionaryWord ->
-                    dictionaryWord.toLearn to dictionaryWord.translation
-                }
-                .let(::ExerciseWords)
-        }
-    }
-
-    private val inProgressRegistry = InProgressRegistry(scope)
-
-    val isInProgress: StateFlow<Boolean>
-        get() = inProgressRegistry.inProgress
-
-    private val engine: Deferred<Engine> = scope.async {
-        Engine(
-            wordsToLearn = exerciseWordsMap.await().words.keys.toList(),
-            knowledgeRepository = dependencies.knowledgeRepository,
-        )
-    }
-
-    init {
-        scope.launch {
-            skeleton
-                .state
-                .collectLatest { state ->
-                    state.fold(
-                        ifPrepare = { previousWord ->
-                            switchToNewQuestion(
-                                previousWord = previousWord,
-                            )
-                        },
-                        ifQuestion = { _ -> },
-                    )
-                }
-        }
-    }
-
-    private suspend fun switchToNewQuestion(
-        previousWord: WordToLearn?,
-    ) {
-        inProgressRegistry.executeRegistered {
-            val engine = engine.await()
-            val newWordToLearn = engine.findNextWordToLearn(
-                wordToLearnToExclude = previousWord,
-            )
-            skeleton.state.value = State.Question(
-                question = QuestionModel.Skeleton(
-                    wordToLearn = newWordToLearn,
-                    previousWord = previousWord,
-                )
-            )
-        }
-    }
-
-    private suspend fun answer(
-        wordToLearn: WordToLearn,
-        rating: FsrsRating,
-    ) {
-        val engine = engine.await()
-        engine.answer(
-            word = wordToLearn,
-            rating = rating,
-        )
-        skeleton.state.value = State.Prepare(
-            previousWord = wordToLearn,
-        )
-    }
-
-    val question: StateFlow<Loadable<KeyValue<WordToLearn, QuestionModel>>> = exerciseWordsMap
-        .toStateFlow(
-            scope = scope,
-            initial = Loading,
-            transform = ::Ready,
-        )
-        .flatMapWithScope(scope) { scope, wordsOrLoading ->
-            wordsOrLoading.fold(
-                ifLoading = { Loading.toMutableStateFlowAsInitial() },
-                ifReady = { words ->
-                    val createQuestion: (
-                        QuestionModel.Skeleton,
-                    ) -> Loadable<KeyValue<WordToLearn, QuestionModel>> = { questionSkeleton ->
-                        Ready(
-                            KeyValue(
-                                key = questionSkeleton.wordToLearn,
-                                value = QuestionModel(
-                                    scope = scope,
-                                    dependencies = dependencies.question(
-                                        exerciseWords = words,
-                                        autoTTS = autoTTS,
-                                    ),
-                                    skeleton = questionSkeleton,
-                                    onAnswer = { rating ->
-                                        val currentQuestionWord: WordToLearn? = skeleton
-                                            .state
-                                            .value
-                                            .fold(
-                                                ifPrepare = { null },
-                                                ifQuestion = QuestionModel.Skeleton::wordToLearn,
-                                            )
-                                        val wordToLearn = questionSkeleton.wordToLearn
-                                        (wordToLearn == currentQuestionWord).ifTrue {
-                                            answer(
-                                                wordToLearn = wordToLearn,
-                                                rating = rating,
-                                            )
-                                        }
-                                    }
-                                )
-                            )
-                        )
-                    }
-
-                    skeleton.state.runningFoldState(
-                        scope = scope,
-                        createInitial = { state ->
-                            state.fold(
-                                ifPrepare = { Loading },
-                                ifQuestion = createQuestion,
-                            )
-                        },
-                        operation = { previous, state ->
-                            state.fold(
-                                ifPrepare = { previous },
-                                ifQuestion = createQuestion,
-                            )
-                        },
+    val question: StateFlow<QuestionPrepareModel> = skeleton
+        .question
+        .mapWithScope(scope) { scope, questionSkeleton ->
+            QuestionPrepareModel(
+                scope = scope,
+                dependencies = dependencies.question(
+                    autoTTS = autoTTS,
+                ),
+                skeleton = questionSkeleton,
+                onReady = { completedWord ->
+                    skeleton.question.value = QuestionPrepareModel.Skeleton.createNext(
+                        previousWord = completedWord,
                     )
                 }
             )
         }
 
-    val goBackHandler: GoBackHandler
-        get() = NeverGoBackHandler
+    val goBackHandler: GoBackHandler = question.flatMapState(
+        scope = scope,
+        transform = QuestionPrepareModel::goBackHandler,
+    )
 }
