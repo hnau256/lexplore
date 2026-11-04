@@ -27,8 +27,8 @@ enum class FsrsRating(
         val gradeOrder: NonEmptyList<FsrsRating> = nonEmptyListOf(
             Again,
             Hard,
-            Easy,
             Good,
+            Easy,
         )
     }
 }

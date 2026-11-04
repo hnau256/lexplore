@@ -111,7 +111,7 @@ class InputProjector(
                         keyboardOptions = KeyboardOptions(
                             autoCorrectEnabled = false,
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.None,
+                            imeAction = ImeAction.Done,
                         ),
                         lineLimits = TextFieldLineLimits.SingleLine,
                     )
