@@ -76,8 +76,6 @@ class QuestionModel(
     )
     interface State {
 
-        val wordToLearn: WordToLearn
-
         companion object
     }
 
@@ -89,6 +87,8 @@ class QuestionModel(
 
     @Pipe
     interface Dependencies {
+
+        val wordToLearn: WordToLearn
 
         val engine: Engine
 
@@ -135,6 +135,18 @@ class QuestionModel(
             )
         }
 
+    private suspend fun onAnswer(
+        rating: FsrsRating,
+    ) {
+        dependencies
+            .engine
+            .answer(
+                word = dependencies.wordToLearn,
+                rating = rating,
+            )
+        onReady()
+    }
+
     private fun switchToError(
         input: String,
     ) {
@@ -148,8 +160,7 @@ class QuestionModel(
         val speak: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>>,
     )
 
-    val previousWordSpeaker: PreviousWordSpeaker? = skeleton
-        .previousWord
+    val previousWordSpeaker: PreviousWordSpeaker? = previousWord
         .foldNullable(
             ifNull = { null },
             ifNotNull = { previousWord ->
@@ -173,7 +184,7 @@ class QuestionModel(
     }
 
     val wordToLearn: WordToLearn
-        get() = skeleton.wordToLearn
+        get() = dependencies.wordToLearn
 
     val info: StateFlow<WordInfo?> =
         dependencies.repository[wordToLearn]

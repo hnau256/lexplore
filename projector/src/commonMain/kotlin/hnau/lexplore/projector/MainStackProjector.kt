@@ -3,10 +3,10 @@ package hnau.lexplore.projector
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import hnau.lexplore.model.MainStackElementModel
-import hnau.lexplore.model.fold
 import hnau.lexplore.model.MainStackModel
+import hnau.lexplore.model.fold
 import hnau.lexplore.projector.dictionaries.DictionariesProjector
-import hnau.lexplore.projector.exercise.ExerciseProjector
+import hnau.lexplore.projector.exercise.ExercisePrepareProjector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import org.hnau.commons.app.projector.stack.Content
@@ -28,7 +28,7 @@ class MainStackProjector(
 
         fun dictionaries(): DictionariesProjector.Dependencies
 
-        fun exercise(): ExerciseProjector.Dependencies
+        fun exercise(): ExercisePrepareProjector.Dependencies
     }
 
     @SealUp(
@@ -38,7 +38,7 @@ class MainStackProjector(
                 identifier = "dictionaries",
             ),
             Variant(
-                type = ExerciseProjector::class,
+                type = ExercisePrepareProjector::class,
                 identifier = "exercise",
             ),
         ],
@@ -72,7 +72,7 @@ class MainStackProjector(
                     },
                     ifExercise = { exerciseModel ->
                         Element.exercise(
-                            ExerciseProjector(
+                            ExercisePrepareProjector(
                                 scope = projectorScope,
                                 model = exerciseModel,
                                 dependencies = dependencies.exercise(),

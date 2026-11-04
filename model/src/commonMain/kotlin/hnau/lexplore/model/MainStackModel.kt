@@ -52,7 +52,7 @@ class MainStackModel(
 
         fun dictionaries(): DictionariesModel.Dependencies
 
-        fun exercise(): ExerciseModel.Dependencies
+        fun exercise(): ExercisePrepareModel.Dependencies
     }
 
     @SealUp(
@@ -62,7 +62,7 @@ class MainStackModel(
                 identifier = "dictionaries",
             ),
             Variant(
-                type = ExerciseModel::class,
+                type = ExercisePrepareModel::class,
                 identifier = "exercise",
             ),
         ],
@@ -83,7 +83,7 @@ class MainStackModel(
                 identifier = "dictionaries",
             ),
             Variant(
-                type = ExerciseModel.Skeleton::class,
+                type = ExercisePrepareModel.Skeleton::class,
                 identifier = "exercise",
             ),
         ],
@@ -121,9 +121,7 @@ class MainStackModel(
                     openQuestions = { names ->
                         skeleton.stack.push(
                             ElementSkeleton.exercise(
-                                ExerciseModel.Skeleton(
-                                    dictionaries = names,
-                                )
+                                dictionaries = names,
                             )
                         )
                     },
@@ -132,7 +130,7 @@ class MainStackModel(
         },
         ifExercise = { exerciseSkeleton ->
             Element.exercise(
-                ExerciseModel(
+                ExercisePrepareModel(
                     scope = modelScope,
                     skeleton = exerciseSkeleton,
                     dependencies = dependencies.exercise(),

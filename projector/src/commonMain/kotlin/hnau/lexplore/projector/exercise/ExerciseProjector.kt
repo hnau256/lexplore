@@ -10,7 +10,7 @@ import androidx.compose.runtime.getValue
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.model.exercise.ExerciseModel
 import hnau.lexplore.projector.Localization
-import hnau.lexplore.projector.exercise.question.QuestionProjector
+import hnau.lexplore.projector.exercise.question.QuestionPrepareProjector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import org.hnau.commons.app.projector.fractal.SScreen
@@ -27,10 +27,8 @@ import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.KeyValue
-import org.hnau.commons.kotlin.Loadable
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
 import org.hnau.commons.kotlin.foldBoolean
-import org.hnau.commons.kotlin.map
 
 class ExerciseProjector(
     scope: CoroutineScope,
@@ -43,23 +41,21 @@ class ExerciseProjector(
 
         val localization: Localization
 
-        fun question(): QuestionProjector.Dependencies
+        fun question(): QuestionPrepareProjector.Dependencies
     }
 
     private val localization: Localization
         get() = dependencies.localization
 
-    private val question: StateFlow<Loadable<KeyValue<WordToLearn, QuestionProjector>>> = model
+    private val question: StateFlow<KeyValue<WordToLearn?, QuestionPrepareProjector>> = model
         .question
-        .mapWithScope(scope) { questionScope, questionOrLoading ->
-            questionOrLoading.map { wordWithQuestion ->
-                wordWithQuestion.map { question ->
-                    QuestionProjector(
-                        scope = questionScope,
-                        model = question,
-                        dependencies = dependencies.question(),
-                    )
-                }
+        .mapWithScope(scope) { scope, wordWithQuestion ->
+            wordWithQuestion.map { question ->
+                QuestionPrepareProjector(
+                    scope = scope,
+                    model = question,
+                    dependencies = dependencies.question(),
+                )
             }
         }
 
@@ -69,7 +65,6 @@ class ExerciseProjector(
     ) {
         val switchAutoTTS by model.switchAutoTTS.collectAsState()
         val autoTTS by model.autoTTS.active.collectAsState()
-        val isInProgress by model.isInProgress.collectAsState()
 
         SScreen(
             contentPadding = contentPadding,
@@ -93,11 +88,11 @@ class ExerciseProjector(
                 )
             },
         ) {
-            question.collectAsState().value.LoadableContent(
-                transitionSpec = TransitionSpec.rememberCrossfade(),
-            ) { questionProjector ->
-                questionProjector.StateContent(
-                    contentKey = KeyValue<WordToLearn, *>::key,
+            question
+                .collectAsState()
+                .value
+                .StateContent(
+                    contentKey = KeyValue<WordToLearn?, *>::key,
                     label = "Question",
                     transitionSpec = getTransitionSpecForSlide(
                         orientation = Orientation.Horizontal,
@@ -106,12 +101,6 @@ class ExerciseProjector(
                 ) { (_, question) ->
                     question.Content()
                 }
-            }
-            isInProgress.BooleanStateContent(
-                transitionSpec = TransitionSpec.rememberCrossfade(),
-            ) {
-                ProgressIndicatorInBox()
-            }
         }
     }
 }

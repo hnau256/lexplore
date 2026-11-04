@@ -9,6 +9,7 @@ package hnau.lexplore.model.exercise
 import arrow.core.getOrElse
 import arrow.core.serialization.NonEmptySetSerializer
 import arrow.core.serialization.OptionSerializer
+import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.dictionary.Dictionaries
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.settings.AppSettings
@@ -23,6 +24,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.hnau.commons.app.model.goback.GoBackHandler
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.kotlin.KeyValue
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
@@ -58,8 +60,11 @@ class ExerciseModel(
 
     @Serializable
     data class Skeleton(
-        val question: MutableStateFlow<QuestionPrepareModel.Skeleton> = QuestionPrepareModel.Skeleton
-            .createFirst()
+        val question: MutableStateFlow<KeyValue<WordToLearn?, QuestionPrepareModel.Skeleton>> = KeyValue(
+            key = null,
+            value = QuestionPrepareModel.Skeleton
+                .createFirst(),
+        )
             .toMutableStateFlowAsInitial(),
     )
 
@@ -83,25 +88,29 @@ class ExerciseModel(
             autoTTSSetting.update(!autoTTS.active.value)
         }
 
-    val question: StateFlow<QuestionPrepareModel> = skeleton
+    val question: StateFlow<KeyValue<WordToLearn?, QuestionPrepareModel>> = skeleton
         .question
-        .mapWithScope(scope) { scope, questionSkeleton ->
-            QuestionPrepareModel(
-                scope = scope,
-                dependencies = dependencies.question(
-                    autoTTS = autoTTS,
-                ),
-                skeleton = questionSkeleton,
-                onReady = { completedWord ->
-                    skeleton.question.value = QuestionPrepareModel.Skeleton.createNext(
-                        previousWord = completedWord,
-                    )
-                }
-            )
+        .mapWithScope(scope) { scope, previousWordWithQuestionSkeleton ->
+            previousWordWithQuestionSkeleton.map { questionSkeleton ->
+                QuestionPrepareModel(
+                    scope = scope,
+                    dependencies = dependencies.question(
+                        autoTTS = autoTTS,
+                    ),
+                    skeleton = questionSkeleton,
+                    onReady = { completedWord ->
+                        skeleton.question.value = KeyValue(
+                            key = completedWord,
+                            value = QuestionPrepareModel.Skeleton.createNext(
+                                previousWord = completedWord,
+                            )
+                        )
+                    }
+                )
+            }
         }
 
-    val goBackHandler: GoBackHandler = question.flatMapState(
-        scope = scope,
-        transform = QuestionPrepareModel::goBackHandler,
-    )
+    val goBackHandler: GoBackHandler = question.flatMapState(scope) { previousWordWithQuestion ->
+        previousWordWithQuestion.value.goBackHandler
+    }
 }
