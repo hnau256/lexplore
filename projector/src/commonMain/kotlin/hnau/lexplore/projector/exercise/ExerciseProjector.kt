@@ -22,7 +22,9 @@ import org.hnau.commons.app.projector.uikit.state.BooleanStateContent
 import org.hnau.commons.app.projector.uikit.state.LoadableContent
 import org.hnau.commons.app.projector.uikit.state.StateContent
 import org.hnau.commons.app.projector.uikit.transition.TransitionSpec
+import org.hnau.commons.app.projector.uikit.transition.getTransitionSpecForSlideByCompare
 import org.hnau.commons.app.projector.utils.Drawable
+import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
 import org.hnau.commons.kotlin.KeyValue
@@ -98,8 +100,10 @@ class ExerciseProjector(
                 questionProjector.StateContent(
                     contentKey = KeyValue<WordToLearn, *>::key,
                     label = "Question",
-                    transitionSpec = TransitionSpec.remember(
-                        showAlignment = Alignment.CenterEnd,
+                    transitionSpec = getTransitionSpecForSlideByCompare(
+                        orientation = Orientation.Horizontal,
+                        offsetFactor = 1f,
+                        extractComparable = { 1f },
                     ),
                 ) { (_, question) ->
                     question.Content()
