@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.hnau.plugin.settings") version "1.30.13"
+    id("org.hnau.plugin.settings") version "1.30.15"
 }
 
 includeBuild("build-logic")

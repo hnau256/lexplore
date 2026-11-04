@@ -1,5 +1,6 @@
 package hnau.lexplore.projector.exercise.question.input
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dock
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
@@ -24,6 +26,7 @@ import hnau.lexplore.model.exercise.question.nonEmptyEntries
 import org.hnau.commons.kotlin.ifTrue
 import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
+import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
 import org.hnau.commons.app.projector.fractal.STabs
 import org.hnau.commons.app.projector.fractal.SText
@@ -64,37 +67,27 @@ class InputProjector(
             orientation = Orientation.Vertical,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Subtable {
-                SCell {
-                    FContext(
-                        update = {
-                            copy(
-                                mood = Mood.Error,
-                            )
-                        }
-                    ) {
-                        SButton(
-                            actionOrElseOrDisabled = ActionOrElse.instant(model.onUnknown),
-                            titleOrIcon = TitleOrIcon.Title(dependencies.localization.rating.again),
-                        )
-                    }
-                }
-                var selectedRating by model.selectedRating.collectAsMutableAccessor()
-                SCell(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    STabs(
-                        items = InputModel.KnownFsrsRating.nonEmptyEntries,
-                        getSelection = { selectedRating },
-                        onSelectionChanged = { newRating -> selectedRating = newRating },
-                    ) { rating ->
-                        SText(
-                            text = dependencies.localization.rating[rating.base]
-                        )
-                    }
+            var selectedRating by model.selectedRating.collectAsMutableAccessor()
+            SCell {
+                STabs(
+                    items = InputModel.KnownFsrsRating.nonEmptyEntries,
+                    getSelection = { selectedRating },
+                    onSelectionChanged = { newRating -> selectedRating = newRating },
+                    importanceToActivate = null,
+                ) { rating ->
+                    SText(
+                        text = dependencies.localization.rating[rating.base]
+                    )
                 }
             }
             Subtable {
+                SCell {
+                    SButton(
+                        actionOrElseOrDisabled = ActionOrElse.instant(model.onUnknown),
+                        titleOrIcon = TitleOrIcon.Title(dependencies.localization.rating.again),
+                        importanceToActivate = null,
+                    )
+                }
                 SCell(
                     modifier = Modifier.weight(1f),
                 ) {
