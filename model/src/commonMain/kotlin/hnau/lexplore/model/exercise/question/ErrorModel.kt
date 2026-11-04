@@ -1,10 +1,11 @@
 package hnau.lexplore.model.exercise.question
 
-import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.speaker.Speaker
+import hnau.lexplore.fsrs.defaultRating
 import hnau.lexplore.fsrs.dto.FsrsRating
 import hnau.lexplore.fsrs.normalized
+import hnau.lexplore.fsrs.recallScore
 import hnau.lexplore.model.exercise.AutoTTS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,10 @@ import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.actionOrCancel
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
+import org.hnau.commons.kotlin.coroutines.flow.state.mapState
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
+import org.hnau.commons.kotlin.coroutines.fold
+import org.hnau.commons.kotlin.foldNullable
 import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
@@ -24,7 +29,7 @@ class ErrorModel(
     private val skeleton: Skeleton,
     private val dependencies: Dependencies,
     val wordToLearn: WordToLearn,
-    private val onAnswer: (FsrsRating) -> Unit,
+    private val answer: StateFlow<ActionOrElse<FsrsRating, CancelOrInProgress.InProgress>>,
 ) {
 
     @Pipe
@@ -38,37 +43,36 @@ class ErrorModel(
     @Serializable
     data class Skeleton(
         val incorrectInput: String,
-        val defaultRating: FsrsRating = FsrsRating.Hard,
         @Serializable(MutableStateFlowSerializer::class)
         val input: MutableStateFlow<String> = "".toMutableStateFlowAsInitial(),
         @Serializable(MutableStateFlowSerializer::class)
-        val selectedRating: MutableStateFlow<FsrsRating> = defaultRating.toMutableStateFlowAsInitial(),
+        val selectedRating: MutableStateFlow<FsrsRating?> = null.toMutableStateFlowAsInitial(),
     )
 
-    val incorrectInput: String?
-        get() = skeleton.incorrectInput.takeIf(String::isNotEmpty)
+    val incorrectInput: String
+        get() = skeleton.incorrectInput
 
-    val selectedRating: StateFlow<FsrsRating>
-        get() = skeleton.selectedRating
-
-    val input: MutableStateFlow<String>
-        get() = skeleton.input
-
-    init {
-        scope.launch {
-            skeleton.input.collect { newValue ->
-                (newValue.normalized == wordToLearn.word.normalized).ifTrue {
-                    onAnswer(skeleton.selectedRating.value)
+    val rating: StateFlow<FsrsRating> = skeleton.selectedRating.mapState(scope) { selected ->
+        selected ?: incorrectInput
+            .takeIf(String::isNotEmpty)
+            .foldNullable(
+                ifNull = { FsrsRating.Again },
+                ifNotNull = { incorrectInput ->
+                    incorrectInput
+                        .recallScore(wordToLearn.word)
+                        .let(::defaultRating)
                 }
-            }
-        }
+            )
     }
 
-    fun selectRating(
+    fun setRating(
         rating: FsrsRating,
     ) {
         skeleton.selectedRating.value = rating
     }
+
+    val input: MutableStateFlow<String>
+        get() = skeleton.input
 
     val correctWordSpeaker: StateFlow<ActionOrElse<Unit, CancelOrInProgress.Cancel>> =
         actionOrCancelIfExecuting(scope) {
@@ -78,6 +82,18 @@ class ErrorModel(
     init {
         dependencies.autoTTS.active.value.ifTrue {
             correctWordSpeaker.value.actionOrCancel()
+        }
+        scope.launch {
+            skeleton.input.collect { newValue ->
+                (newValue.normalized == wordToLearn.word.normalized).ifTrue {
+                    answer.value.fold(
+                        ifAction = { action ->
+                            action(rating.value)
+                        },
+                        ifElse = {},
+                    )
+                }
+            }
         }
     }
 }

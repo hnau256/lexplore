@@ -1,5 +1,6 @@
 package hnau.lexplore.projector.exercise.question.error
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material.icons.Icons
@@ -10,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
@@ -21,9 +21,9 @@ import hnau.lexplore.projector.Localization
 import org.hnau.commons.app.projector.fractal.SButton
 import org.hnau.commons.app.projector.fractal.SElements
 import org.hnau.commons.app.projector.fractal.SPanel
-import org.hnau.commons.app.projector.fractal.STextField
 import org.hnau.commons.app.projector.fractal.STabs
 import org.hnau.commons.app.projector.fractal.SText
+import org.hnau.commons.app.projector.fractal.STextField
 import org.hnau.commons.app.projector.fractal.context.FContext
 import org.hnau.commons.app.projector.fractal.size.SizeType
 import org.hnau.commons.app.projector.fractal.table.STable
@@ -53,7 +53,7 @@ class ErrorProjector(
         ) {
 
             val input by model.input.collectAsState()
-            val selectedRating by model.selectedRating.collectAsState()
+            val selectedRating by model.rating.collectAsState()
             val correctWordSpeaker by model.correctWordSpeaker.collectAsState()
             val focusRequester = remember { FocusRequester() }
             LaunchedEffect(focusRequester) {
@@ -63,24 +63,27 @@ class ErrorProjector(
             STable(
                 orientation = Orientation.Vertical,
             ) {
-                model.incorrectInput?.let { incorrectInput ->
-                    SCell {
-                        SPanel(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            FContext(
-                                update = {
-                                    copy(mood = Mood.Error)
-                                },
+                model
+                    .incorrectInput
+                    .takeIf(String::isNotEmpty)
+                    ?.let { incorrectInput ->
+                        SCell {
+                            SPanel(
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
-                                SText(
-                                    text = incorrectInput,
-                                    type = SizeType.Large,
-                                )
+                                FContext(
+                                    update = {
+                                        copy(mood = Mood.Error)
+                                    },
+                                ) {
+                                    SText(
+                                        text = incorrectInput,
+                                        type = SizeType.Large,
+                                    )
+                                }
                             }
                         }
                     }
-                }
                 Subtable {
                     SCell(
                         modifier = Modifier.weight(1f),
@@ -116,10 +119,10 @@ class ErrorProjector(
                         modifier = Modifier.fillMaxWidth(),
                         items = FsrsRating.gradeOrder,
                         getSelection = { selectedRating },
-                        onSelectionChanged = model::selectRating,
+                        onSelectionChanged = model::setRating,
                     ) { rating ->
                         SText(
-                            text = dependencies.localization.gradeLabel(rating),
+                            text = dependencies.localization.rating[rating],
                             type = SizeType.Small,
                             maxLines = 1,
                         )

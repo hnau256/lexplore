@@ -1,32 +1,34 @@
+@file:UseSerializers(
+    MutableStateFlowSerializer::class,
+)
+
 package hnau.lexplore.model.exercise.question
 
-import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.common.exercise.ExerciseWords
 import hnau.lexplore.common.knowledge.KnowledgeRepository
 import hnau.lexplore.common.speaker.Speaker
-import hnau.lexplore.fsrs.defaultRating
 import hnau.lexplore.fsrs.dto.FsrsRating
-import hnau.lexplore.fsrs.dto.fold
 import hnau.lexplore.fsrs.dto.WordInfo
 import hnau.lexplore.fsrs.normalized
-import hnau.lexplore.fsrs.recallScore
 import hnau.lexplore.model.exercise.AutoTTS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.hnau.commons.gen.pipe.annotations.Pipe
+import org.hnau.commons.gen.sealup.annotations.SealUp
+import org.hnau.commons.gen.sealup.annotations.Variant
 import org.hnau.commons.kotlin.coroutines.ActionOrElse
 import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
-import org.hnau.commons.kotlin.coroutines.InProgressRegistry
 import org.hnau.commons.kotlin.coroutines.actionOrCancel
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
+import org.hnau.commons.kotlin.coroutines.flow.state.mutable.toMutableStateFlowAsInitial
+import org.hnau.commons.kotlin.coroutines.operationOrInProgressIfExecuting
 import org.hnau.commons.kotlin.foldBoolean
 import org.hnau.commons.kotlin.foldNullable
-import org.hnau.commons.kotlin.ifTrue
 import org.hnau.commons.kotlin.serialization.MutableStateFlowSerializer
 
 class QuestionModel(
@@ -36,14 +38,49 @@ class QuestionModel(
     private val onAnswer: suspend (FsrsRating) -> Unit,
 ) {
 
+    @SealUp(
+        serializable = true,
+        sealedInterfaceName = "QuestionModelStateSkeleton",
+        variants = [
+            Variant(
+                type = InputModel.Skeleton::class,
+                identifier = "input",
+            ),
+            Variant(
+                type = ErrorModel.Skeleton::class,
+                identifier = "error",
+            ),
+        ],
+    )
+    interface StateSkeleton {
+
+        companion object
+    }
+
+    @SealUp(
+        sealedInterfaceName = "QuestionModelState",
+        variants = [
+            Variant(
+                type = InputModel::class,
+                identifier = "input",
+            ),
+            Variant(
+                type = ErrorModel::class,
+                identifier = "error",
+            ),
+        ],
+    )
+    interface State {
+
+        companion object
+    }
+
     @Serializable
     data class Skeleton(
         val wordToLearn: WordToLearn,
         val previousWord: WordToLearn?,
-        @Serializable(MutableStateFlowSerializer::class)
-        val error: MutableStateFlow<ErrorModel.Skeleton?> = null.toMutableStateFlowAsInitial(),
-        @Serializable(MutableStateFlowSerializer::class)
-        val input: MutableStateFlow<String> = "".toMutableStateFlowAsInitial(),
+        val state: MutableStateFlow<QuestionModelStateSkeleton> = StateSkeleton.input()
+            .toMutableStateFlowAsInitial(),
     )
 
     @Pipe
@@ -57,9 +94,47 @@ class QuestionModel(
 
         val autoTTS: AutoTTS
 
-        fun input(): InputModel.Dependencies
-
         fun error(): ErrorModel.Dependencies
+    }
+
+    val state: StateFlow<QuestionModelState> = skeleton
+        .state
+        .mapWithScope(scope) { scope, state ->
+            state.fold(
+                ifInput = { inputSkeleton ->
+                    State.input(
+                        scope = scope,
+                        skeleton = inputSkeleton,
+                        onReady = { rating, input ->
+                            val target = wordToLearn.word
+                            (input.normalized == target.normalized).foldBoolean(
+                                ifTrue = { onAnswer(rating) },
+                                ifFalse = { switchToError(input) }
+                            )
+                        },
+                        onUnknown = { switchToError("") },
+                    )
+                },
+                ifError = { errorSkeleton ->
+                    State.error(
+                        scope = scope,
+                        dependencies = dependencies.error(),
+                        skeleton = errorSkeleton,
+                        wordToLearn = wordToLearn,
+                        answer = operationOrInProgressIfExecuting(scope) { _, rating ->
+                            onAnswer(rating)
+                        }
+                    )
+                }
+            )
+        }
+
+    private fun switchToError(
+        input: String,
+    ) {
+        skeleton.state.value = StateSkeleton.error(
+            incorrectInput = input
+        )
     }
 
     data class PreviousWordSpeaker(
@@ -96,94 +171,6 @@ class QuestionModel(
 
     val info: StateFlow<WordInfo?> =
         dependencies.repository[wordToLearn]
-
-    val input: MutableStateFlow<String>
-        get() = skeleton.input
-
-    private val answeringInProgressRegistry = InProgressRegistry(scope)
-
-    val isAnswering: StateFlow<Boolean>
-        get() = answeringInProgressRegistry.inProgress
-
-    val state: StateFlow<QuestionStateModel> = skeleton
-        .error
-        .mapWithScope(scope) { stateScope, errorSkeleton ->
-            errorSkeleton.foldNullable(
-                ifNull = {
-                    QuestionStateModelElement.input(
-                        InputModel(
-                            input = skeleton.input,
-                            onGradeSelected = ::onGrade,
-                        )
-                    )
-                },
-                ifNotNull = { error ->
-                    QuestionStateModelElement.error(
-                        ErrorModel(
-                            scope = stateScope,
-                            skeleton = error,
-                            dependencies = dependencies.error(),
-                            wordToLearn = skeleton.wordToLearn,
-                            onAnswer = ::onAnswer,
-                        )
-                    )
-                },
-            )
-        }
-
-    private fun onGrade(
-        rating: FsrsRating,
-        input: String,
-    ) {
-        rating.fold(
-            ifAgain = {
-                openError(
-                    incorrectInput = "",
-                    defaultRating = FsrsRating.Again,
-                )
-            },
-            ifHard = { gradeInput(rating = rating, input = input) },
-            ifGood = { gradeInput(rating = rating, input = input) },
-            ifEasy = { gradeInput(rating = rating, input = input) },
-        )
-    }
-
-    private fun gradeInput(
-        rating: FsrsRating,
-        input: String,
-    ) {
-        val target = wordToLearn.word
-        (input.normalized == target.normalized).foldBoolean(
-            ifTrue = { onAnswer(rating) },
-            ifFalse = {
-                val score = input.recallScore(target)
-                openError(
-                    incorrectInput = input,
-                    defaultRating = defaultRating(score),
-                )
-            },
-        )
-    }
-
-    private fun openError(
-        incorrectInput: String,
-        defaultRating: FsrsRating,
-    ) {
-        skeleton.error.value = ErrorModel.Skeleton(
-            incorrectInput = incorrectInput,
-            defaultRating = defaultRating,
-        )
-    }
-
-    fun onAnswer(
-        rating: FsrsRating,
-    ) {
-        scope.launch {
-            answeringInProgressRegistry.executeRegistered {
-                onAnswer.invoke(rating)
-            }
-        }
-    }
 
     val title: String
         get() = wordToLearn

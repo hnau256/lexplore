@@ -3,14 +3,12 @@ package hnau.lexplore.projector.exercise.question
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import hnau.lexplore.model.exercise.question.QuestionModel
-import hnau.lexplore.model.exercise.question.QuestionStateModel
 import hnau.lexplore.model.exercise.question.fold
 import hnau.lexplore.projector.Localization
 import hnau.lexplore.projector.exercise.question.error.ErrorProjector
@@ -31,10 +29,8 @@ import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
 import org.hnau.commons.gen.pipe.annotations.Pipe
-import org.hnau.commons.kotlin.coroutines.ActionOrElse
-import org.hnau.commons.kotlin.ifNull
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
-import org.hnau.commons.kotlin.coroutines.instant
+import org.hnau.commons.kotlin.ifNull
 
 class QuestionProjector(
     scope: CoroutineScope,

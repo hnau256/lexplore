@@ -21,6 +21,9 @@ enum class FsrsRating(
 
     companion object {
 
+        val default: FsrsRating
+            get() = Good
+
         val gradeOrder: NonEmptyList<FsrsRating> = nonEmptyListOf(
             Again,
             Hard,

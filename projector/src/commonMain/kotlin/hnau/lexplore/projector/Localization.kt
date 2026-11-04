@@ -2,6 +2,7 @@ package hnau.lexplore.projector
 
 import androidx.compose.runtime.Immutable
 import hnau.lexplore.fsrs.dto.FsrsRating
+import hnau.lexplore.fsrs.dto.FsrsRatingValues
 import hnau.lexplore.fsrs.dto.fold
 
 @Immutable
@@ -11,10 +12,12 @@ data class Localization(
     val all: String = "Все",
     val none: String = "Ни одного",
     val exerciseTitle: String = "Упражнение",
-    val gradeAgain: String = "Не знаю",
-    val gradeHard: String = "Сложно",
-    val gradeGood: String = "Нормально",
-    val gradeEasy: String = "Легко",
+    val rating: FsrsRatingValues<String> = FsrsRatingValues(
+        again = "Не знаю",
+        hard = "Сложно",
+        good = "Нормально",
+        easy = "Легко",
+    ),
     val infoKnowledgeLevel: String = "Помню",
     val infoForgettingFactor: String = "Знаю",
     val infoDifficulty: String = "Сложность",
@@ -41,15 +44,6 @@ data class Localization(
                 ) { (suffix, value) -> value.toString() + suffix }
         },
 ) {
-
-    fun gradeLabel(
-        rating: FsrsRating,
-    ): String = rating.fold(
-        ifAgain = this::gradeAgain,
-        ifHard = this::gradeHard,
-        ifGood = this::gradeGood,
-        ifEasy = this::gradeEasy,
-    )
 
     companion object {
 
