@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import hnau.lexplore.common.WordToLearn
 import hnau.lexplore.model.exercise.ExerciseModel
 import hnau.lexplore.projector.Localization
@@ -22,7 +21,7 @@ import org.hnau.commons.app.projector.uikit.state.BooleanStateContent
 import org.hnau.commons.app.projector.uikit.state.LoadableContent
 import org.hnau.commons.app.projector.uikit.state.StateContent
 import org.hnau.commons.app.projector.uikit.transition.TransitionSpec
-import org.hnau.commons.app.projector.uikit.transition.getTransitionSpecForSlideByCompare
+import org.hnau.commons.app.projector.uikit.transition.getTransitionSpecForSlide
 import org.hnau.commons.app.projector.utils.Drawable
 import org.hnau.commons.app.projector.utils.Orientation
 import org.hnau.commons.app.projector.utils.TitleOrIcon
@@ -100,10 +99,9 @@ class ExerciseProjector(
                 questionProjector.StateContent(
                     contentKey = KeyValue<WordToLearn, *>::key,
                     label = "Question",
-                    transitionSpec = getTransitionSpecForSlideByCompare(
+                    transitionSpec = getTransitionSpecForSlide(
                         orientation = Orientation.Horizontal,
-                        offsetFactor = 1f,
-                        extractComparable = { 1f },
+                        slideCoefficientProvider = { 1f },
                     ),
                 ) { (_, question) ->
                     question.Content()

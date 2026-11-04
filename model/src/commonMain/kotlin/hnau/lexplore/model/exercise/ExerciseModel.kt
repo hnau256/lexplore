@@ -22,12 +22,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -44,7 +40,7 @@ import org.hnau.commons.kotlin.coroutines.CancelOrInProgress
 import org.hnau.commons.kotlin.coroutines.InProgressRegistry
 import org.hnau.commons.kotlin.coroutines.actionOrCancelIfExecuting
 import org.hnau.commons.kotlin.coroutines.flow.state.mapState
-import org.hnau.commons.kotlin.coroutines.flow.state.mapWithScope
+import org.hnau.commons.kotlin.coroutines.flow.state.runningFoldState
 import arrow.core.getOrElse
 import org.hnau.commons.kotlin.KeyValue
 import org.hnau.commons.kotlin.coroutines.flow.state.flatMapWithScope
@@ -220,44 +216,55 @@ class ExerciseModel(
             wordsOrLoading.fold(
                 ifLoading = { Loading.toMutableStateFlowAsInitial() },
                 ifReady = { words ->
-                    skeleton
-                        .state
-                        .mapWithScope(scope) { scope, state ->
+                    val createQuestion: (
+                        QuestionModel.Skeleton,
+                    ) -> Loadable<KeyValue<WordToLearn, QuestionModel>> = { questionSkeleton ->
+                        Ready(
+                            KeyValue(
+                                key = questionSkeleton.wordToLearn,
+                                value = QuestionModel(
+                                    scope = scope,
+                                    dependencies = dependencies.question(
+                                        exerciseWords = words,
+                                        autoTTS = autoTTS,
+                                    ),
+                                    skeleton = questionSkeleton,
+                                    onAnswer = { rating ->
+                                        val currentQuestionWord: WordToLearn? = skeleton
+                                            .state
+                                            .value
+                                            .fold(
+                                                ifPrepare = { null },
+                                                ifQuestion = QuestionModel.Skeleton::wordToLearn,
+                                            )
+                                        val wordToLearn = questionSkeleton.wordToLearn
+                                        (wordToLearn == currentQuestionWord).ifTrue {
+                                            answer(
+                                                wordToLearn = wordToLearn,
+                                                rating = rating,
+                                            )
+                                        }
+                                    }
+                                )
+                            )
+                        )
+                    }
+
+                    skeleton.state.runningFoldState(
+                        scope = scope,
+                        createInitial = { state ->
                             state.fold(
                                 ifPrepare = { Loading },
-                                ifQuestion = { questionSkeleton ->
-                                    Ready(
-                                        KeyValue(
-                                            key = questionSkeleton.wordToLearn,
-                                            value = QuestionModel(
-                                                scope = scope,
-                                                dependencies = dependencies.question(
-                                                    exerciseWords = words,
-                                                    autoTTS = autoTTS,
-                                                ),
-                                                skeleton = questionSkeleton,
-                                                onAnswer = { rating ->
-                                                    val currentQuestionWord: WordToLearn? = skeleton
-                                                        .state
-                                                        .value
-                                                        .fold(
-                                                            ifPrepare = { null },
-                                                            ifQuestion = QuestionModel.Skeleton::wordToLearn,
-                                                        )
-                                                    val wordToLearn = questionSkeleton.wordToLearn
-                                                    (wordToLearn == currentQuestionWord).ifTrue {
-                                                        answer(
-                                                            wordToLearn = wordToLearn,
-                                                            rating = rating,
-                                                        )
-                                                    }
-                                                }
-                                            )
-                                        )
-                                    )
-                                }
+                                ifQuestion = createQuestion,
                             )
-                        }
+                        },
+                        operation = { previous, state ->
+                            state.fold(
+                                ifPrepare = { previous },
+                                ifQuestion = createQuestion,
+                            )
+                        },
+                    )
                 }
             )
         }
